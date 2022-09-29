@@ -217,11 +217,38 @@ void DrawingRotedRails(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int xBlock, int yBloc
 		LineTo(hdc, pt[1].x, pt[1].y);
 	};
 
-	for (int i = 0; i < 2; i++) {
-		Arc(hdc, 45, 45, 155, 155, 155, 100, 100, 45);
+	SelectObject(hdc, hPenRailSteel);
+
+	//Arc(hdc, xLeft, yTop, xRight, yBottom, xStart, yStart, xEnd, yEnd) ;
+
+	int nextBlockX = x + 100;
+	int nextBlockY = y + 100;
+
+	for (int i = 0; i < 1; i++) {
+		switch (iAngle)
+		{
+		case 1:
+			Arc(hdc, (x - 45 + (i * 10)), (y - 45 + (i * 10)), (x + 45 + (i * 10)), (y + 45 + (i * 10)), (x + 45 + (i * 10)), y, x, (y + 45 + (i * 10)));
+			break;
+		case 2:
+			Arc(hdc, (x - 45 + (i * 10)), (nextBlockY - 45 + (i * 10)), (x + 45 + (i * 10)),
+				(nextBlockY + 45 + (i * 10)), nextBlockX, (x + 45 + (i * 10)), nextBlockY, x, (nextBlockY - 45 + (i * 10)));
+			break;
+		case 3:
+			Arc(hdc, (nextBlockX - 45 + (i * 10)), (nextBlockY - 45 + (i * 10)), (nextBlockX + 45 + (i * 10)),
+				(nextBlockY + 45 + (i * 10)), nextBlockX, (nextBlockY - 45 + (i * 10)), (nextBlockX - 45 + (i * 10)), nextBlockY);
+			break;
+		case 4:
+			Arc(hdc, (nextBlockX - 45 + (i * 10)), (y - 45 + (i * 10)), (nextBlockX + 45 + (i * 10)), (y + 45 + (i * 10)),
+				(nextBlockX - 45 + (i * 10)), y, nextBlockX, (y + 45 + (i * 10)));
+			break;
+
+		}
 	}
 	
 	//Arc(hdc, 55, 55, 145, 145, 145, 100, 100, 55);
+	//Arc(hdc, 145, 145, 255, 255, 155, 200, 200, 245);
+	//Arc(hdc, 155, 155, 245, 245, 145, 200, 200, 255);
 
 	SelectObject(hdc, hOldPen);
 	DeleteObject(hPenRailSteel);
@@ -252,19 +279,20 @@ void DrawingRailWays(HWND hwnd) {
 
 	//painting steelness part of railways
 
-	SelectObject(hdc, hPenRailSteel);
+	//SelectObject(hdc, hPenRailSteel);
 	
 	//Arc(hdc, xLeft, yTop, xRight, yBottom, xStart, yStart, xEnd, yEnd) ;
-	Arc(hdc, 45, 45, 155, 155, 155, 100, 100, 45);
+	/*Arc(hdc, 45, 45, 155, 155, 155, 100, 100, 45);
 	Arc(hdc, 55, 55, 145, 145, 145, 100, 100, 55);
 
 	Arc(hdc, 145, 145, 255, 255, 155, 200, 200, 245);
-	Arc(hdc, 155, 155, 245, 245, 145, 200, 200, 255);
+	Arc(hdc, 155, 155, 245, 245, 145, 200, 200, 255);*/
 
-	SelectObject(hdc, hOldPen);
+	//SelectObject(hdc, hOldPen);
 
 	DrawingRotedRails(hwnd, hdc, ps, 1, 1, 1);
 	DrawingRotedRails(hwnd, hdc, ps, 2, 2, 3);
+	DrawingRotedRails(hwnd, hdc, ps, 3, 3, 1);
 
 	DrawStraightRails(hwnd, hdc, ps, 2, 2, TRUE);
 	
