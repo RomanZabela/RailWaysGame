@@ -116,7 +116,7 @@ void RotatePoint(POINT pt[], int iAngle)
 	
 }
 
-//drawing railways
+//drawing straight railways
 
 void DrawStraightRails(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int xBlock, int yBlock, BOOL HorizontalFlag) {
 	
@@ -178,6 +178,8 @@ void DrawStraightRails(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int xBlock, int yBloc
 	DeleteObject(hPenRailWood);
 }
 
+//drawing turning railways
+
 void DrawingRotedRails(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int xBlock, int yBlock, int iAngle) {
 	LOGBRUSH brush;
 	DWORD pen_style = PS_SOLID | PS_GEOMETRIC | PS_JOIN_BEVEL;
@@ -195,6 +197,22 @@ void DrawingRotedRails(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int xBlock, int yBloc
 	POINT pt[2];
 	int x = 100 * xBlock;
 	int y = 100 * yBlock;
+
+	switch (iAngle)
+	{
+	case 1:
+		y = y + 100;
+		break;
+	case 2:
+		x = x + 100;
+		y = y + 100;
+		break;
+	case 3:
+		x = x + 100;
+	default:
+		break;
+	}
+
 	int tempAngle = 90 * iAngle;
 	
 	for (int i = (tempAngle + 10); i < tempAngle + 90; i += 10)
@@ -221,34 +239,28 @@ void DrawingRotedRails(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int xBlock, int yBloc
 
 	//Arc(hdc, xLeft, yTop, xRight, yBottom, xStart, yStart, xEnd, yEnd) ;
 
-	int nextBlockX = x + 100;
-	int nextBlockY = y + 100;
-
-	for (int i = 0; i < 1; i++) {
+	for (int i = 0; i < 2; i++) {
 		switch (iAngle)
 		{
 		case 1:
-			Arc(hdc, (x - 45 + (i * 10)), (y - 45 + (i * 10)), (x + 45 + (i * 10)), (y + 45 + (i * 10)), (x + 45 + (i * 10)), y, x, (y + 45 + (i * 10)));
+			Arc(hdc, (x - 55 + (i * 10)), (y - 55 + (i * 10)), (x + 55 - (i * 10)),
+				(y + 55 - (i * 10)), (x + 55 - (i * 10)), y, x, (y - 55 + (i * 10)));
 			break;
 		case 2:
-			Arc(hdc, (x - 45 + (i * 10)), (nextBlockY - 45 + (i * 10)), (x + 45 + (i * 10)),
-				(nextBlockY + 45 + (i * 10)), nextBlockX, (x + 45 + (i * 10)), nextBlockY, x, (nextBlockY - 45 + (i * 10)));
+			Arc(hdc, (x - 55 + (i * 10)), (y - 55 + (i * 10)), (x + 55 - (i * 10)),
+				(y + 55 - (i * 10)), x, (y - 55 + (i * 10)), (x - 55 + (i * 10)), y);
 			break;
 		case 3:
-			Arc(hdc, (nextBlockX - 45 + (i * 10)), (nextBlockY - 45 + (i * 10)), (nextBlockX + 45 + (i * 10)),
-				(nextBlockY + 45 + (i * 10)), nextBlockX, (nextBlockY - 45 + (i * 10)), (nextBlockX - 45 + (i * 10)), nextBlockY);
+			Arc(hdc, (x - 55 + (i * 10)), (y - 55 + (i * 10)), (x + 55 - (i * 10)),
+				(y + 55 - (i * 10)), (x - 55 + (i * 10)), y, x, (y + 45 + (i * 10)));
 			break;
 		case 4:
-			Arc(hdc, (nextBlockX - 45 + (i * 10)), (y - 45 + (i * 10)), (nextBlockX + 45 + (i * 10)), (y + 45 + (i * 10)),
-				(nextBlockX - 45 + (i * 10)), y, nextBlockX, (y + 45 + (i * 10)));
+			Arc(hdc, (x - 55 + (i * 10)), (y - 55 + (i * 10)), (x + 55 - (i * 10)),
+				(y + 55 - (i * 10)), x, (y + 55 - (i * 10)), (x + 55 - (i * 10)), y);
 			break;
 
 		}
 	}
-	
-	//Arc(hdc, 55, 55, 145, 145, 145, 100, 100, 55);
-	//Arc(hdc, 145, 145, 255, 255, 155, 200, 200, 245);
-	//Arc(hdc, 155, 155, 245, 245, 145, 200, 200, 255);
 
 	SelectObject(hdc, hOldPen);
 	DeleteObject(hPenRailSteel);
@@ -256,43 +268,16 @@ void DrawingRotedRails(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int xBlock, int yBloc
 }
 
 void DrawingRailWays(HWND hwnd) {
-	
-	LOGBRUSH brush;
-	DWORD pen_style = PS_SOLID | PS_GEOMETRIC | PS_JOIN_BEVEL;
-
-	brush.lbStyle = BS_SOLID;
-	brush.lbColor = RGB(121, 121, 121);
-	brush.lbHatch = 0;
 
 	PAINTSTRUCT ps;
 
 	HDC hdc = BeginPaint(hwnd, &ps);
 
-	HPEN hPenRailSteel = ExtCreatePen(pen_style, 3, &brush, 0, NULL);
-	
-
-	brush.lbColor = RGB(196, 107, 29);
-	HPEN hPenRailWood = ExtCreatePen(pen_style, 4, &brush, 0, NULL);
-	HPEN hOldPen = SelectObject(hdc, hPenRailWood);
-
-	//painting wood part of railways
-
-	//painting steelness part of railways
-
-	//SelectObject(hdc, hPenRailSteel);
-	
-	//Arc(hdc, xLeft, yTop, xRight, yBottom, xStart, yStart, xEnd, yEnd) ;
-	/*Arc(hdc, 45, 45, 155, 155, 155, 100, 100, 45);
-	Arc(hdc, 55, 55, 145, 145, 145, 100, 100, 55);
-
-	Arc(hdc, 145, 145, 255, 255, 155, 200, 200, 245);
-	Arc(hdc, 155, 155, 245, 245, 145, 200, 200, 255);*/
-
-	//SelectObject(hdc, hOldPen);
-
-	DrawingRotedRails(hwnd, hdc, ps, 1, 1, 1);
-	DrawingRotedRails(hwnd, hdc, ps, 2, 2, 3);
-	DrawingRotedRails(hwnd, hdc, ps, 3, 3, 1);
+	DrawingRotedRails(hwnd, hdc, ps, 1, 0, 1);
+	DrawingRotedRails(hwnd, hdc, ps, 2, 1, 2);
+	DrawingRotedRails(hwnd, hdc, ps, 1, 2, 3);
+	DrawingRotedRails(hwnd, hdc, ps, 3, 2, 4);
+	DrawingRotedRails(hwnd, hdc, ps, 3, 1, 1);
 
 	DrawStraightRails(hwnd, hdc, ps, 2, 2, TRUE);
 	
@@ -302,7 +287,5 @@ void DrawingRailWays(HWND hwnd) {
 
 	DrawStraightRails(hwnd, hdc, ps, 2, 2, FALSE);
 
-	DeleteObject(hPenRailSteel);
-	DeleteObject(hPenRailWood);
 	EndPaint(hwnd, &ps);
 }
