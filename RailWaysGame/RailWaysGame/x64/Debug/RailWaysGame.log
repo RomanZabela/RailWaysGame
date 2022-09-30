@@ -1,0 +1,3 @@
+﻿  RailWaysGame.c
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(171,38): warning C4020: 'LineTo': too many actual parameters
+  RailWaysGame.vcxproj -> C:\Projects\C\RailWaysGame\RailWaysGame\x64\Debug\RailWaysGame.exe
