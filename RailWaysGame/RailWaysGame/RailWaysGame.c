@@ -5,9 +5,9 @@
 #define TWOPI (2 * 3.14159)
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-void DrawTrain(HWND);
+void DrawTrain(HWND, HDC, PAINTSTRUCT);
 void RestartTimer(HWND);
-void DrawingRailWays(HWND);
+void DrawingRailWays(HWND, HDC, PAINTSTRUCT);
 
 const int TimerID = 1001;
 
@@ -37,11 +37,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {	
 	
+	PAINTSTRUCT ps;
+
+	HDC hdc;
+
 	switch (msg)
 	{
 	case WM_PAINT:
-		//DrawTrain(hwnd);
-		DrawingRailWays(hwnd);
+		hdc = BeginPaint(hwnd, &ps);
+		DrawingRailWays(hwnd, hdc, ps);
+		DrawTrain(hwnd, hdc, ps);
+		EndPaint(hwnd, &ps);
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
@@ -55,48 +61,63 @@ void RestartTimer(HWND hwnd) {
 	SetTimer(hwnd, TimerID, 50, NULL);
 }
 
-void DrawTrain(HWND hwnd) {
-
-	PAINTSTRUCT ps;
-
-	HDC hdc = BeginPaint(hwnd, &ps);
+void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
 	RECT rect;
 
 	GetClientRect(hwnd, &rect);
 
-	HPEN hPen = CreatePen(PS_NULL, 1, RGB(120, 0, 0));
+	LOGBRUSH brush;
+	DWORD pen_style = PS_SOLID | PS_GEOMETRIC | PS_JOIN_BEVEL;
+
+	brush.lbStyle = BS_SOLID;
+	brush.lbColor = RGB(32, 64, 228);
+	brush.lbHatch = 0;
+
+	HPEN hPen = ExtCreatePen(pen_style, 6, &brush, 0, NULL);
+
+	//HPEN hPen = CreatePen(PS_NULL, 1, RGB(32, 64, 228));
 	HPEN hOldPen = SelectObject(hdc, hPen);
 
-	HBRUSH hBrush = CreateSolidBrush(RGB(51, 141, 108));
+	HBRUSH hBrush = CreateSolidBrush(RGB(32, 64, 228));
 	HBRUSH hOldBrush = SelectObject(hdc, hBrush);
 
-	Rectangle(hdc, 600, 450, 900, 550);
-	Rectangle(hdc, 630, 400, 740, 451);
-	Rectangle(hdc, 600, 440, 631, 451);
-	Ellipse(hdc, 850, 450, 950, 550);
+	Rectangle(hdc, 509, 335, 591, 365);
+	Rectangle(hdc, 590, 346, 600, 354);
+	Rectangle(hdc, 500, 344, 510, 356);
 
-	hBrush = CreateSolidBrush(RGB(20, 20, 100));
-	SelectObject(hdc, hBrush);
+	MoveToEx(hdc, 590, 335, NULL);
+	LineTo(hdc, 599, 346);
 
-	Rectangle(hdc, 640, 430, 680, 470);
-	Rectangle(hdc, 690, 430, 730, 470);
+	MoveToEx(hdc, 599, 354, NULL);
+	LineTo(hdc, 590, 364);
 
-	hBrush = CreateSolidBrush(RGB(120, 20, 0));
-	SelectObject(hdc, hBrush);
+	MoveToEx(hdc, 509, 335, NULL);
+	LineTo(hdc, 501, 344);
 
-	Ellipse(hdc, 590, 500, 690, 600);
-	Ellipse(hdc, 700, 500, 800, 600);
+	MoveToEx(hdc, 501, 356, NULL);
+	LineTo(hdc, 510, 364);
+	//Ellipse(hdc, 850, 450, 950, 550);
 
-	Ellipse(hdc, 820, 540, 880, 600);
+	//hBrush = CreateSolidBrush(RGB(20, 20, 100));
+	//SelectObject(hdc, hBrush);
+
+	////Rectangle(hdc, 640, 430, 680, 470);
+	//Rectangle(hdc, 690, 430, 730, 470);
+
+	//hBrush = CreateSolidBrush(RGB(120, 20, 0));
+	//SelectObject(hdc, hBrush);
+
+	//Ellipse(hdc, 590, 500, 690, 600);
+	//Ellipse(hdc, 700, 500, 800, 600);
+
+	//Ellipse(hdc, 820, 540, 880, 600);
 
 	SelectObject(hdc, hOldBrush);
 	SelectObject(hdc, hOldPen);
 
 	DeleteObject(hPen);
 	DeleteObject(hBrush);
-
-	EndPaint(hwnd, &ps);
 }
 
 void RotatePoint(POINT pt[], int iAngle)
@@ -215,7 +236,7 @@ void DrawingRotedRails(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int xBlock, int yBloc
 
 	int tempAngle = 90 * iAngle;
 	
-	for (int i = (tempAngle + 10); i < tempAngle + 90; i += 10)
+	for (int i = (tempAngle + 10); i < tempAngle + 91; i += 10)
 	{
 		pt[0].x = 0;
 		pt[0].y = 40;
@@ -267,25 +288,21 @@ void DrawingRotedRails(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int xBlock, int yBloc
 	DeleteObject(hPenRailWood);
 }
 
-void DrawingRailWays(HWND hwnd) {
-
-	PAINTSTRUCT ps;
-
-	HDC hdc = BeginPaint(hwnd, &ps);
+void DrawingRailWays(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
 	DrawingRotedRails(hwnd, hdc, ps, 1, 0, 1);
 	DrawingRotedRails(hwnd, hdc, ps, 2, 1, 2);
 	DrawingRotedRails(hwnd, hdc, ps, 1, 2, 3);
 	DrawingRotedRails(hwnd, hdc, ps, 3, 2, 4);
 	DrawingRotedRails(hwnd, hdc, ps, 3, 1, 1);
+	DrawingRotedRails(hwnd, hdc, ps, 2, 3, 3);
 
 	DrawStraightRails(hwnd, hdc, ps, 2, 2, TRUE);
-	
 	DrawStraightRails(hwnd, hdc, ps, 0, 0, TRUE);
-
+	DrawStraightRails(hwnd, hdc, ps, 3, 3, TRUE);
+	DrawStraightRails(hwnd, hdc, ps, 4, 3, TRUE);
+	DrawStraightRails(hwnd, hdc, ps, 5, 3, TRUE);
 	DrawStraightRails(hwnd, hdc, ps, 1, 1, FALSE);
 
 	DrawStraightRails(hwnd, hdc, ps, 2, 2, FALSE);
-
-	EndPaint(hwnd, &ps);
 }
