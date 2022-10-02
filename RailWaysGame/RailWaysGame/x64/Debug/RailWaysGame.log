@@ -1,3 +1,2 @@
-﻿  RailWaysGame.c
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(171,38): warning C4020: 'LineTo': too many actual parameters
+﻿  LINK : C:\Projects\C\RailWaysGame\RailWaysGame\x64\Debug\RailWaysGame.exe not found or not built by the last incremental link; performing full link
   RailWaysGame.vcxproj -> C:\Projects\C\RailWaysGame\RailWaysGame\x64\Debug\RailWaysGame.exe
