@@ -9,7 +9,8 @@ void DrawTrain(HWND, HDC, PAINTSTRUCT);
 void RestartTimer(HWND);
 void DrawingRailWays(HWND, HDC, PAINTSTRUCT);
 
-const int TimerID = 1001;
+const int TimerID = 51;
+int moving = 0;
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine, int nCmdShow) {
 	
@@ -41,8 +42,19 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 	HDC hdc;
 
+	RECT redrawingRect = {300, 330, 1800, 370};
+
 	switch (msg)
 	{
+	case WM_CREATE:
+		RestartTimer(hwnd);
+		break;
+	case WM_TIMER:
+		if (wParam == TimerID) {
+			moving++;
+			RestartTimer(hwnd);
+			InvalidateRect(hwnd, &redrawingRect, TRUE);
+		}
 	case WM_PAINT:
 		hdc = BeginPaint(hwnd, &ps);
 		DrawingRailWays(hwnd, hdc, ps);
@@ -68,50 +80,88 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 	GetClientRect(hwnd, &rect);
 
 	LOGBRUSH brush;
-	DWORD pen_style = PS_SOLID | PS_GEOMETRIC | PS_JOIN_BEVEL;
+	DWORD pen_style = PS_GEOMETRIC; //PS_SOLID | PS_GEOMETRIC | PS_JOIN_BEVEL;
 
 	brush.lbStyle = BS_SOLID;
-	brush.lbColor = RGB(32, 64, 228);
+	brush.lbColor = RGB(100, 120, 240);
 	brush.lbHatch = 0;
 
-	HPEN hPen = ExtCreatePen(pen_style, 6, &brush, 0, NULL);
+	HPEN hPen = ExtCreatePen(pen_style, 25, &brush, 0, NULL);
 
-	//HPEN hPen = CreatePen(PS_NULL, 1, RGB(32, 64, 228));
 	HPEN hOldPen = SelectObject(hdc, hPen);
 
-	HBRUSH hBrush = CreateSolidBrush(RGB(32, 64, 228));
+	HBRUSH hBrush = CreateSolidBrush(RGB(100, 120, 240));
 	HBRUSH hOldBrush = SelectObject(hdc, hBrush);
 
-	Rectangle(hdc, 509, 335, 591, 365);
-	Rectangle(hdc, 590, 346, 600, 354);
-	Rectangle(hdc, 500, 344, 510, 356);
 
-	MoveToEx(hdc, 590, 335, NULL);
-	LineTo(hdc, 599, 346);
+	for (int i = 0; i < 180; i += 60)
+	{
+		MoveToEx(hdc, 350 + i + moving, 350, NULL);
+		LineTo(hdc, 380 + i + moving, 350);
+	};
 
-	MoveToEx(hdc, 599, 354, NULL);
-	LineTo(hdc, 590, 364);
+	MoveToEx(hdc, 530 + moving, 350, NULL);
+	LineTo(hdc, 580 + moving, 350);
 
-	MoveToEx(hdc, 509, 335, NULL);
-	LineTo(hdc, 501, 344);
+	brush.lbColor = RGB(150, 150, 240);
 
-	MoveToEx(hdc, 501, 356, NULL);
-	LineTo(hdc, 510, 364);
-	//Ellipse(hdc, 850, 450, 950, 550);
+	hPen = ExtCreatePen(pen_style, 15, &brush, 0, NULL);
 
-	//hBrush = CreateSolidBrush(RGB(20, 20, 100));
-	//SelectObject(hdc, hBrush);
+	SelectObject(hdc, hPen);
 
-	////Rectangle(hdc, 640, 430, 680, 470);
-	//Rectangle(hdc, 690, 430, 730, 470);
+	for (int i = 0; i <= 120; i += 60)
+	{
+		MoveToEx(hdc, 352 + i + moving, 350, NULL);
+		LineTo(hdc, 378 + i + moving, 350);
+	};
 
-	//hBrush = CreateSolidBrush(RGB(120, 20, 0));
-	//SelectObject(hdc, hBrush);
+	MoveToEx(hdc, 532 + moving, 350, NULL);
+	LineTo(hdc, 578 + moving, 350);
 
-	//Ellipse(hdc, 590, 500, 690, 600);
-	//Ellipse(hdc, 700, 500, 800, 600);
+	brush.lbColor = RGB(100, 100, 220);
 
-	//Ellipse(hdc, 820, 540, 880, 600);
+	hPen = ExtCreatePen(pen_style, 3, &brush, 0, NULL);
+	SelectObject(hdc, hPen);
+
+	hBrush = CreateSolidBrush(RGB(0, 0, 0));
+	SelectObject(hdc, hBrush);
+
+	for (int i = 0; i <= 39; i += 13)
+	{
+		Ellipse(hdc, 468 + i + moving, 346, 478 + i + moving, 355);
+	};
+
+	for (int i = 0; i < 54; i += 9)
+	{
+		if ((i <= 9) || (i >= 36)) {
+			Ellipse(hdc, 531 + i + moving, 346, 535 + i + moving, 355);
+		}
+	}
+
+	for (int i = 0; i <= 39; i += 13)
+	{
+		Ellipse(hdc, 347 + i + moving, 346, 357 + i + moving, 355);
+	};
+
+	brush.lbColor = RGB(153, 76, 0);
+
+	hPen = ExtCreatePen(pen_style, 3, &brush, 0, NULL);
+	SelectObject(hdc, hPen);
+
+	for (int i = 0; i <= 16; i += 4) {
+		MoveToEx(hdc, 405 + moving, 342 + i, NULL);
+		LineTo(hdc, 445 + moving, 342 + i);
+	};
+
+	brush.lbColor = RGB(0, 0, 0);
+
+	hPen = ExtCreatePen(pen_style, 5, &brush, 0, NULL);
+	SelectObject(hdc, hPen);
+
+	for (int i = 0; i <= 120; i += 60) {
+		MoveToEx(hdc, 393 + i + moving, 350, NULL);
+		LineTo(hdc, 397 + i + moving, 350);
+	}	
 
 	SelectObject(hdc, hOldBrush);
 	SelectObject(hdc, hOldPen);
