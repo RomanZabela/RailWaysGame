@@ -25,6 +25,8 @@ int moving = 0;
 */
 int map[15][10][6];
 
+int trainDirection[20];
+
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine, int nCmdShow) {
 	
 	MSG msg;
@@ -55,7 +57,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 	HDC hdc;
 
-	RECT redrawingRect = {0, 330, 1800, 370};
+	RECT redrawingRect = {0, 30, 1800, 70};
 
 	switch (msg)
 	{
@@ -88,6 +90,7 @@ void RestartTimer(HWND hwnd) {
 
 void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
+	int horizontalMove, verticalMove;
 	RECT rect;
 
 	GetClientRect(hwnd, &rect);
@@ -106,16 +109,24 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 	HBRUSH hBrush = CreateSolidBrush(RGB(100, 120, 240));
 	HBRUSH hOldBrush = SelectObject(hdc, hBrush);
 
+	
+	if (trainDirection[0] == 105) {
+		if (map[1][0][0] == 2 || map[1][0][3] == 2 || map[1][0][4] == 2) {
+			moving = moving - 1;
+		}
+	}
+	horizontalMove = moving;
+
 	//draw 3 cars
 	for (int i = 0; i < 180; i += 60)
 	{
-		MoveToEx(hdc, 0 - 230 + i + moving, 350, NULL); //350; 350
-		LineTo(hdc, 0 - 200 + i + moving, 350);			//380; 350
+		MoveToEx(hdc, 0 - 230 + i + horizontalMove, 50, NULL); //350; 350
+		LineTo(hdc, 0 - 200 + i + horizontalMove, 50);			//380; 350
 	};
 
 	//draw train
-	MoveToEx(hdc, 0 - 50 + moving, 350, NULL); //530; 350
-	LineTo(hdc, 0 + moving, 350);			//580; 350
+	MoveToEx(hdc, 0 - 50 + horizontalMove, 50, NULL); //530; 350
+	LineTo(hdc, 0 + horizontalMove, 50);			//580; 350
 
 	brush.lbColor = RGB(150, 150, 240);
 
@@ -126,13 +137,13 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 	//visualisation for cars
 	for (int i = 0; i <= 120; i += 60)
 	{
-		MoveToEx(hdc, 0 - 228 + i + moving, 350, NULL); //352 ; 350
-		LineTo(hdc, 0 - 202 + i + moving, 350);			//378 ; 350
+		MoveToEx(hdc, 0 - 228 + i + horizontalMove, 50, NULL); //352 ; 350
+		LineTo(hdc, 0 - 202 + i + horizontalMove, 50);			//378 ; 350
 	};
 
 	//visualisation for train
-	MoveToEx(hdc, 0 - 48 + moving, 350, NULL);	//532 ; 350
-	LineTo(hdc, 0 - 2 + moving, 350);			//578 ; 350
+	MoveToEx(hdc, 0 - 48 + horizontalMove, 50, NULL);	//532 ; 350
+	LineTo(hdc, 0 - 2 + horizontalMove, 50);			//578 ; 350
 
 	brush.lbColor = RGB(100, 100, 220);
 
@@ -145,15 +156,15 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 	//visualisation for cars - oil
 	for (int i = 0; i < 39; i += 13)
 	{
-		Ellipse(hdc, 0 - 112 + i + moving, 346, 0 - 102 + i + moving, 355);	//468 ; 346 ; 478 ; 355
-		Ellipse(hdc, 0 - 233 + i + moving, 346, 0 - 223 + i + moving, 355); //347 ; 346 ; 357 ; 355
+		Ellipse(hdc, 0 - 112 + i + horizontalMove, 46, 0 - 102 + i + horizontalMove, 55);	//468 ; 346 ; 478 ; 355
+		Ellipse(hdc, 0 - 233 + i + horizontalMove, 46, 0 - 223 + i + horizontalMove, 55); //347 ; 346 ; 357 ; 355
 	};
 
 	//visualisation for train
 	for (int i = 0; i < 54; i += 9)
 	{
 		if ((i <= 9) || (i >= 36)) {
-			Ellipse(hdc, 0 - 49 + i + moving, 346, 0 - 45 + i + moving, 355); //531; 346; 535; 355
+			Ellipse(hdc, 0 - 49 + i + horizontalMove, 46, 0 - 45 + i + horizontalMove, 55); //531; 346; 535; 355
 		}
 	}
 
@@ -164,8 +175,8 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
 	//visualisation for cars - woods
 	for (int i = 0; i <= 16; i += 4) {
-		MoveToEx(hdc, 0 - 175 + moving, 342 + i, NULL);	//405; 342
-		LineTo(hdc, 0 - 135 + moving, 342 + i);			//445; 342
+		MoveToEx(hdc, 0 - 175 + horizontalMove, 42 + i, NULL);	//405; 342
+		LineTo(hdc, 0 - 135 + horizontalMove, 42 + i);			//445; 342
 	};
 
 	brush.lbColor = RGB(0, 0, 0);
@@ -175,8 +186,8 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
 	//connections between the train and cars
 	for (int i = 0; i <= 120; i += 60) {
-		MoveToEx(hdc, 0 - 187 + i + moving, 350, NULL);	//393; 350
-		LineTo(hdc, 0 - 183 + i + moving, 350);			//397; 350
+		MoveToEx(hdc, 0 - 187 + i + horizontalMove, 50, NULL);	//393; 350
+		LineTo(hdc, 0 - 183 + i + horizontalMove, 50);			//397; 350
 	}	
 
 	SelectObject(hdc, hOldBrush);
@@ -184,6 +195,8 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
 	DeleteObject(hPen);
 	DeleteObject(hBrush);
+
+	trainDirection[0] = horizontalMove;
 }
 
 void RotatePoint(POINT pt[], int iAngle)
