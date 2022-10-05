@@ -62,7 +62,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 	HDC hdc;
 
-	RECT redrawingRect = {0, 30, 700, 400};
+	RECT redrawingRect = {0, 30, 800, 400};
 
 	switch (msg)
 	{
@@ -91,6 +91,27 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 void RestartTimer(HWND hwnd) {
 	SetTimer(hwnd, TimerID, 50, NULL);
+}
+
+BOOL DirectMoving(int BlockX, int BlockY, int train) {
+
+	BOOL flag = FALSE;
+	
+	int xPosition = trainDirection[train][0];
+	int yPosition = trainDirection[train][1];
+	int nextBlockX = (100 * (BlockX + 1)) + 20;
+	int currentBlockX = (100 * BlockX);
+	int currentBlockY = (100 * BlockY);
+	int nextBlockY = (100 * (BlockY + 1)) + 20;
+
+	if (xPosition >= currentBlockX && xPosition <= nextBlockX && 
+		yPosition >= currentBlockY && yPosition <= nextBlockY) {
+		trainDirection[train][0]++;
+		trainDirection[train][2]++;
+		flag = TRUE;
+	}
+	
+	return flag;
 }
 
 void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
@@ -125,11 +146,18 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
 	//changing direction
 
-	if (moving <= 120) {
+	//direct way X+
+	/*if (moving <= 120) {
 		headX++;
 		tailX++;
+	}*/
+
+	if (DirectMoving(0, 0, 0)) {
+		headX = trainDirection[0][0];
+		tailX = trainDirection[0][2];
 	}
 
+	//turning 1 +
 	if (moving > 120 && moving < 150) {
 		headX++;
 		tailX+=2;
@@ -144,22 +172,105 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 		tailY++;
 	}
 
-	if (moving > 150 && moving < 250) {
+	//direct way Y+
+	if (moving > 150 && moving <= 250) {
 		headY++;
 		tailY++;
 	}
 
+	//turning 3 +
 	if (moving > 250 && moving < 280) {
 		headX++;
 		headY++;
 		tailY+=2;
 	}
 
-	if (moving >= 280 && moving < 321) {
-		;
-		;
-		;
+	if (moving >= 280 && moving < 301) {
+		headX+=2;
+		tailX++;
+		tailY++;
 	}
+
+	//direct way X+
+	if (DirectMoving(2, 2, 0)) {
+		headX = trainDirection[0][0];
+		tailX = trainDirection[0][2];
+	};
+
+	//turning 4 +
+	if (moving > 380 && moving < 410) {
+		headX++;
+		tailX+= 2;
+		headY--;
+	}
+
+	if (moving >= 410 && moving < 431) {
+		tailY--;
+		headY -= 2;
+		tailX++;
+	}
+
+	//turning 1-
+	if (moving > 430 && moving < 460) {
+		tailY -= 2;
+		headX--;
+		headY--;
+	}
+
+	if (moving >= 460 && moving < 481) {
+		headX -= 2;
+		tailY--;
+		tailX--;
+	}
+
+	//turning 2 +
+	if (moving >= 481 && moving < 510) {
+		tailX -= 2;
+		headX--;
+		headY++;
+	}
+
+	if (moving >= 510 && moving < 531) {
+		headY += 2;
+		tailX--;
+		tailY++;
+	}
+
+	//direct way Y+
+	if (moving >= 510 && moving < 610) {
+		headY++;
+		tailY++;
+	}
+
+	//turning 3 +
+	if (moving > 610 && moving < 640) {
+		headX++;
+		headY++;
+		tailY += 2;
+	}
+
+	if (moving >= 640 && moving < 661) {
+		headX += 2;
+		tailX++;
+		tailY++;
+	}
+
+	//direct way X+
+
+	if (DirectMoving(3, 3, 0)) {
+		headX = trainDirection[0][0];
+		tailX = trainDirection[0][2];
+	};
+	if (DirectMoving(4, 3, 0)) {
+		headX = trainDirection[0][0];
+		tailX = trainDirection[0][2];
+	};
+	if (DirectMoving(5, 3, 0)) {
+		headX = trainDirection[0][0];
+		tailX = trainDirection[0][2];
+	};
+
+
 		
 		//draw 3 cars
 	//for (int i = 0; i < 180; i += 60)
