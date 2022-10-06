@@ -11,6 +11,7 @@ void DrawingRailWays(HWND, HDC, PAINTSTRUCT);
 
 const int TimerID = 51;
 int moving = 0;
+int train = -1;
 
 /*map[x][y][z]
 * z: 0 = left-bottom
@@ -21,11 +22,11 @@ int moving = 0;
 *	5 = vertical
 * def: 2 = train can ride
 *		1 = road not available now
-*		0 = not road;
+*		0 = no road;
 */
 int map[15][10][6];
 
-int trainDirection[20][4];
+int trainDirection[20][6];
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine, int nCmdShow) {
 	
@@ -38,11 +39,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
 	wc.hbrBackground = GetSysColorBrush(COLOR_3DFACE);
 	wc.lpfnWndProc = WndProc;
 	wc.hCursor = LoadCursor(0, IDC_ARROW);
-
-	trainDirection[0][0] = 0;
-	trainDirection[0][1] = 50;
-	trainDirection[0][2] = 0;
-	trainDirection[0][3] = 50;
 
 	RegisterClassW(&wc);
 	CreateWindowW(wc.lpszClassName, L"RailWays", WS_SYSMENU | WS_MINIMIZEBOX| WS_VISIBLE, 200, 25, 1500, 1000, NULL, NULL, hInstance, NULL);
@@ -62,7 +58,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 	HDC hdc;
 
-	RECT redrawingRect = {0, 30, 800, 400};
+	RECT redrawingRect = {0, 0, 300, 300};
 
 	switch (msg)
 	{
@@ -93,33 +89,118 @@ void RestartTimer(HWND hwnd) {
 	SetTimer(hwnd, TimerID, 50, NULL);
 }
 
-BOOL DirectMoving(int BlockX, int BlockY, int train) {
-
-	BOOL flag = FALSE;
+void DirectMoving(int numberTrain, byte Vertical) {
 	
-	int xPosition = trainDirection[train][0];
-	int yPosition = trainDirection[train][1];
-	int nextBlockX = (100 * (BlockX + 1)) + 20;
-	int currentBlockX = (100 * BlockX);
-	int currentBlockY = (100 * BlockY);
-	int nextBlockY = (100 * (BlockY + 1)) + 20;
+	int blockX = trainDirection[numberTrain][4];
+	int blockY = trainDirection[numberTrain][5];
+	
+	if (Vertical) {
+		trainDirection[numberTrain][1]++;
+		trainDirection[numberTrain][3]++;
+		
+		if (map[blockX][blockY - 1][0] == 2 && trainDirection[numberTrain][1] <= ((blockX * 100) + 10)) {
+			trainDirection[numberTrain][2]++;
+		}
 
-	if (xPosition >= currentBlockX && xPosition <= nextBlockX && 
-		yPosition >= currentBlockY && yPosition <= nextBlockY) {
-		trainDirection[train][0]++;
-		trainDirection[train][2]++;
-		flag = TRUE;
+		if (map[blockX][blockY - 1][1] == 2 && trainDirection[numberTrain][1] <= ((blockX * 100) + 10)) {
+			trainDirection[numberTrain][2]--;
+		}
+
 	}
-	
-	return flag;
+	else {
+		trainDirection[numberTrain][0]++;
+		trainDirection[numberTrain][2]++;
+		
+		/*if (map[blockX - 1][blockY][2] == 2 && trainDirection[numberTrain][0] <= ((blockX * 100) + 10)) {
+			trainDirection[numberTrain][3]++;
+		}*/
+
+		if (map[blockX - 1][blockY][3] == 2 && trainDirection[numberTrain][0] <= ((blockX * 100) + 10)) {
+			trainDirection[numberTrain][3]--;
+		}
+	}
+}
+
+void TurningTrainLeftBottom(int numberTrain) {
+
+	int headX = trainDirection[numberTrain][0];
+	int headY = trainDirection[numberTrain][1];
+	int tailX = trainDirection[numberTrain][2];
+	int tailY = trainDirection[numberTrain][3];
+	int blockX = (trainDirection[numberTrain][4] * 100);
+	int blockY = (trainDirection[numberTrain][5] * 100);
+
+	if (headX <= (blockX + 20)) {
+		headX++;
+		tailX++;
+	}
+
+	if (headX > (blockX + 20) && headX <= (blockX + 50)) {
+		headX++;
+		tailX += 2;
+		headY++;
+	}
+
+	if (headX > (blockX + 45) && headX <= (blockX + 50)) {
+		tailY++;
+	}
+
+	if (headY >= (blockY + 79) && headY <= (blockY + 100)) {
+		tailX++;
+		headY += 2;
+	}
+
+	if (headY >= (blockY + 84) && headY <= (blockY + 90)) {
+		tailY++;
+	}
+
+	 trainDirection[numberTrain][0] = headX;
+	 trainDirection[numberTrain][1] = headY;
+	 trainDirection[numberTrain][2] = tailX;
+	 trainDirection[numberTrain][3] = tailY;
+}
+
+void TurningTrainTopRight(int numberTrain) {
+
+	int headX = trainDirection[numberTrain][0];
+	int headY = trainDirection[numberTrain][1];
+	int tailX = trainDirection[numberTrain][2];
+	int tailY = trainDirection[numberTrain][3];
+	int blockX = (trainDirection[numberTrain][4] * 100);
+	int blockY = (trainDirection[numberTrain][5] * 100);
+
+	if (headY <= (blockY + 20)) {
+		headY++;
+		tailY++;
+	}
+
+	if (headY >= (blockY + 20) && headY <= (blockY + 50)) {
+		headY++;
+		tailY += 2;
+		headX++;
+	}
+
+	if (headY > (blockY + 45) && headY <= (blockY + 50)) {
+		tailX++;
+	}
+
+	if (headX >= (blockX + 79) && headX <= (blockX + 100)) {
+		tailY++;
+		headX += 2;
+	}
+
+	if (headX >= (blockX + 84) && headX <= (blockX + 90)) {
+		tailX++;
+	}
+
+	trainDirection[numberTrain][0] = headX;
+	trainDirection[numberTrain][1] = headY;
+	trainDirection[numberTrain][2] = tailX;
+	trainDirection[numberTrain][3] = tailY;
 }
 
 void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
-	int headX;
-	int headY;
-	int tailX;
-	int tailY;
 	RECT rect;
 
 	GetClientRect(hwnd, &rect);
@@ -139,7 +220,52 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 	HBRUSH hOldBrush = SelectObject(hdc, hBrush);
 
 
-	headX	=	trainDirection[0][0];
+	if (moving == 0) {
+		trainDirection[0][0] = 0;
+		trainDirection[0][1] = 50;
+		trainDirection[0][2] = -50;
+		trainDirection[0][3] = 50;
+		trainDirection[0][4] = 0;
+		trainDirection[0][5] = 0;
+		train++;
+	}
+
+	if (map[trainDirection[0][4]][trainDirection[0][5]][0] == 2) {
+		TurningTrainLeftBottom(0);
+	}
+
+	if (map[trainDirection[0][4]][trainDirection[0][5]][1] == 2) {
+
+	}
+
+	if (map[trainDirection[0][4]][trainDirection[0][5]][2] == 2) {
+		TurningTrainTopRight(0);
+	}
+
+	if (map[trainDirection[0][4]][trainDirection[0][5]][3] == 2) {
+
+	}
+
+	if (map[trainDirection[0][4]][trainDirection[0][5]][4] == 2) {
+		DirectMoving(0, FALSE);
+	}
+
+	if (map[trainDirection[0][4]][trainDirection[0][5]][5] == 2) {
+		DirectMoving(0, TRUE);
+	}
+
+	if (trainDirection[0][0] % 100 == 0) {
+		trainDirection[0][4] = trainDirection[0][0] / 100;
+	}
+	if (trainDirection[0][1] % 100 == 0) {
+		trainDirection[0][5] = trainDirection[0][1] / 100;
+	}
+
+	if (train != -1) {
+		MoveToEx(hdc, trainDirection[0][0], trainDirection[0][1], NULL); //530; 350
+		LineTo(hdc, trainDirection[0][2], trainDirection[0][3]);			//580; 350
+	}
+	/*headX = trainDirection[0][0];
 	headY	=	trainDirection[0][1];
 	tailX	=	trainDirection[0][2];
 	tailY	=	trainDirection[0][3];
@@ -147,52 +273,77 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 	//changing direction
 
 	//direct way X+
-	/*if (moving <= 120) {
+	if (moving <= 120) {
 		headX++;
 		tailX++;
-	}*/
+	}
 
-	if (DirectMoving(0, 0, 0)) {
+	if (DirectMoving(0, 0, 0, FALSE)) {
 		headX = trainDirection[0][0];
 		tailX = trainDirection[0][2];
 	}
 
 	//turning 1 +
+
+	if (moving > 100 && moving <= 120) {
+		headX++;
+		tailX++;
+	}
 	if (moving > 120 && moving < 150) {
 		headX++;
 		tailX+=2;
-
 		headY++;
 	}
 
-	if (moving >= 150 && moving < 171) {
+	if (moving >= 150 && moving <= 170) {
 		tailX++;
 		headY+=2;
-		
 		tailY++;
 	}
 
+
+	if (moving > 160 && moving <= 170) {
+		tailX++;
+		headY++;
+	}
+
+	if (moving > 170 && moving <= 180) {
+		headY++;
+	}
+
 	//direct way Y+
+
+	if (DirectMoving(1, 1, 0, TRUE)) {
+		headY = trainDirection[0][1];
+		tailY = trainDirection[0][3];
+	}
+	
 	if (moving > 150 && moving <= 250) {
 		headY++;
 		tailY++;
 	}
 
+
 	//turning 3 +
 	if (moving > 250 && moving < 280) {
-		headX++;
+ 		headX++;
 		headY++;
 		tailY+=2;
 	}
 
-	if (moving >= 280 && moving < 301) {
+	if (moving >= 280 && moving <= 300) {
 		headX+=2;
 		tailX++;
 		tailY++;
 	}
 
 	//direct way X+
-	if (DirectMoving(2, 2, 0)) {
+
+	if (moving > 280 && moving <= 380) {
+		headX++;
+		tailX++;
+	}
+	if (DirectMovingX(2, 2, 0)) {
 		headX = trainDirection[0][0];
 		tailX = trainDirection[0][2];
 	};
@@ -256,16 +407,23 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 	}
 
 	//direct way X+
-
-	if (DirectMoving(3, 3, 0)) {
+	if (moving > 640 && moving <= 740) {
+		headX++;
+		tailX++;
+	}
+	if (moving > 740 && moving <= 840) {
+		headX++;
+		tailX++;
+	}
+	if (DirectMovingX(3, 3, 0)) {
 		headX = trainDirection[0][0];
 		tailX = trainDirection[0][2];
 	};
-	if (DirectMoving(4, 3, 0)) {
+	if (DirectMovingX(4, 3, 0)) {
 		headX = trainDirection[0][0];
 		tailX = trainDirection[0][2];
 	};
-	if (DirectMoving(5, 3, 0)) {
+	if (DirectMovingX(5, 3, 0)) {
 		headX = trainDirection[0][0];
 		tailX = trainDirection[0][2];
 	};
@@ -283,7 +441,7 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 	MoveToEx(hdc, headX, headY, NULL); //530; 350
 	LineTo(hdc, tailX - 50, tailY);			//580; 350
 
-	/*MoveToEx(hdc, 0 - 230 + horizontalMove, 50, NULL); //350; 350
+	MoveToEx(hdc, 0 - 230 + horizontalMove, 50, NULL); //350; 350
 	LineTo(hdc, 0 - 200 + horizontalMove, 50);			//380; 350
 
 	MoveToEx(hdc, 0 - 230 + 60 + horizontalMove, 50, NULL); //350; 350
@@ -394,11 +552,6 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
 	DeleteObject(hPen);
 	DeleteObject(hBrush);
-
-	trainDirection[0][0] = headX;
-	trainDirection[0][1] = headY;
-	trainDirection[0][2] = tailX;
-	trainDirection[0][3] = tailY;
 }
 
 void RotatePoint(POINT pt[], int iAngle)
