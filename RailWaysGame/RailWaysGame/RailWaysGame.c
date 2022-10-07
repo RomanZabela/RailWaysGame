@@ -111,9 +111,9 @@ void DirectMoving(int numberTrain, byte Vertical) {
 		trainDirection[numberTrain][0]++;
 		trainDirection[numberTrain][2]++;
 		
-		/*if (map[blockX - 1][blockY][2] == 2 && trainDirection[numberTrain][0] <= ((blockX * 100) + 10)) {
+		if (map[blockX - 1][blockY][2] == 2 && trainDirection[numberTrain][0] <= ((blockX * 100) + 10)) {
 			trainDirection[numberTrain][3]++;
-		}*/
+		}
 
 		if (map[blockX - 1][blockY][3] == 2 && trainDirection[numberTrain][0] <= ((blockX * 100) + 10)) {
 			trainDirection[numberTrain][3]--;
@@ -130,28 +130,20 @@ void TurningTrainLeftBottom(int numberTrain) {
 	int blockX = (trainDirection[numberTrain][4] * 100);
 	int blockY = (trainDirection[numberTrain][5] * 100);
 
-	if (headX <= (blockX + 20)) {
+	if (headX < (blockX + 20)) {
 		headX++;
 		tailX++;
 	}
 
-	if (headX > (blockX + 20) && headX <= (blockX + 50)) {
+	if (headX >= (blockX + 20) && headX < (blockX + 50)) {
 		headX++;
 		tailX += 2;
 		headY++;
 	}
 
-	if (headX > (blockX + 45) && headX <= (blockX + 50)) {
-		tailY++;
-	}
-
 	if (headY >= (blockY + 79) && headY <= (blockY + 100)) {
 		tailX++;
 		headY += 2;
-	}
-
-	if (headY >= (blockY + 84) && headY <= (blockY + 90)) {
-		tailY++;
 	}
 
 	 trainDirection[numberTrain][0] = headX;
@@ -169,28 +161,20 @@ void TurningTrainTopRight(int numberTrain) {
 	int blockX = (trainDirection[numberTrain][4] * 100);
 	int blockY = (trainDirection[numberTrain][5] * 100);
 
-	if (headY <= (blockY + 20)) {
+	if (headY < (blockY + 20)) {
 		headY++;
 		tailY++;
 	}
 
-	if (headY >= (blockY + 20) && headY <= (blockY + 50)) {
+	if (headY >= (blockY + 20) && headY < (blockY + 50)) {
 		headY++;
 		tailY += 2;
 		headX++;
 	}
 
-	if (headY > (blockY + 45) && headY <= (blockY + 50)) {
-		tailX++;
-	}
-
 	if (headX >= (blockX + 79) && headX <= (blockX + 100)) {
 		tailY++;
 		headX += 2;
-	}
-
-	if (headX >= (blockX + 84) && headX <= (blockX + 90)) {
-		tailX++;
 	}
 
 	trainDirection[numberTrain][0] = headX;
@@ -246,11 +230,13 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
 	}
 
-	if (map[trainDirection[0][4]][trainDirection[0][5]][4] == 2) {
+	//Horizontal
+	if (map[trainDirection[0][4]][trainDirection[0][5]][4] == 2 && (trainDirection[0][0] - trainDirection[0][2]) == 50) {
 		DirectMoving(0, FALSE);
 	}
 
-	if (map[trainDirection[0][4]][trainDirection[0][5]][5] == 2) {
+	//Vertical
+	if (map[trainDirection[0][4]][trainDirection[0][5]][5] == 2 && (trainDirection[0][1] - trainDirection[0][3]) == 50) {
 		DirectMoving(0, TRUE);
 	}
 
