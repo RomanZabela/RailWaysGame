@@ -26,7 +26,18 @@ int train = -1;
 */
 int map[15][10][6];
 
-int trainDirection[20][6];
+/*trainDirection[x][y]
+* x: train - "-1" no train on the map
+* y:	0 - headX
+*		1 - headY
+*		2 - tailX
+*		3 - tailY
+*		4 - current BlockX
+*		5 - current BlockY
+*		6 - previous BlockX = "-1" train just started
+*		7 - previous BlockY
+*/
+int trainDirection[20][8];
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine, int nCmdShow) {
 	
@@ -58,7 +69,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 	HDC hdc;
 
-	RECT redrawingRect = {0, 0, 300, 300};
+	int rectLeft = trainDirection[0][4] * 100 - 100;
+	int rectRigth = trainDirection[0][4] * 100 + 140;
+	int rectTop = trainDirection[0][5] * 100 - 100;
+	int rectBottom = trainDirection[0][5] * 100 + 140;
+
+	RECT redrawingRect = {rectLeft, rectTop, rectRigth, rectBottom};
 
 	switch (msg)
 	{
@@ -183,6 +199,107 @@ void TurningTrainTopRight(int numberTrain) {
 	trainDirection[numberTrain][3] = tailY;
 }
 
+void TurningTrainLeftTop(int numberTrain) {
+	
+	int headX = trainDirection[numberTrain][0];
+	int headY = trainDirection[numberTrain][1];
+	int tailX = trainDirection[numberTrain][2];
+	int tailY = trainDirection[numberTrain][3];
+	int blockX = (trainDirection[numberTrain][4] * 100);
+	int blockY = (trainDirection[numberTrain][5] * 100);
+
+	if (headX < (blockX + 20)) {
+		headX++;
+		tailX++;
+	}
+
+	if (headX >= (blockX + 20) && headX < (blockX + 50)) {
+		headX++;
+		tailX += 2;
+		headY--;
+	}
+
+	if (headY <= (blockY + 29) && headY >= (blockY)) {
+		tailX++;
+		headY -= 2;
+	}
+
+	trainDirection[numberTrain][0] = headX;
+	trainDirection[numberTrain][1] = headY;
+	trainDirection[numberTrain][2] = tailX;
+	trainDirection[numberTrain][3] = tailY;
+}
+
+void TurningTrainBottomLeft(int numberTrain) {
+
+	int headX = trainDirection[numberTrain][0];
+	int headY = trainDirection[numberTrain][1];
+	int tailX = trainDirection[numberTrain][2];
+	int tailY = trainDirection[numberTrain][3];
+	int blockX = (trainDirection[numberTrain][4] * 100);
+	int blockY = (trainDirection[numberTrain][5] * 100 + 100);
+
+	if (map[trainDirection[0][6]][trainDirection[0][7]][3] == 2 && tailX - blockX < 50) {
+		tailX++;
+	}
+	
+	if (headY > (blockY - 20)) {
+		headY--;
+		tailY--;
+	}
+
+	if (headY <= (blockY - 20) && headY > (blockY - 50)) {
+		headY--;
+		tailY -= 2;
+		headX--;
+	}
+
+	if (headX <= (blockX + 29) && headX >= (blockX)) {
+		tailY--;
+		headX -= 2;
+	}
+
+	trainDirection[numberTrain][0] = headX;
+	trainDirection[numberTrain][1] = headY;
+	trainDirection[numberTrain][2] = tailX;
+	trainDirection[numberTrain][3] = tailY;
+}
+
+void TurningTrainRightBottom(int numberTrain) {
+
+	int headX = trainDirection[numberTrain][0];
+	int headY = trainDirection[numberTrain][1];
+	int tailX = trainDirection[numberTrain][2];
+	int tailY = trainDirection[numberTrain][3];
+	int blockX = (trainDirection[numberTrain][4] * 100 + 100);
+	int blockY = (trainDirection[numberTrain][5] * 100);
+
+	if (map[trainDirection[0][6]][trainDirection[0][7]][0] == 2 && tailY - blockY > 50) {
+		tailY--;
+	}
+
+	if (headX > (blockX - 20)) {
+		headX--;
+		tailX--;
+	}
+
+	if (headX <= (blockX - 20) && headX > (blockX - 50)) {
+		headX--;
+		tailX -= 2;
+		headY++;
+	}
+
+	if (headY >= (blockY + 79) && headY <= (blockY + 100)) {
+		tailX--;
+		headY += 2;
+	}
+
+	trainDirection[numberTrain][0] = headX;
+	trainDirection[numberTrain][1] = headY;
+	trainDirection[numberTrain][2] = tailX;
+	trainDirection[numberTrain][3] = tailY;
+}
+
 void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
 	RECT rect;
@@ -211,40 +328,79 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 		trainDirection[0][3] = 50;
 		trainDirection[0][4] = 0;
 		trainDirection[0][5] = 0;
+		trainDirection[0][6] = 0;
+		trainDirection[0][7] = 0;
 		train++;
 	}
 
 	if (map[trainDirection[0][4]][trainDirection[0][5]][0] == 2) {
-		TurningTrainLeftBottom(0);
+		if (trainDirection[0][5] - trainDirection[0][7] == 0) {
+			TurningTrainLeftBottom(0);
+		}
+		else {
+			TurningTrainBottomLeft(0);
+		}
 	}
 
 	if (map[trainDirection[0][4]][trainDirection[0][5]][1] == 2) {
+		if (trainDirection[0][5] - trainDirection[0][7] == 0) {
+			TurningTrainRightBottom(0);
+		}
+		else {
 
+		}
 	}
 
 	if (map[trainDirection[0][4]][trainDirection[0][5]][2] == 2) {
-		TurningTrainTopRight(0);
+		if (trainDirection[0][4] - trainDirection[0][6] == 0) {
+			TurningTrainTopRight(0);
+		}
+		else {
+
+		}
 	}
 
 	if (map[trainDirection[0][4]][trainDirection[0][5]][3] == 2) {
+		if (trainDirection[0][5] - trainDirection[0][7] == 0) {
+			TurningTrainLeftTop(0);
+		}
+		else
+		{
 
+		}
 	}
 
 	//Horizontal
-	if (map[trainDirection[0][4]][trainDirection[0][5]][4] == 2 && (trainDirection[0][0] - trainDirection[0][2]) == 50) {
+	if (map[trainDirection[0][4]][trainDirection[0][5]][4] == 2 && (trainDirection[0][5] - trainDirection[0][7] == 0)) {
 		DirectMoving(0, FALSE);
 	}
 
 	//Vertical
-	if (map[trainDirection[0][4]][trainDirection[0][5]][5] == 2 && (trainDirection[0][1] - trainDirection[0][3]) == 50) {
+	if (map[trainDirection[0][4]][trainDirection[0][5]][5] == 2 && (trainDirection[0][4] - trainDirection[0][6] == 0)) {
 		DirectMoving(0, TRUE);
 	}
 
 	if (trainDirection[0][0] % 100 == 0) {
-		trainDirection[0][4] = trainDirection[0][0] / 100;
+		trainDirection[0][6] = trainDirection[0][4];
+		trainDirection[0][7] = trainDirection[0][5];
+
+		if (trainDirection[0][4] == trainDirection[0][0] / 100) {
+			trainDirection[0][4] = (trainDirection[0][0] / 100) - 1;
+		}
+		else {
+			trainDirection[0][4] = trainDirection[0][0] / 100;
+		}
 	}
 	if (trainDirection[0][1] % 100 == 0) {
-		trainDirection[0][5] = trainDirection[0][1] / 100;
+		trainDirection[0][6] = trainDirection[0][4];
+		trainDirection[0][7] = trainDirection[0][5];
+		if (trainDirection[0][5] == trainDirection[0][1] / 100) {
+			trainDirection[0][5] = (trainDirection[0][1] / 100) - 1;
+		}
+		else {
+			trainDirection[0][5] = trainDirection[0][1] / 100;
+		}
+		
 	}
 
 	if (train != -1) {
