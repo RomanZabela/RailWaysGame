@@ -48,6 +48,7 @@ struct Road map[15][10];
 *		7 - previous BlockY
 */
 int trainDirection[20][8];
+int rightButton;
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine, int nCmdShow) {
 	
@@ -90,6 +91,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	{
 	case WM_CREATE:
 		RestartTimer(hwnd);
+		rightButton = -1;
 		break;
 	case WM_TIMER:
 		if (wParam == TimerID) {
@@ -103,6 +105,21 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		DrawTrain(hwnd, hdc, ps);
 		EndPaint(hwnd, &ps);
 		break;
+	case WM_RBUTTONDOWN:
+		if (rightButton == 7) {
+			rightButton = -1;
+		}
+		else {
+			rightButton++;
+		}
+		break;
+	case WM_RBUTTONUP:
+		DrawingRotedRails(hwnd, hdc, ps, int xBlock, int yBlock, int iAngle)
+		break;
+	case WM_LBUTTONDOWN:
+		break;
+	case WM_LBUTTONUP:
+		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
@@ -115,36 +132,47 @@ void RestartTimer(HWND hwnd) {
 	SetTimer(hwnd, TimerID, 50, NULL);
 }
 
+int CorrectTail(int Tail, const int Block) {
+
+	if (Tail - Block < 50) {
+		return Tail + 1;
+	}
+	else if (Tail - Block > 50) {
+		return Tail - 1;
+	}
+	else {
+		return Tail;
+	}
+}
+
 void DirectMoving(int numberTrain, byte Vertical) {
 	
-	int blockX = trainDirection[numberTrain][4];
-	int blockY = trainDirection[numberTrain][5];
+	int headX = trainDirection[numberTrain][0];
+	int headY = trainDirection[numberTrain][1];
+	int tailX = trainDirection[numberTrain][2];
+	int tailY = trainDirection[numberTrain][3];
+	int blockX = (trainDirection[numberTrain][4] * 100);
+	int blockY = (trainDirection[numberTrain][5] * 100);
 	
 	if (Vertical) {
-		trainDirection[numberTrain][1]++;
-		trainDirection[numberTrain][3]++;
+		headY++;
+		tailY++;
 		
-		if (map[blockX][blockY - 1].leftTop == 2 && trainDirection[numberTrain][1] <= ((blockX * 100) + 10)) {
-			trainDirection[numberTrain][2]++;
-		}
-
-		if (map[blockX][blockY - 1].topRight == 2 && trainDirection[numberTrain][1] <= ((blockX * 100) + 10)) {
-			trainDirection[numberTrain][2]--;
-		}
+		tailX = CorrectTail(tailX, blockX);
 
 	}
 	else {
-		trainDirection[numberTrain][0]++;
-		trainDirection[numberTrain][2]++;
+		headX++;
+		tailX++;
 		
-		if (map[blockX - 1][blockY].topRight == 2 && trainDirection[numberTrain][0] <= ((blockX * 100) + 10)) {
-			trainDirection[numberTrain][3]++;
-		}
+		tailY = CorrectTail(tailY, blockY);
 
-		if (map[blockX - 1][blockY].leftTop == 2 && trainDirection[numberTrain][0] <= ((blockX * 100) + 10)) {
-			trainDirection[numberTrain][3]--;
-		}
 	}
+
+	trainDirection[numberTrain][0] = headX;
+	trainDirection[numberTrain][1] = headY;
+	trainDirection[numberTrain][2] = tailX;
+	trainDirection[numberTrain][3] = tailY;
 }
 
 void TurningTrainLeftBottom(int numberTrain) {
@@ -155,6 +183,8 @@ void TurningTrainLeftBottom(int numberTrain) {
 	int tailY = trainDirection[numberTrain][3];
 	int blockX = (trainDirection[numberTrain][4] * 100);
 	int blockY = (trainDirection[numberTrain][5] * 100);
+
+	tailY = CorrectTail(tailY, blockY);
 
 	if (headX < (blockX + 20)) {
 		headX++;
@@ -178,6 +208,39 @@ void TurningTrainLeftBottom(int numberTrain) {
 	 trainDirection[numberTrain][3] = tailY;
 }
 
+void TurningTrainBottomLeft(int numberTrain) {
+
+	int headX = trainDirection[numberTrain][0];
+	int headY = trainDirection[numberTrain][1];
+	int tailX = trainDirection[numberTrain][2];
+	int tailY = trainDirection[numberTrain][3];
+	int blockX = (trainDirection[numberTrain][4] * 100);
+	int blockY = (trainDirection[numberTrain][5] * 100 + 100);
+
+	tailX = CorrectTail(tailX, blockX);
+
+	if (headY > (blockY - 20)) {
+		headY--;
+		tailY--;
+	}
+
+	if (headY <= (blockY - 20) && headY > (blockY - 50)) {
+		headY--;
+		tailY -= 2;
+		headX--;
+	}
+
+	if (headX <= (blockX + 29) && headX >= (blockX)) {
+		tailY--;
+		headX -= 2;
+	}
+
+	trainDirection[numberTrain][0] = headX;
+	trainDirection[numberTrain][1] = headY;
+	trainDirection[numberTrain][2] = tailX;
+	trainDirection[numberTrain][3] = tailY;
+}
+
 void TurningTrainTopRight(int numberTrain) {
 
 	int headX = trainDirection[numberTrain][0];
@@ -186,6 +249,8 @@ void TurningTrainTopRight(int numberTrain) {
 	int tailY = trainDirection[numberTrain][3];
 	int blockX = (trainDirection[numberTrain][4] * 100);
 	int blockY = (trainDirection[numberTrain][5] * 100);
+
+	tailX = CorrectTail(tailX, blockX);
 
 	if (headY < (blockY + 20)) {
 		headY++;
@@ -209,6 +274,39 @@ void TurningTrainTopRight(int numberTrain) {
 	trainDirection[numberTrain][3] = tailY;
 }
 
+void TurningTrainRightTop(int numberTrain) {
+
+	int headX = trainDirection[numberTrain][0];
+	int headY = trainDirection[numberTrain][1];
+	int tailX = trainDirection[numberTrain][2];
+	int tailY = trainDirection[numberTrain][3];
+	int blockX = (trainDirection[numberTrain][4] * 100);
+	int blockY = (trainDirection[numberTrain][5] * 100);
+
+	tailY = CorrectTail(tailY, blockY);
+
+	if (headX > (blockX - 20)) {
+		headX--;
+		tailX--;
+	}
+
+	if (headX <= (blockX - 20) && headX > (blockX - 50)) {
+		headX--;
+		tailX -= 2;
+		headY--;
+	}
+
+	if (headY <= (blockY + 29) && headY >= (blockY)) {
+		tailX--;
+		headY -= 2;
+	}
+
+	trainDirection[numberTrain][0] = headX;
+	trainDirection[numberTrain][1] = headY;
+	trainDirection[numberTrain][2] = tailX;
+	trainDirection[numberTrain][3] = tailY;
+}
+
 void TurningTrainLeftTop(int numberTrain) {
 	
 	int headX = trainDirection[numberTrain][0];
@@ -217,6 +315,8 @@ void TurningTrainLeftTop(int numberTrain) {
 	int tailY = trainDirection[numberTrain][3];
 	int blockX = (trainDirection[numberTrain][4] * 100);
 	int blockY = (trainDirection[numberTrain][5] * 100);
+
+	tailY = CorrectTail(tailY, blockY);
 
 	if (headX < (blockX + 20)) {
 		headX++;
@@ -240,32 +340,30 @@ void TurningTrainLeftTop(int numberTrain) {
 	trainDirection[numberTrain][3] = tailY;
 }
 
-void TurningTrainBottomLeft(int numberTrain) {
+void TurningTrainTopLeft(int numberTrain) {
 
 	int headX = trainDirection[numberTrain][0];
 	int headY = trainDirection[numberTrain][1];
 	int tailX = trainDirection[numberTrain][2];
 	int tailY = trainDirection[numberTrain][3];
 	int blockX = (trainDirection[numberTrain][4] * 100);
-	int blockY = (trainDirection[numberTrain][5] * 100 + 100);
+	int blockY = (trainDirection[numberTrain][5] * 100);
 
-	if (map[trainDirection[0][6]][trainDirection[0][7]].leftTop == 2 && tailX - blockX < 50) {
-		tailX++;
-	}
-	
-	if (headY > (blockY - 20)) {
-		headY--;
-		tailY--;
+	tailX = CorrectTail(tailX, blockX);
+
+	if (headY < (blockY + 20)) {
+		headY++;
+		tailY++;
 	}
 
-	if (headY <= (blockY - 20) && headY > (blockY - 50)) {
-		headY--;
-		tailY -= 2;
+	if (headY >= (blockY + 20) && headY < (blockY + 50)) {
+		headY++;
+		tailY += 2;
 		headX--;
 	}
 
 	if (headX <= (blockX + 29) && headX >= (blockX)) {
-		tailY--;
+		tailY++;
 		headX -= 2;
 	}
 
@@ -284,9 +382,7 @@ void TurningTrainRightBottom(int numberTrain) {
 	int blockX = (trainDirection[numberTrain][4] * 100 + 100);
 	int blockY = (trainDirection[numberTrain][5] * 100);
 
-	if (map[trainDirection[0][6]][trainDirection[0][7]].leftBottom == 2 && tailY - blockY > 50) {
-		tailY--;
-	}
+	tailY = CorrectTail(tailY, blockY);
 
 	if (headX > (blockX - 20)) {
 		headX--;
@@ -302,6 +398,39 @@ void TurningTrainRightBottom(int numberTrain) {
 	if (headY >= (blockY + 79) && headY <= (blockY + 100)) {
 		tailX--;
 		headY += 2;
+	}
+
+	trainDirection[numberTrain][0] = headX;
+	trainDirection[numberTrain][1] = headY;
+	trainDirection[numberTrain][2] = tailX;
+	trainDirection[numberTrain][3] = tailY;
+}
+
+void TurningTrainBottomRight(int numberTrain) {
+
+	int headX = trainDirection[numberTrain][0];
+	int headY = trainDirection[numberTrain][1];
+	int tailX = trainDirection[numberTrain][2];
+	int tailY = trainDirection[numberTrain][3];
+	int blockX = (trainDirection[numberTrain][4] * 100 + 100);
+	int blockY = (trainDirection[numberTrain][5] * 100);
+
+	tailX = CorrectTail(tailX, blockX);
+
+	if (headY > (blockY - 20)) {
+		headY--;
+		tailY--;
+	}
+
+	if (headY <= (blockY - 20) && headY > (blockY - 50)) {
+		headY--;
+		tailY -= 2;
+		headX++;
+	}
+
+	if (headX >= (blockX + 79) && headX <= (blockX + 100)) {
+		tailY--;
+		headX += 2;
 	}
 
 	trainDirection[numberTrain][0] = headX;
@@ -357,7 +486,7 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 			TurningTrainRightBottom(0);
 		}
 		else {
-
+			TurningTrainBottomRight(0);
 		}
 	}
 
@@ -366,7 +495,7 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 			TurningTrainTopRight(0);
 		}
 		else {
-
+			TurningTrainRightTop(0);
 		}
 	}
 
@@ -376,7 +505,7 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 		}
 		else
 		{
-
+			TurningTrainTopLeft(0);
 		}
 	}
 
@@ -403,6 +532,10 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
 			trainDirection[0][4] = trainDirection[0][0] / 100;
 		}
+		else {
+			trainDirection[0][4] = -1;
+			trainDirection[0][5] = -1;
+		}
 	}
 	if (trainDirection[0][1] % 100 == 0) {		
 		if (trainDirection[0][5] == trainDirection[0][1] / 100 && map[trainDirection[0][4]][(trainDirection[0][1] / 100) - 1].isRoad) {
@@ -411,11 +544,15 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
 			trainDirection[0][5] = (trainDirection[0][1] / 100) - 1;
 		}
-		else  if (trainDirection[0][5] != trainDirection[0][1] / 100 && map[trainDirection[0][4]][(trainDirection[0][1] / 100)].isRoad) {
+		else  if (trainDirection[0][5] != trainDirection[0][1] / 100 && map[trainDirection[0][4]][trainDirection[0][1] / 100].isRoad) {
 			trainDirection[0][6] = trainDirection[0][4];
 			trainDirection[0][7] = trainDirection[0][5];
 
 			trainDirection[0][5] = trainDirection[0][1] / 100;
+		}
+		else {
+			trainDirection[0][4] = -1;
+			trainDirection[0][5] = -1;
 		}
 		
 	}
@@ -760,22 +897,6 @@ void DrawingRailWays(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 	map[4][3].horizontal = 2;
 	map[4][3].isRoad = TRUE;
 
-	DrawStraightRails(hwnd, hdc, ps, 5, 3, TRUE);
-	map[5][3].horizontal = 2;
-	map[5][3].isRoad = TRUE;
-
-	DrawStraightRails(hwnd, hdc, ps, 6, 3, TRUE);
-	map[6][3].horizontal = 2;
-	map[6][3].isRoad = TRUE;
-
-	DrawStraightRails(hwnd, hdc, ps, 7, 3, TRUE);
-	map[7][3].horizontal = 2;
-	map[7][3].isRoad = TRUE;
-
-	DrawStraightRails(hwnd, hdc, ps, 8, 3, TRUE);
-	map[8][3].horizontal = 2;
-	map[8][3].isRoad = TRUE;
-
 	DrawStraightRails(hwnd, hdc, ps, 1, 1, FALSE);
 	map[1][1].vertical = 2;
 	map[1][1].isRoad = TRUE;
@@ -783,4 +904,6 @@ void DrawingRailWays(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 	DrawStraightRails(hwnd, hdc, ps, 2, 2, FALSE);
 	map[2][2].vertical = 2;
 	map[2][2].isRoad = TRUE;
+
+
 }
