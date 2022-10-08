@@ -24,7 +24,7 @@
     <ClInclude Include="Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RailWaysGame.h">
+    <ClInclude Include="DrawingRailways.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
