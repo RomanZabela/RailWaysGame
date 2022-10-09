@@ -18,6 +18,8 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 void DrawTrain(HWND, HDC, PAINTSTRUCT);
 void RestartTimer(HWND);
 void DrawingRailWays(HWND, HDC, PAINTSTRUCT);
+void DrawStraightRails(HWND, HDC, PAINTSTRUCT, int, int, BOOL);
+void DrawingRotedRails(HWND, HDC, PAINTSTRUCT, int, int, int);
 
 const int TimerID = 51;
 int moving = 0;
@@ -49,6 +51,7 @@ struct Road map[15][10];
 */
 int trainDirection[20][8];
 int rightButton;
+POINT mouse, nextMouse;
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine, int nCmdShow) {
 	
@@ -106,24 +109,82 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		EndPaint(hwnd, &ps);
 		break;
 	case WM_RBUTTONDOWN:
-		if (rightButton == 7) {
+		if (rightButton == 5) {
 			rightButton = -1;
 		}
 		else {
 			rightButton++;
 		}
 		break;
-	case WM_RBUTTONUP:
-		DrawingRotedRails(hwnd, hdc, ps, int xBlock, int yBlock, int iAngle)
+	case WM_RBUTTONUP:	
+
+		mouse.x = LOWORD(lParam) / 100;
+		mouse.y = HIWORD(lParam) / 100;
+
+		switch (rightButton)
+		{
+		case 0:
+			map[mouse.x][mouse.y].horizontal = 2;
+			map[mouse.x][mouse.y].isRoad = TRUE;
+			break;
+		case 1:
+			map[mouse.x][mouse.y].horizontal = 0;
+			map[mouse.x][mouse.y].vertical = 2;
+			map[mouse.x][mouse.y].isRoad = TRUE;
+			break;
+		case 2:
+			map[mouse.x][mouse.y].vertical = 0;
+			map[mouse.x][mouse.y].leftBottom = 2;
+			map[mouse.x][mouse.y].isRoad = TRUE;
+			break;
+		case 3:
+			map[mouse.x][mouse.y].leftBottom = 0;
+			map[mouse.x][mouse.y].bottomRight = 2;
+			map[mouse.x][mouse.y].isRoad = TRUE;
+			break;
+		case 4:
+			map[mouse.x][mouse.y].bottomRight = 0;
+			map[mouse.x][mouse.y].topRight = 2;
+			map[mouse.x][mouse.y].isRoad = TRUE;
+			break;
+		case 5:
+			map[mouse.x][mouse.y].topRight = 0;
+			map[mouse.x][mouse.y].leftTop = 2;
+			map[mouse.x][mouse.y].isRoad = TRUE;
+			break;
+		case -1:
+			map[mouse.x][mouse.y].leftTop = 0;
+			map[mouse.x][mouse.y].isRoad = FALSE;
+		default:
+			break;
+		}		
+
+		redrawingRect.left = mouse.x * 100;
+		redrawingRect.top = mouse.y * 100;
+		redrawingRect.right = (mouse.x * 100) + 100;
+		redrawingRect.bottom = (mouse.y * 100) + 100;
+
+		InvalidateRect(hwnd, &redrawingRect, TRUE);
+
 		break;
 	case WM_LBUTTONDOWN:
 		break;
 	case WM_LBUTTONUP:
 		break;
+	case WM_MOUSEMOVE:
+
+		nextMouse.x = LOWORD(lParam) / 100;
+		nextMouse.y = HIWORD(lParam) / 100;
+
+		if (&mouse != &nextMouse) {
+			rightButton = -1;
+		}
+
+		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
-	}
+	};
 
 	return DefWindowProcW(hwnd, msg, wParam, lParam);
 }
@@ -154,19 +215,40 @@ void DirectMoving(int numberTrain, byte Vertical) {
 	int blockX = (trainDirection[numberTrain][4] * 100);
 	int blockY = (trainDirection[numberTrain][5] * 100);
 	
+	byte forwardVertical, forwardHorizontal;
+	
+	forwardVertical = trainDirection[numberTrain][5] - trainDirection[numberTrain][7] < 0;
+	forwardHorizontal = trainDirection[numberTrain][4] - trainDirection[numberTrain][6] < 0;
+	
 	if (Vertical) {
-		headY++;
-		tailY++;
-		
-		tailX = CorrectTail(tailX, blockX);
+		if (forwardVertical) {
+			headY--;
+			tailY--;
+
+			tailX = CorrectTail(tailX, blockX);
+		}
+		else {
+			headY++;
+			tailY++;
+
+			tailX = CorrectTail(tailX, blockX);
+		}
 
 	}
 	else {
-		headX++;
-		tailX++;
-		
-		tailY = CorrectTail(tailY, blockY);
+		if (forwardHorizontal) {
+			headX--;
+			tailX--;
 
+			tailY = CorrectTail(tailY, blockY);
+		}
+		else
+		{
+			headX++;
+			tailX++;
+
+			tailY = CorrectTail(tailY, blockY);
+		}
 	}
 
 	trainDirection[numberTrain][0] = headX;
@@ -412,8 +494,8 @@ void TurningTrainBottomRight(int numberTrain) {
 	int headY = trainDirection[numberTrain][1];
 	int tailX = trainDirection[numberTrain][2];
 	int tailY = trainDirection[numberTrain][3];
-	int blockX = (trainDirection[numberTrain][4] * 100 + 100);
-	int blockY = (trainDirection[numberTrain][5] * 100);
+	int blockX = (trainDirection[numberTrain][4] * 100);
+	int blockY = (trainDirection[numberTrain][5] * 100 + 100);
 
 	tailX = CorrectTail(tailX, blockX);
 
@@ -857,53 +939,76 @@ void DrawingRotedRails(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int xBlock, int yBloc
 
 void DrawingRailWays(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
-	DrawingRotedRails(hwnd, hdc, ps, 1, 0, 1);
+	//DrawingRotedRails(hwnd, hdc, ps, 1, 0, 1);
 	map[1][0].leftBottom = 2;
 	map[1][0].isRoad = TRUE;
 
-	DrawingRotedRails(hwnd, hdc, ps, 2, 1, 2);
+	//DrawingRotedRails(hwnd, hdc, ps, 2, 1, 2);
 	map[2][1].bottomRight = 2;
 	map[2][1].isRoad = TRUE;
 
-	DrawingRotedRails(hwnd, hdc, ps, 1, 2, 3);
+	//DrawingRotedRails(hwnd, hdc, ps, 1, 2, 3);
 	map[1][2].topRight = 2;
 	map[1][2].isRoad = TRUE;
 
-	DrawingRotedRails(hwnd, hdc, ps, 3, 2, 4);
+	//DrawingRotedRails(hwnd, hdc, ps, 3, 2, 4);
 	map[3][2].leftTop = 2;
 	map[3][2].isRoad = TRUE;
 
-	DrawingRotedRails(hwnd, hdc, ps, 3, 1, 1);
+	//DrawingRotedRails(hwnd, hdc, ps, 3, 1, 1);
 	map[3][1].leftBottom = 2;
 	map[3][1].isRoad = TRUE;
 
-	DrawingRotedRails(hwnd, hdc, ps, 2, 3, 3);
+	//DrawingRotedRails(hwnd, hdc, ps, 2, 3, 3);
 	map[2][3].topRight = 2;
 	map[2][3].isRoad = TRUE;
 
-	DrawStraightRails(hwnd, hdc, ps, 2, 2, TRUE);
+	//DrawStraightRails(hwnd, hdc, ps, 2, 2, TRUE);
 	map[2][2].horizontal = 2;
 	map[2][2].isRoad = TRUE;
 
-	DrawStraightRails(hwnd, hdc, ps, 0, 0, TRUE);
+	//DrawStraightRails(hwnd, hdc, ps, 0, 0, TRUE);
 	map[0][0].horizontal = 2;
 	map[0][0].isRoad = TRUE;
 
-	DrawStraightRails(hwnd, hdc, ps, 3, 3, TRUE);
+	//DrawStraightRails(hwnd, hdc, ps, 3, 3, TRUE);
 	map[3][3].horizontal = 2;
 	map[3][3].isRoad = TRUE;
 
-	DrawStraightRails(hwnd, hdc, ps, 4, 3, TRUE);
+	//DrawStraightRails(hwnd, hdc, ps, 4, 3, TRUE);
 	map[4][3].horizontal = 2;
 	map[4][3].isRoad = TRUE;
 
-	DrawStraightRails(hwnd, hdc, ps, 1, 1, FALSE);
+	//DrawStraightRails(hwnd, hdc, ps, 1, 1, FALSE);
 	map[1][1].vertical = 2;
 	map[1][1].isRoad = TRUE;
 
-	DrawStraightRails(hwnd, hdc, ps, 2, 2, FALSE);
+	//DrawStraightRails(hwnd, hdc, ps, 2, 2, FALSE);
 	map[2][2].vertical = 2;
 	map[2][2].isRoad = TRUE;
 
-
+	for (int i = 0; i < 15; i++) {
+		for (int j = 0; j < 10; j++) {
+			if (map[i][j].isRoad) {
+				if (map[i][j].horizontal == 2) {
+					DrawStraightRails(hwnd, hdc, ps, i, j, TRUE);
+				}
+				if (map[i][j].vertical == 2) {
+					DrawStraightRails(hwnd, hdc, ps, i, j, FALSE);
+				}
+				if (map[i][j].leftBottom == 2) {
+					DrawingRotedRails(hwnd, hdc, ps, i, j, 1);
+				}
+				if (map[i][j].bottomRight == 2) {
+					DrawingRotedRails(hwnd, hdc, ps, i, j, 2);
+				}
+				if (map[i][j].topRight == 2) {
+					DrawingRotedRails(hwnd, hdc, ps, i, j, 3);
+				}
+				if (map[i][j].leftTop == 2) {
+					DrawingRotedRails(hwnd, hdc, ps, i, j, 4);
+				}
+			}
+		}
+	}
 }
