@@ -20,8 +20,11 @@ void RestartTimer(HWND);
 void DrawingRailWays(HWND, HDC, PAINTSTRUCT);
 void DrawStraightRails(HWND, HDC, PAINTSTRUCT, int, int, BOOL);
 void DrawingRotedRails(HWND, HDC, PAINTSTRUCT, int, int, int);
+void CityDrawing(HWND, HDC, PAINTSTRUCT);
 
 const int TimerID = 51;
+const int newTrainTimer = 6001;
+const int newCityTimer = 10001;
 int moving = 0;
 int train = -1;
 
@@ -102,10 +105,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			RestartTimer(hwnd);
 			InvalidateRect(hwnd, &redrawingRect, TRUE);
 		}
+		if (wParam == newTrainTimer) {
+
+		}
+		if (wParam == newCityTimer) {
+
+		}
 	case WM_PAINT:
 		hdc = BeginPaint(hwnd, &ps);
 		DrawingRailWays(hwnd, hdc, ps);
 		DrawTrain(hwnd, hdc, ps);
+		CityDrawing(hwnd, hdc, ps);
 		EndPaint(hwnd, &ps);
 		break;
 	case WM_RBUTTONDOWN:
@@ -121,51 +131,52 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		mouse.x = LOWORD(lParam) / 100;
 		mouse.y = HIWORD(lParam) / 100;
 
-		switch (rightButton)
-		{
-		case 0:
-			map[mouse.x][mouse.y].horizontal = 2;
-			map[mouse.x][mouse.y].isRoad = TRUE;
-			break;
-		case 1:
-			map[mouse.x][mouse.y].horizontal = 0;
-			map[mouse.x][mouse.y].vertical = 2;
-			map[mouse.x][mouse.y].isRoad = TRUE;
-			break;
-		case 2:
-			map[mouse.x][mouse.y].vertical = 0;
-			map[mouse.x][mouse.y].leftBottom = 2;
-			map[mouse.x][mouse.y].isRoad = TRUE;
-			break;
-		case 3:
-			map[mouse.x][mouse.y].leftBottom = 0;
-			map[mouse.x][mouse.y].bottomRight = 2;
-			map[mouse.x][mouse.y].isRoad = TRUE;
-			break;
-		case 4:
-			map[mouse.x][mouse.y].bottomRight = 0;
-			map[mouse.x][mouse.y].topRight = 2;
-			map[mouse.x][mouse.y].isRoad = TRUE;
-			break;
-		case 5:
-			map[mouse.x][mouse.y].topRight = 0;
-			map[mouse.x][mouse.y].leftTop = 2;
-			map[mouse.x][mouse.y].isRoad = TRUE;
-			break;
-		case -1:
-			map[mouse.x][mouse.y].leftTop = 0;
-			map[mouse.x][mouse.y].isRoad = FALSE;
-		default:
-			break;
-		}		
+		if (mouse.x != 0 && mouse.x != 14) {
+			switch (rightButton)
+			{
+			case 0:
+				map[mouse.x][mouse.y].horizontal = 2;
+				map[mouse.x][mouse.y].isRoad = TRUE;
+				break;
+			case 1:
+				map[mouse.x][mouse.y].horizontal = 0;
+				map[mouse.x][mouse.y].vertical = 2;
+				map[mouse.x][mouse.y].isRoad = TRUE;
+				break;
+			case 2:
+				map[mouse.x][mouse.y].vertical = 0;
+				map[mouse.x][mouse.y].leftBottom = 2;
+				map[mouse.x][mouse.y].isRoad = TRUE;
+				break;
+			case 3:
+				map[mouse.x][mouse.y].leftBottom = 0;
+				map[mouse.x][mouse.y].bottomRight = 2;
+				map[mouse.x][mouse.y].isRoad = TRUE;
+				break;
+			case 4:
+				map[mouse.x][mouse.y].bottomRight = 0;
+				map[mouse.x][mouse.y].topRight = 2;
+				map[mouse.x][mouse.y].isRoad = TRUE;
+				break;
+			case 5:
+				map[mouse.x][mouse.y].topRight = 0;
+				map[mouse.x][mouse.y].leftTop = 2;
+				map[mouse.x][mouse.y].isRoad = TRUE;
+				break;
+			case -1:
+				map[mouse.x][mouse.y].leftTop = 0;
+				map[mouse.x][mouse.y].isRoad = FALSE;
+			default:
+				break;
+			}
 
-		redrawingRect.left = mouse.x * 100;
-		redrawingRect.top = mouse.y * 100;
-		redrawingRect.right = (mouse.x * 100) + 100;
-		redrawingRect.bottom = (mouse.y * 100) + 100;
+			redrawingRect.left = mouse.x * 100;
+			redrawingRect.top = mouse.y * 100;
+			redrawingRect.right = (mouse.x * 100) + 100;
+			redrawingRect.bottom = (mouse.y * 100) + 100;
 
-		InvalidateRect(hwnd, &redrawingRect, TRUE);
-
+			InvalidateRect(hwnd, &redrawingRect, TRUE);
+		}
 		break;
 	case WM_LBUTTONDOWN:
 		break;
@@ -553,215 +564,217 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 		trainDirection[0][7] = 0;
 		train++;
 	}
+	for (int i = 0; i <= train; i++) {
 
-	if (map[trainDirection[0][4]][trainDirection[0][5]].leftBottom == 2) {
-		if (trainDirection[0][5] - trainDirection[0][7] == 0) {
-			TurningTrainLeftBottom(0);
+		if (map[trainDirection[0][4]][trainDirection[0][5]].leftBottom == 2) {
+			if (trainDirection[0][5] - trainDirection[0][7] == 0) {
+				TurningTrainLeftBottom(0);
+			}
+			else {
+				TurningTrainBottomLeft(0);
+			}
 		}
-		else {
-			TurningTrainBottomLeft(0);
+
+		if (map[trainDirection[0][4]][trainDirection[0][5]].bottomRight == 2) {
+			if (trainDirection[0][5] - trainDirection[0][7] == 0) {
+				TurningTrainRightBottom(0);
+			}
+			else {
+				TurningTrainBottomRight(0);
+			}
 		}
+
+		if (map[trainDirection[0][4]][trainDirection[0][5]].topRight == 2) {
+			if (trainDirection[0][4] - trainDirection[0][6] == 0) {
+				TurningTrainTopRight(0);
+			}
+			else {
+				TurningTrainRightTop(0);
+			}
+		}
+
+		if (map[trainDirection[0][4]][trainDirection[0][5]].leftTop == 2) {
+			if (trainDirection[0][5] - trainDirection[0][7] == 0) {
+				TurningTrainLeftTop(0);
+			}
+			else
+			{
+				TurningTrainTopLeft(0);
+			}
+		}
+
+		//Horizontal
+		if (map[trainDirection[0][4]][trainDirection[0][5]].horizontal == 2 && (trainDirection[0][5] - trainDirection[0][7] == 0)) {
+			DirectMoving(0, FALSE);
+		}
+
+		//Vertical
+		if (map[trainDirection[0][4]][trainDirection[0][5]].vertical == 2 && (trainDirection[0][4] - trainDirection[0][6] == 0)) {
+			DirectMoving(0, TRUE);
+		}
+
+		if (trainDirection[0][0] % 100 == 0) {
+			if (trainDirection[0][4] == trainDirection[0][0] / 100 && map[(trainDirection[0][0] / 100) - 1][trainDirection[0][5]].isRoad) {
+				trainDirection[0][6] = trainDirection[0][4];
+				trainDirection[0][7] = trainDirection[0][5];
+
+				trainDirection[0][4] = (trainDirection[0][0] / 100) - 1;
+			}
+			else if (trainDirection[0][4] != trainDirection[0][0] / 100 && map[(trainDirection[0][0] / 100)][trainDirection[0][5]].isRoad) {
+				trainDirection[0][6] = trainDirection[0][4];
+				trainDirection[0][7] = trainDirection[0][5];
+
+				trainDirection[0][4] = trainDirection[0][0] / 100;
+			}
+			else {
+				trainDirection[0][4] = -1;
+				trainDirection[0][5] = -1;
+			}
+		}
+		if (trainDirection[0][1] % 100 == 0) {
+			if (trainDirection[0][5] == trainDirection[0][1] / 100 && map[trainDirection[0][4]][(trainDirection[0][1] / 100) - 1].isRoad) {
+				trainDirection[0][6] = trainDirection[0][4];
+				trainDirection[0][7] = trainDirection[0][5];
+
+				trainDirection[0][5] = (trainDirection[0][1] / 100) - 1;
+			}
+			else  if (trainDirection[0][5] != trainDirection[0][1] / 100 && map[trainDirection[0][4]][trainDirection[0][1] / 100].isRoad) {
+				trainDirection[0][6] = trainDirection[0][4];
+				trainDirection[0][7] = trainDirection[0][5];
+
+				trainDirection[0][5] = trainDirection[0][1] / 100;
+			}
+			else {
+				trainDirection[0][4] = -1;
+				trainDirection[0][5] = -1;
+			}
+
+		}
+
+		if (train != -1) {
+			MoveToEx(hdc, trainDirection[0][0], trainDirection[0][1], NULL); //530; 350
+			LineTo(hdc, trainDirection[0][2], trainDirection[0][3]);			//580; 350
+		}
+
+		/*
+			//draw 3 cars
+		//for (int i = 0; i < 180; i += 60)
+		//{
+		//	MoveToEx(hdc, 0 - 230 + i + horizontalMove, 50, NULL); //350; 350
+		//	LineTo(hdc, 0 - 200 + i + horizontalMove, 50);			//380; 350
+		//}
+
+		//draw train
+		MoveToEx(hdc, headX, headY, NULL); //530; 350
+		LineTo(hdc, tailX - 50, tailY);			//580; 350
+
+		MoveToEx(hdc, 0 - 230 + horizontalMove, 50, NULL); //350; 350
+		LineTo(hdc, 0 - 200 + horizontalMove, 50);			//380; 350
+
+		MoveToEx(hdc, 0 - 230 + 60 + horizontalMove, 50, NULL); //350; 350
+		LineTo(hdc, 0 - 200 + 60 + horizontalMove, 50);			//380; 350
+
+		MoveToEx(hdc, 0 - 230 + 120 + horizontalMove, 50, NULL); //350; 350
+		LineTo(hdc, 0 - 200 + 120 + horizontalMove, 50);			//380; 350
+
+		MoveToEx(hdc, 0 - 230 + 180 + horizontalMove, 50, NULL); //350; 350
+		LineTo(hdc, 0 - 200 + 180 + horizontalMove, 50);			//380; 350
+		*/
+		brush.lbColor = RGB(150, 150, 240);
+
+		hPen = ExtCreatePen(pen_style, 15, &brush, 0, NULL);
+
+		SelectObject(hdc, hPen);
+
+		//visualisation for cars
+		//for (int i = 0; i <= 120; i += 60)
+		//{
+		//	MoveToEx(hdc, 0 - 228 + i + horizontalMove, 50, NULL); //352 ; 350
+		//	LineTo(hdc, 0 - 202 + i + horizontalMove, 50);			//378 ; 350
+		//};
+
+		//visualisation for train
+		/*MoveToEx(hdc, 0 - 48 + horizontalMove, 50, NULL);	//532 ; 350
+		LineTo(hdc, 0 - 2 + horizontalMove, 50);			//578 ; 350
+
+		MoveToEx(hdc, 0 - 228 + horizontalMove, 50, NULL); //352 ; 350
+		LineTo(hdc, 0 - 202 + horizontalMove, 50);			//378 ; 350
+
+		MoveToEx(hdc, 0 - 228 + 60 + horizontalMove, 50, NULL); //352 ; 350
+		LineTo(hdc, 0 - 202 + 60 + horizontalMove, 50);			//378 ; 350
+
+		MoveToEx(hdc, 0 - 228 + 120 + horizontalMove, 50, NULL); //352 ; 350
+		LineTo(hdc, 0 - 202 + 120 + horizontalMove, 50);			//378 ; 350
+		*/
+		brush.lbColor = RGB(100, 100, 220);
+
+		hPen = ExtCreatePen(pen_style, 3, &brush, 0, NULL);
+		SelectObject(hdc, hPen);
+
+		hBrush = CreateSolidBrush(RGB(0, 0, 0));
+		SelectObject(hdc, hBrush);
+
+		//visualisation for cars - oil
+		//for (int i = 0; i < 39; i += 13)
+		//{
+		//	Ellipse(hdc, 0 - 112 + i + horizontalMove, 46, 0 - 102 + i + horizontalMove, 55);	//468 ; 346 ; 478 ; 355
+		//	Ellipse(hdc, 0 - 233 + i + horizontalMove, 46, 0 - 223 + i + horizontalMove, 55); //347 ; 346 ; 357 ; 355
+		//};
+
+		//visualisation for train
+		//for (int i = 0; i < 54; i += 9)
+		//{
+		//	if ((i <= 9) || (i >= 36)) {
+		//		Ellipse(hdc, 0 - 49 + i + horizontalMove, 46 + verticalMove, 0 - 45 + i + horizontalMove, 55 + verticalMove); //531; 346; 535; 355
+		//	}
+		//}
+
+		/*Ellipse(hdc, 0 - 49 + horizontalMove, 46, 0 - 45 + horizontalMove, 55); //531; 346; 535; 355
+		Ellipse(hdc, 0 - 49 + 9 + horizontalMove, 46, 0 - 45 + 9 + horizontalMove, 55); //531; 346; 535; 355
+		Ellipse(hdc, 0 - 49 + 36 + horizontalMove, 46, 0 - 45 + 36 + horizontalMove, 55); //531; 346; 535; 355
+		Ellipse(hdc, 0 - 49 + 45 + horizontalMove, 46, 0 - 45 + 45 + horizontalMove, 55); //531; 346; 535; 355
+
+		Ellipse(hdc, 0 - 112 + horizontalMove, 46, 0 - 102 + horizontalMove, 55);	//468 ; 346 ; 478 ; 355
+		Ellipse(hdc, 0 - 233 + horizontalMove, 46, 0 - 223 + horizontalMove, 55); //347 ; 346 ; 357 ; 355
+
+		Ellipse(hdc, 0 - 112 + 13 + horizontalMove, 46, 0 - 102 + 13 + horizontalMove, 55);	//468 ; 346 ; 478 ; 355
+		Ellipse(hdc, 0 - 233 + 13 + horizontalMove, 46, 0 - 223 + 13 + horizontalMove, 55); //347 ; 346 ; 357 ; 355
+
+		Ellipse(hdc, 0 - 112 + 26 + horizontalMove, 46, 0 - 102 + 26 + horizontalMove, 55);	//468 ; 346 ; 478 ; 355
+		Ellipse(hdc, 0 - 233 + 26 + horizontalMove, 46, 0 - 223 + 26 + horizontalMove, 55); //347 ; 346 ; 357 ; 355
+		*/
+		brush.lbColor = RGB(153, 76, 0);
+
+		hPen = ExtCreatePen(pen_style, 3, &brush, 0, NULL);
+		SelectObject(hdc, hPen);
+
+		//visualisation for cars - woods
+		/*for (int i = 0; i <= 16; i += 4) {
+			MoveToEx(hdc, 0 - 175 + horizontalMove, 42 + i, NULL);	//405; 342
+			LineTo(hdc, 0 - 135 + horizontalMove, 42 + i);			//445; 342
+		};*/
+
+		brush.lbColor = RGB(0, 0, 0);
+
+		hPen = ExtCreatePen(pen_style, 5, &brush, 0, NULL);
+		SelectObject(hdc, hPen);
+
+		//connections between the train and cars
+		//for (int i = 0; i <= 120; i += 60) {
+		//	MoveToEx(hdc, 0 - 187 + i + horizontalMove, 50, NULL);	//393; 350
+		//	LineTo(hdc, 0 - 183 + i + horizontalMove, 50);			//397; 350
+		//}	
+
+		/*MoveToEx(hdc, 0 - 187 + horizontalMove, 50, NULL);	//393; 350
+		LineTo(hdc, 0 - 183 + horizontalMove, 50);			//397; 350
+
+		MoveToEx(hdc, 0 - 187 + 60 + horizontalMove, 50, NULL);	//393; 350
+		LineTo(hdc, 0 - 183 + 60 + horizontalMove, 50);			//397; 350
+
+		MoveToEx(hdc, 0 - 187 + 120 + horizontalMove, 50, NULL);	//393; 350
+		LineTo(hdc, 0 - 183 + 120 + horizontalMove, 50);			//397; 350
+		*/
 	}
-
-	if (map[trainDirection[0][4]][trainDirection[0][5]].bottomRight == 2) {
-		if (trainDirection[0][5] - trainDirection[0][7] == 0) {
-			TurningTrainRightBottom(0);
-		}
-		else {
-			TurningTrainBottomRight(0);
-		}
-	}
-
-	if (map[trainDirection[0][4]][trainDirection[0][5]].topRight == 2) {
-		if (trainDirection[0][4] - trainDirection[0][6] == 0) {
-			TurningTrainTopRight(0);
-		}
-		else {
-			TurningTrainRightTop(0);
-		}
-	}
-
-	if (map[trainDirection[0][4]][trainDirection[0][5]].leftTop == 2) {
-		if (trainDirection[0][5] - trainDirection[0][7] == 0) {
-			TurningTrainLeftTop(0);
-		}
-		else
-		{
-			TurningTrainTopLeft(0);
-		}
-	}
-
-	//Horizontal
-	if (map[trainDirection[0][4]][trainDirection[0][5]].horizontal == 2 && (trainDirection[0][5] - trainDirection[0][7] == 0)) {
-		DirectMoving(0, FALSE);
-	}
-
-	//Vertical
-	if (map[trainDirection[0][4]][trainDirection[0][5]].vertical == 2 && (trainDirection[0][4] - trainDirection[0][6] == 0)) {
-		DirectMoving(0, TRUE);
-	}
-
-	if (trainDirection[0][0] % 100 == 0) {
-		if (trainDirection[0][4] == trainDirection[0][0] / 100 && map[(trainDirection[0][0] / 100) - 1][trainDirection[0][5]].isRoad) {
-			trainDirection[0][6] = trainDirection[0][4];
-			trainDirection[0][7] = trainDirection[0][5];
-
-			trainDirection[0][4] = (trainDirection[0][0] / 100) - 1;
-		}
-		else if (trainDirection[0][4] != trainDirection[0][0] / 100 && map[(trainDirection[0][0] / 100)][trainDirection[0][5]].isRoad) {
-			trainDirection[0][6] = trainDirection[0][4];
-			trainDirection[0][7] = trainDirection[0][5];
-
-			trainDirection[0][4] = trainDirection[0][0] / 100;
-		}
-		else {
-			trainDirection[0][4] = -1;
-			trainDirection[0][5] = -1;
-		}
-	}
-	if (trainDirection[0][1] % 100 == 0) {		
-		if (trainDirection[0][5] == trainDirection[0][1] / 100 && map[trainDirection[0][4]][(trainDirection[0][1] / 100) - 1].isRoad) {
-			trainDirection[0][6] = trainDirection[0][4];
-			trainDirection[0][7] = trainDirection[0][5];
-
-			trainDirection[0][5] = (trainDirection[0][1] / 100) - 1;
-		}
-		else  if (trainDirection[0][5] != trainDirection[0][1] / 100 && map[trainDirection[0][4]][trainDirection[0][1] / 100].isRoad) {
-			trainDirection[0][6] = trainDirection[0][4];
-			trainDirection[0][7] = trainDirection[0][5];
-
-			trainDirection[0][5] = trainDirection[0][1] / 100;
-		}
-		else {
-			trainDirection[0][4] = -1;
-			trainDirection[0][5] = -1;
-		}
-		
-	}
-
-	if (train != -1) {
-		MoveToEx(hdc, trainDirection[0][0], trainDirection[0][1], NULL); //530; 350
-		LineTo(hdc, trainDirection[0][2], trainDirection[0][3]);			//580; 350
-	}
-
-	/*		
-		//draw 3 cars
-	//for (int i = 0; i < 180; i += 60)
-	//{
-	//	MoveToEx(hdc, 0 - 230 + i + horizontalMove, 50, NULL); //350; 350
-	//	LineTo(hdc, 0 - 200 + i + horizontalMove, 50);			//380; 350
-	//}
-
-	//draw train
-	MoveToEx(hdc, headX, headY, NULL); //530; 350
-	LineTo(hdc, tailX - 50, tailY);			//580; 350
-
-	MoveToEx(hdc, 0 - 230 + horizontalMove, 50, NULL); //350; 350
-	LineTo(hdc, 0 - 200 + horizontalMove, 50);			//380; 350
-
-	MoveToEx(hdc, 0 - 230 + 60 + horizontalMove, 50, NULL); //350; 350
-	LineTo(hdc, 0 - 200 + 60 + horizontalMove, 50);			//380; 350
-
-	MoveToEx(hdc, 0 - 230 + 120 + horizontalMove, 50, NULL); //350; 350
-	LineTo(hdc, 0 - 200 + 120 + horizontalMove, 50);			//380; 350
-
-	MoveToEx(hdc, 0 - 230 + 180 + horizontalMove, 50, NULL); //350; 350
-	LineTo(hdc, 0 - 200 + 180 + horizontalMove, 50);			//380; 350
-	*/
-	brush.lbColor = RGB(150, 150, 240);
-
-	hPen = ExtCreatePen(pen_style, 15, &brush, 0, NULL);
-
-	SelectObject(hdc, hPen);
-
-	//visualisation for cars
-	//for (int i = 0; i <= 120; i += 60)
-	//{
-	//	MoveToEx(hdc, 0 - 228 + i + horizontalMove, 50, NULL); //352 ; 350
-	//	LineTo(hdc, 0 - 202 + i + horizontalMove, 50);			//378 ; 350
-	//};
-
-	//visualisation for train
-	/*MoveToEx(hdc, 0 - 48 + horizontalMove, 50, NULL);	//532 ; 350
-	LineTo(hdc, 0 - 2 + horizontalMove, 50);			//578 ; 350
-
-	MoveToEx(hdc, 0 - 228 + horizontalMove, 50, NULL); //352 ; 350
-	LineTo(hdc, 0 - 202 + horizontalMove, 50);			//378 ; 350
-
-	MoveToEx(hdc, 0 - 228 + 60 + horizontalMove, 50, NULL); //352 ; 350
-	LineTo(hdc, 0 - 202 + 60 + horizontalMove, 50);			//378 ; 350
-
-	MoveToEx(hdc, 0 - 228 + 120 + horizontalMove, 50, NULL); //352 ; 350
-	LineTo(hdc, 0 - 202 + 120 + horizontalMove, 50);			//378 ; 350
-	*/
-	brush.lbColor = RGB(100, 100, 220);
-
-	hPen = ExtCreatePen(pen_style, 3, &brush, 0, NULL);
-	SelectObject(hdc, hPen);
-
-	hBrush = CreateSolidBrush(RGB(0, 0, 0));
-	SelectObject(hdc, hBrush);
-
-	//visualisation for cars - oil
-	//for (int i = 0; i < 39; i += 13)
-	//{
-	//	Ellipse(hdc, 0 - 112 + i + horizontalMove, 46, 0 - 102 + i + horizontalMove, 55);	//468 ; 346 ; 478 ; 355
-	//	Ellipse(hdc, 0 - 233 + i + horizontalMove, 46, 0 - 223 + i + horizontalMove, 55); //347 ; 346 ; 357 ; 355
-	//};
-
-	//visualisation for train
-	//for (int i = 0; i < 54; i += 9)
-	//{
-	//	if ((i <= 9) || (i >= 36)) {
-	//		Ellipse(hdc, 0 - 49 + i + horizontalMove, 46 + verticalMove, 0 - 45 + i + horizontalMove, 55 + verticalMove); //531; 346; 535; 355
-	//	}
-	//}
-
-	/*Ellipse(hdc, 0 - 49 + horizontalMove, 46, 0 - 45 + horizontalMove, 55); //531; 346; 535; 355
-	Ellipse(hdc, 0 - 49 + 9 + horizontalMove, 46, 0 - 45 + 9 + horizontalMove, 55); //531; 346; 535; 355
-	Ellipse(hdc, 0 - 49 + 36 + horizontalMove, 46, 0 - 45 + 36 + horizontalMove, 55); //531; 346; 535; 355
-	Ellipse(hdc, 0 - 49 + 45 + horizontalMove, 46, 0 - 45 + 45 + horizontalMove, 55); //531; 346; 535; 355
-
-	Ellipse(hdc, 0 - 112 + horizontalMove, 46, 0 - 102 + horizontalMove, 55);	//468 ; 346 ; 478 ; 355
-	Ellipse(hdc, 0 - 233 + horizontalMove, 46, 0 - 223 + horizontalMove, 55); //347 ; 346 ; 357 ; 355
-
-	Ellipse(hdc, 0 - 112 + 13 + horizontalMove, 46, 0 - 102 + 13 + horizontalMove, 55);	//468 ; 346 ; 478 ; 355
-	Ellipse(hdc, 0 - 233 + 13 + horizontalMove, 46, 0 - 223 + 13 + horizontalMove, 55); //347 ; 346 ; 357 ; 355
-
-	Ellipse(hdc, 0 - 112 + 26 + horizontalMove, 46, 0 - 102 + 26 + horizontalMove, 55);	//468 ; 346 ; 478 ; 355
-	Ellipse(hdc, 0 - 233 + 26 + horizontalMove, 46, 0 - 223 + 26 + horizontalMove, 55); //347 ; 346 ; 357 ; 355
-	*/
-	brush.lbColor = RGB(153, 76, 0);
-
-	hPen = ExtCreatePen(pen_style, 3, &brush, 0, NULL);
-	SelectObject(hdc, hPen);
-
-	//visualisation for cars - woods
-	/*for (int i = 0; i <= 16; i += 4) {
-		MoveToEx(hdc, 0 - 175 + horizontalMove, 42 + i, NULL);	//405; 342
-		LineTo(hdc, 0 - 135 + horizontalMove, 42 + i);			//445; 342
-	};*/
-
-	brush.lbColor = RGB(0, 0, 0);
-
-	hPen = ExtCreatePen(pen_style, 5, &brush, 0, NULL);
-	SelectObject(hdc, hPen);
-
-	//connections between the train and cars
-	//for (int i = 0; i <= 120; i += 60) {
-	//	MoveToEx(hdc, 0 - 187 + i + horizontalMove, 50, NULL);	//393; 350
-	//	LineTo(hdc, 0 - 183 + i + horizontalMove, 50);			//397; 350
-	//}	
-
-	/*MoveToEx(hdc, 0 - 187 + horizontalMove, 50, NULL);	//393; 350
-	LineTo(hdc, 0 - 183 + horizontalMove, 50);			//397; 350
-
-	MoveToEx(hdc, 0 - 187 + 60 + horizontalMove, 50, NULL);	//393; 350
-	LineTo(hdc, 0 - 183 + 60 + horizontalMove, 50);			//397; 350
-
-	MoveToEx(hdc, 0 - 187 + 120 + horizontalMove, 50, NULL);	//393; 350
-	LineTo(hdc, 0 - 183 + 120 + horizontalMove, 50);			//397; 350
-	*/
 	SelectObject(hdc, hOldBrush);
 	SelectObject(hdc, hOldPen);
 
@@ -1011,4 +1024,82 @@ void DrawingRailWays(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 			}
 		}
 	}
+}
+
+void CityDrawing(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
+	
+	RECT rect;
+	
+	POINT triangle[3]  = {36, 70, 50, 60, 62, 70};
+
+	GetClientRect(hwnd, &rect);
+
+	LOGBRUSH brush;
+	DWORD pen_style = PS_SOLID | PS_GEOMETRIC | PS_JOIN_ROUND;
+
+	brush.lbStyle = BS_SOLID;
+	brush.lbColor = RGB(0, 0, 0);
+	brush.lbHatch = 0;
+
+	HPEN hPenBuild = ExtCreatePen(pen_style, 2, &brush, 0, NULL);
+
+	brush.lbColor = RGB(252, 252, 25);
+
+	HPEN hPenWindows = ExtCreatePen(pen_style, 1, &brush, 0, NULL);
+
+	HPEN hOldPen = SelectObject(hdc, hPenBuild);
+
+	HBRUSH hBrushBuild = CreateSolidBrush(RGB(100, 120, 240));
+	HBRUSH hBrushWindows = CreateSolidBrush(RGB(252, 252, 25));
+
+	HBRUSH hOldBrush = SelectObject(hdc, hBrushBuild);
+
+	Rectangle(hdc, 10, 10, 40, 50);
+
+	SelectObject(hdc, hBrushWindows);
+	SelectObject(hdc, hPenWindows);
+
+	for (int i = 0; i < 2; i++) {
+		for (int j = 0; j < 2; j++) {
+			Rectangle(hdc, 15 + 15 * i, 15 + 20 * j, 20 + 15 * i, 25 + 20 * j);
+		}
+	}
+
+	SelectObject(hdc, hBrushBuild);
+	SelectObject(hdc, hPenBuild);
+
+	Rectangle(hdc, 0, 40, 30, 80);
+	Rectangle(hdc, 40, 70, 60, 90);
+	Rectangle(hdc, 55, 15, 75, 35);
+
+	Polygon(hdc, triangle, 3);
+
+	triangle[0].x = 51;
+	triangle[0].y = 15;
+	triangle[1].x = 65;
+	triangle[1].y = 5;
+	triangle[2].x = 77;
+	triangle[2].y = 15;
+
+	Polygon(hdc, triangle, 3);
+	
+	SelectObject(hdc, hPenWindows);
+
+	SelectObject(hdc, hBrushWindows);
+
+	for (int i = 0; i < 2; i++) {
+		for (int j = 0; j < 2; j++) {
+			Rectangle(hdc, 5 + 15 * i, 45 + 20 * j, 10 + 15 * i, 55 + 20 * j);
+		}
+	}
+	
+	Rectangle(hdc, 45, 75, 50, 80);
+	Rectangle(hdc, 60, 20, 65, 25);
+	SelectObject(hdc, hOldBrush);
+	SelectObject(hdc, hOldPen);
+
+	DeleteObject(hPenWindows);
+	DeleteObject(hBrushWindows);
+	DeleteObject(hPenBuild);
+	DeleteObject(hBrushBuild);
 }
