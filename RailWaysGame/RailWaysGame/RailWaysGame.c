@@ -14,6 +14,11 @@ struct Road {
 	byte isRoad;
 };
 
+struct City {
+	int xBlock;
+	int yBlock;
+};
+
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 void DrawTrain(HWND, HDC, PAINTSTRUCT);
 void RestartTimer(HWND);
@@ -23,10 +28,11 @@ void DrawingRotedRails(HWND, HDC, PAINTSTRUCT, int, int, int);
 void CityDrawing(HWND, HDC, PAINTSTRUCT);
 
 const int TimerID = 51;
-const int newTrainTimer = 6001;
-const int newCityTimer = 10001;
-int moving = 0;
+const int newTrainTimer = 1200;
+const int newCityTimer = 10000;
+int timer = 601;
 int train = -1;
+
 
 /*map[x][y][z]
 * z: 0 = left-bottom
@@ -101,12 +107,21 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		break;
 	case WM_TIMER:
 		if (wParam == TimerID) {
-			moving++;
+			timer++;
 			RestartTimer(hwnd);
-			InvalidateRect(hwnd, &redrawingRect, TRUE);
+			InvalidateRect(hwnd, NULL, TRUE);
 		}
-		if (wParam == newTrainTimer) {
-
+		if (timer % newTrainTimer == 0) {
+			train++;
+			trainDirection[train][0] = 0;
+			trainDirection[train][1] = 50;
+			trainDirection[train][2] = -50;
+			trainDirection[train][3] = 50;
+			trainDirection[train][4] = 0;
+			trainDirection[train][5] = 0;
+			trainDirection[train][6] = 0;
+			trainDirection[train][7] = 0;
+			
 		}
 		if (wParam == newCityTimer) {
 
@@ -552,110 +567,100 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 	HBRUSH hBrush = CreateSolidBrush(RGB(100, 120, 240));
 	HBRUSH hOldBrush = SelectObject(hdc, hBrush);
 
+	if (train != -1) {
+		for (int i = 0; i <= train; i++) {
 
-	if (moving == 0) {
-		trainDirection[0][0] = 0;
-		trainDirection[0][1] = 50;
-		trainDirection[0][2] = -50;
-		trainDirection[0][3] = 50;
-		trainDirection[0][4] = 0;
-		trainDirection[0][5] = 0;
-		trainDirection[0][6] = 0;
-		trainDirection[0][7] = 0;
-		train++;
+			if (map[trainDirection[i][4]][trainDirection[i][5]].leftBottom == 2) {
+				if (trainDirection[i][5] - trainDirection[i][7] == 0) {
+					TurningTrainLeftBottom(i);
+				}
+				else {
+					TurningTrainBottomLeft(i);
+				}
+			}
+
+			if (map[trainDirection[i][4]][trainDirection[i][5]].bottomRight == 2) {
+				if (trainDirection[i][5] - trainDirection[i][7] == 0) {
+					TurningTrainRightBottom(i);
+				}
+				else {
+					TurningTrainBottomRight(i);
+				}
+			}
+
+			if (map[trainDirection[i][4]][trainDirection[i][5]].topRight == 2) {
+				if (trainDirection[i][4] - trainDirection[i][6] == 0) {
+					TurningTrainTopRight(i);
+				}
+				else {
+					TurningTrainRightTop(i);
+				}
+			}
+
+			if (map[trainDirection[i][4]][trainDirection[i][5]].leftTop == 2) {
+				if (trainDirection[i][5] - trainDirection[i][7] == 0) {
+					TurningTrainLeftTop(i);
+				}
+				else
+				{
+					TurningTrainTopLeft(i);
+				}
+			}
+
+			//Horizontal
+			if (map[trainDirection[i][4]][trainDirection[i][5]].horizontal == 2 && (trainDirection[i][5] - trainDirection[i][7] == 0)) {
+				DirectMoving(i, FALSE);
+			}
+
+			//Vertical
+			if (map[trainDirection[i][4]][trainDirection[i][5]].vertical == 2 && (trainDirection[i][4] - trainDirection[i][6] == 0)) {
+				DirectMoving(i, TRUE);
+			}
+
+			if (trainDirection[i][0] % 100 == 0) {
+				if (trainDirection[i][4] == trainDirection[i][0] / 100 && map[(trainDirection[i][0] / 100) - 1][trainDirection[i][5]].isRoad) {
+					trainDirection[i][6] = trainDirection[i][4];
+					trainDirection[i][7] = trainDirection[i][5];
+
+					trainDirection[i][4] = (trainDirection[i][0] / 100) - 1;
+				}
+				else if (trainDirection[i][4] != trainDirection[i][0] / 100 && map[(trainDirection[i][0] / 100)][trainDirection[i][5]].isRoad) {
+					trainDirection[i][6] = trainDirection[i][4];
+					trainDirection[i][7] = trainDirection[i][5];
+
+					trainDirection[i][4] = trainDirection[i][0] / 100;
+				}
+				else {
+					trainDirection[i][4] = -1;
+					trainDirection[i][5] = -1;
+				}
+			}
+			if (trainDirection[i][1] % 100 == 0) {
+				if (trainDirection[i][5] == trainDirection[i][1] / 100 && map[trainDirection[i][4]][(trainDirection[i][1] / 100) - 1].isRoad) {
+					trainDirection[i][6] = trainDirection[i][4];
+					trainDirection[i][7] = trainDirection[i][5];
+
+					trainDirection[i][5] = (trainDirection[i][1] / 100) - 1;
+				}
+				else  if (trainDirection[i][5] != trainDirection[i][1] / 100 && map[trainDirection[i][4]][trainDirection[i][1] / 100].isRoad) {
+					trainDirection[i][6] = trainDirection[i][4];
+					trainDirection[i][7] = trainDirection[i][5];
+
+					trainDirection[i][5] = trainDirection[i][1] / 100;
+				}
+				else {
+					trainDirection[i][4] = -1;
+					trainDirection[i][5] = -1;
+				}
+
+			}
+
+			if (train != -1) {
+				MoveToEx(hdc, trainDirection[i][0], trainDirection[i][1], NULL); //530; 350
+				LineTo(hdc, trainDirection[i][2], trainDirection[i][3]);			//580; 350
+			}
+		}
 	}
-	for (int i = 0; i <= train; i++) {
-
-		if (map[trainDirection[0][4]][trainDirection[0][5]].leftBottom == 2) {
-			if (trainDirection[0][5] - trainDirection[0][7] == 0) {
-				TurningTrainLeftBottom(0);
-			}
-			else {
-				TurningTrainBottomLeft(0);
-			}
-		}
-
-		if (map[trainDirection[0][4]][trainDirection[0][5]].bottomRight == 2) {
-			if (trainDirection[0][5] - trainDirection[0][7] == 0) {
-				TurningTrainRightBottom(0);
-			}
-			else {
-				TurningTrainBottomRight(0);
-			}
-		}
-
-		if (map[trainDirection[0][4]][trainDirection[0][5]].topRight == 2) {
-			if (trainDirection[0][4] - trainDirection[0][6] == 0) {
-				TurningTrainTopRight(0);
-			}
-			else {
-				TurningTrainRightTop(0);
-			}
-		}
-
-		if (map[trainDirection[0][4]][trainDirection[0][5]].leftTop == 2) {
-			if (trainDirection[0][5] - trainDirection[0][7] == 0) {
-				TurningTrainLeftTop(0);
-			}
-			else
-			{
-				TurningTrainTopLeft(0);
-			}
-		}
-
-		//Horizontal
-		if (map[trainDirection[0][4]][trainDirection[0][5]].horizontal == 2 && (trainDirection[0][5] - trainDirection[0][7] == 0)) {
-			DirectMoving(0, FALSE);
-		}
-
-		//Vertical
-		if (map[trainDirection[0][4]][trainDirection[0][5]].vertical == 2 && (trainDirection[0][4] - trainDirection[0][6] == 0)) {
-			DirectMoving(0, TRUE);
-		}
-
-		if (trainDirection[0][0] % 100 == 0) {
-			if (trainDirection[0][4] == trainDirection[0][0] / 100 && map[(trainDirection[0][0] / 100) - 1][trainDirection[0][5]].isRoad) {
-				trainDirection[0][6] = trainDirection[0][4];
-				trainDirection[0][7] = trainDirection[0][5];
-
-				trainDirection[0][4] = (trainDirection[0][0] / 100) - 1;
-			}
-			else if (trainDirection[0][4] != trainDirection[0][0] / 100 && map[(trainDirection[0][0] / 100)][trainDirection[0][5]].isRoad) {
-				trainDirection[0][6] = trainDirection[0][4];
-				trainDirection[0][7] = trainDirection[0][5];
-
-				trainDirection[0][4] = trainDirection[0][0] / 100;
-			}
-			else {
-				trainDirection[0][4] = -1;
-				trainDirection[0][5] = -1;
-			}
-		}
-		if (trainDirection[0][1] % 100 == 0) {
-			if (trainDirection[0][5] == trainDirection[0][1] / 100 && map[trainDirection[0][4]][(trainDirection[0][1] / 100) - 1].isRoad) {
-				trainDirection[0][6] = trainDirection[0][4];
-				trainDirection[0][7] = trainDirection[0][5];
-
-				trainDirection[0][5] = (trainDirection[0][1] / 100) - 1;
-			}
-			else  if (trainDirection[0][5] != trainDirection[0][1] / 100 && map[trainDirection[0][4]][trainDirection[0][1] / 100].isRoad) {
-				trainDirection[0][6] = trainDirection[0][4];
-				trainDirection[0][7] = trainDirection[0][5];
-
-				trainDirection[0][5] = trainDirection[0][1] / 100;
-			}
-			else {
-				trainDirection[0][4] = -1;
-				trainDirection[0][5] = -1;
-			}
-
-		}
-
-		if (train != -1) {
-			MoveToEx(hdc, trainDirection[0][0], trainDirection[0][1], NULL); //530; 350
-			LineTo(hdc, trainDirection[0][2], trainDirection[0][3]);			//580; 350
-		}
-
 		/*
 			//draw 3 cars
 		//for (int i = 0; i < 180; i += 60)
@@ -679,7 +684,7 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
 		MoveToEx(hdc, 0 - 230 + 180 + horizontalMove, 50, NULL); //350; 350
 		LineTo(hdc, 0 - 200 + 180 + horizontalMove, 50);			//380; 350
-		*/
+		
 		brush.lbColor = RGB(150, 150, 240);
 
 		hPen = ExtCreatePen(pen_style, 15, &brush, 0, NULL);
@@ -705,7 +710,7 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
 		MoveToEx(hdc, 0 - 228 + 120 + horizontalMove, 50, NULL); //352 ; 350
 		LineTo(hdc, 0 - 202 + 120 + horizontalMove, 50);			//378 ; 350
-		*/
+		
 		brush.lbColor = RGB(100, 100, 220);
 
 		hPen = ExtCreatePen(pen_style, 3, &brush, 0, NULL);
@@ -742,7 +747,7 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
 		Ellipse(hdc, 0 - 112 + 26 + horizontalMove, 46, 0 - 102 + 26 + horizontalMove, 55);	//468 ; 346 ; 478 ; 355
 		Ellipse(hdc, 0 - 233 + 26 + horizontalMove, 46, 0 - 223 + 26 + horizontalMove, 55); //347 ; 346 ; 357 ; 355
-		*/
+		
 		brush.lbColor = RGB(153, 76, 0);
 
 		hPen = ExtCreatePen(pen_style, 3, &brush, 0, NULL);
@@ -752,7 +757,7 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 		/*for (int i = 0; i <= 16; i += 4) {
 			MoveToEx(hdc, 0 - 175 + horizontalMove, 42 + i, NULL);	//405; 342
 			LineTo(hdc, 0 - 135 + horizontalMove, 42 + i);			//445; 342
-		};*/
+		};
 
 		brush.lbColor = RGB(0, 0, 0);
 
@@ -774,7 +779,7 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 		MoveToEx(hdc, 0 - 187 + 120 + horizontalMove, 50, NULL);	//393; 350
 		LineTo(hdc, 0 - 183 + 120 + horizontalMove, 50);			//397; 350
 		*/
-	}
+	
 	SelectObject(hdc, hOldBrush);
 	SelectObject(hdc, hOldPen);
 
@@ -864,6 +869,7 @@ void DrawStraightRails(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int xBlock, int yBloc
 //drawing turning railways
 
 void DrawingRotedRails(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int xBlock, int yBlock, int iAngle) {
+	
 	LOGBRUSH brush;
 	DWORD pen_style = PS_SOLID | PS_GEOMETRIC | PS_JOIN_BEVEL;
 
@@ -952,53 +958,53 @@ void DrawingRotedRails(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int xBlock, int yBloc
 
 void DrawingRailWays(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
-	//DrawingRotedRails(hwnd, hdc, ps, 1, 0, 1);
+	/*DrawingRotedRails(hwnd, hdc, ps, 1, 0, 1);
 	map[1][0].leftBottom = 2;
 	map[1][0].isRoad = TRUE;
 
-	//DrawingRotedRails(hwnd, hdc, ps, 2, 1, 2);
+	DrawingRotedRails(hwnd, hdc, ps, 2, 1, 2);
 	map[2][1].bottomRight = 2;
 	map[2][1].isRoad = TRUE;
 
-	//DrawingRotedRails(hwnd, hdc, ps, 1, 2, 3);
+	DrawingRotedRails(hwnd, hdc, ps, 1, 2, 3);
 	map[1][2].topRight = 2;
 	map[1][2].isRoad = TRUE;
 
-	//DrawingRotedRails(hwnd, hdc, ps, 3, 2, 4);
+	DrawingRotedRails(hwnd, hdc, ps, 3, 2, 4);
 	map[3][2].leftTop = 2;
 	map[3][2].isRoad = TRUE;
 
-	//DrawingRotedRails(hwnd, hdc, ps, 3, 1, 1);
+	DrawingRotedRails(hwnd, hdc, ps, 3, 1, 1);
 	map[3][1].leftBottom = 2;
 	map[3][1].isRoad = TRUE;
 
-	//DrawingRotedRails(hwnd, hdc, ps, 2, 3, 3);
+	DrawingRotedRails(hwnd, hdc, ps, 2, 3, 3);
 	map[2][3].topRight = 2;
 	map[2][3].isRoad = TRUE;
 
-	//DrawStraightRails(hwnd, hdc, ps, 2, 2, TRUE);
+	DrawStraightRails(hwnd, hdc, ps, 2, 2, TRUE);
 	map[2][2].horizontal = 2;
 	map[2][2].isRoad = TRUE;
 
-	//DrawStraightRails(hwnd, hdc, ps, 0, 0, TRUE);
+	DrawStraightRails(hwnd, hdc, ps, 0, 0, TRUE);
 	map[0][0].horizontal = 2;
 	map[0][0].isRoad = TRUE;
 
-	//DrawStraightRails(hwnd, hdc, ps, 3, 3, TRUE);
+	DrawStraightRails(hwnd, hdc, ps, 3, 3, TRUE);
 	map[3][3].horizontal = 2;
 	map[3][3].isRoad = TRUE;
 
-	//DrawStraightRails(hwnd, hdc, ps, 4, 3, TRUE);
+	DrawStraightRails(hwnd, hdc, ps, 4, 3, TRUE);
 	map[4][3].horizontal = 2;
 	map[4][3].isRoad = TRUE;
 
-	//DrawStraightRails(hwnd, hdc, ps, 1, 1, FALSE);
+	DrawStraightRails(hwnd, hdc, ps, 1, 1, FALSE);
 	map[1][1].vertical = 2;
 	map[1][1].isRoad = TRUE;
 
-	//DrawStraightRails(hwnd, hdc, ps, 2, 2, FALSE);
+	DrawStraightRails(hwnd, hdc, ps, 2, 2, FALSE);
 	map[2][2].vertical = 2;
-	map[2][2].isRoad = TRUE;
+	map[2][2].isRoad = TRUE;*/
 
 	for (int i = 0; i < 15; i++) {
 		for (int j = 0; j < 10; j++) {
@@ -1028,6 +1034,9 @@ void DrawingRailWays(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
 void CityDrawing(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 	
+	map[0][0].horizontal = 2;
+	map[0][0].isRoad = TRUE;
+
 	RECT rect;
 	
 	POINT triangle[3]  = {36, 70, 50, 60, 62, 70};
