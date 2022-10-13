@@ -27,6 +27,9 @@
     <ClInclude Include="DrawingRailways.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="HelpPoced.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RailWaysGame.c">
