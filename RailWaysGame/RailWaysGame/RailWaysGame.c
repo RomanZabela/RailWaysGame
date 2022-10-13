@@ -214,18 +214,34 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			switch (rightButton)
 			{
 			case 0:
-				
+				if (!map[mouse.x][mouse.y].isRoad) {
 					map[mouse.x][mouse.y].horizontal = 2;
 					map[mouse.x][mouse.y].isRoad = TRUE;
-				
-										
+
+					newRoad = TRUE;
+				}
+				else if (map[mouse.x][mouse.y].horizontal != 2) {
+					map[mouse.x][mouse.y].horizontal = 1;
+					newRoad = FALSE;
+				}
+
 				break;
 			case 1:
-				
+				if (newRoad) {
 					map[mouse.x][mouse.y].horizontal = 0;
 					map[mouse.x][mouse.y].vertical = 2;
 					map[mouse.x][mouse.y].isRoad = TRUE;
-				
+				}
+				else if (map[mouse.x][mouse.y].vertical != 2) {
+					if (map[mouse.x][mouse.y].horizontal != 2) {
+						map[mouse.x][mouse.y].horizontal = 0;
+						map[mouse.x][mouse.y].vertical = 1;
+					}
+					else {
+						map[mouse.x][mouse.y].vertical = 1;
+					}
+					
+				}
 					
 				break;
 			case 2:
@@ -1200,6 +1216,30 @@ void DrawingRailWays(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 		}
 	}
 
+	for (int i = 0; i < 15; i++) {
+		for (int j = 0; j < 10; j++) {
+			if (map[i][j].isRoad) {
+				if (map[i][j].horizontal == 1) {
+					DrawStraightRails(hwnd, hdc, ps, i, j, TRUE);
+				}
+				if (map[i][j].vertical == 1) {
+					DrawStraightRails(hwnd, hdc, ps, i, j, FALSE);
+				}
+				if (map[i][j].leftBottom == 1) {
+					DrawingRotedRails(hwnd, hdc, ps, i, j, 1);
+				}
+				if (map[i][j].bottomRight == 1) {
+					DrawingRotedRails(hwnd, hdc, ps, i, j, 2);
+				}
+				if (map[i][j].topRight == 1) {
+					DrawingRotedRails(hwnd, hdc, ps, i, j, 3);
+				}
+				if (map[i][j].leftTop == 1) {
+					DrawingRotedRails(hwnd, hdc, ps, i, j, 4);
+				}
+			}
+		}
+	}
 		
 }
 

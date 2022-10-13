@@ -1,6 +1,6 @@
 ﻿  RailWaysGame.c
 C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(122,8): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1049,38): warning C4020: 'LineTo': too many actual parameters
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1352,6): warning C4101: 'xPos': unreferenced local variable
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1352,12): warning C4101: 'yPos': unreferenced local variable
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1092,38): warning C4020: 'LineTo': too many actual parameters
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1419,6): warning C4101: 'xPos': unreferenced local variable
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1419,12): warning C4101: 'yPos': unreferenced local variable
   RailWaysGame.vcxproj -> C:\Projects\C\RailWaysGame\RailWaysGame\x64\Debug\RailWaysGame.exe
