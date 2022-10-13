@@ -1,7 +1,4 @@
 ﻿  RailWaysGame.c
 C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(117,8): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(172,44): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(172,30): warning C4024: 'CityDrawing': different types for formal and actual parameter 4
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(898,38): warning C4020: 'LineTo': too many actual parameters
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1058,37): warning C4047: '<=': 'int' differs in levels of indirection from 'int *'
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(916,38): warning C4020: 'LineTo': too many actual parameters
   RailWaysGame.vcxproj -> C:\Projects\C\RailWaysGame\RailWaysGame\x64\Debug\RailWaysGame.exe

@@ -1,6 +1,6 @@
 #include <windows.h>
 #include <time.h>
-#include <math.h>
+#include <math.h> 
 
 #define TWOPI (2 * 3.14159)
 
@@ -57,7 +57,7 @@ const COLORREF BankOfColors[] = {0x000099, 0x9999FF, 0x8000FF, 0x00994c,
 
 const int TimerID = 51;
 const int newTrainTimer = 1200;
-const int newCityTimer = 3600;
+const int newCityTimer = 600;
 int timer = 1001;
 int trainsOnTheMap = -1;
 int citiesOnTheMap = -1;
@@ -106,7 +106,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
 	wc.hCursor = LoadCursor(0, IDC_ARROW);
 
 	RegisterClassW(&wc);
-	CreateWindowW(wc.lpszClassName, L"RailWays", WS_SYSMENU | WS_MINIMIZEBOX| WS_VISIBLE, 200, 25, 1500, 1000, NULL, NULL, hInstance, NULL);
+	CreateWindowW(wc.lpszClassName, L"RailWays", WS_SYSMENU | WS_MINIMIZEBOX| WS_VISIBLE, 200, 25, 1400, 1050, NULL, NULL, hInstance, NULL);
 
 	while (GetMessage(&msg, NULL, 0, 0)) 
 	{
@@ -141,13 +141,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 		RandomCities(0);
 		RandomCities(1);
-
 		break;
 	case WM_TIMER:
 		if (wParam == TimerID) {
 			timer++;
 			RestartTimer(hwnd);
-			InvalidateRect(hwnd, NULL, TRUE);
+			//InvalidateRect(hwnd, NULL, TRUE);
 		}
 		if (timer % newTrainTimer == 0) {
 			trainsOnTheMap++;
@@ -163,14 +162,33 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		}
 		if (timer % newCityTimer == 0) {
 
+			if (citiesOnTheMap < 13) {
+				citiesOnTheMap++;
+
+				RandomCities(citiesOnTheMap);
+			}
 
 		}
+		if (timer % (newCityTimer + 1) == 0) {
+
+			if (citiesOnTheMap < 13) {
+				redrawingRect.left = cities[citiesOnTheMap].xBlock * 100;
+				redrawingRect.top = cities[citiesOnTheMap].yBlock * 100;
+				redrawingRect.right = cities[citiesOnTheMap].xBlock * 100 + 100;
+				redrawingRect.bottom = cities[citiesOnTheMap].yBlock * 100 + 100;
+
+				InvalidateRect(hwnd, &redrawingRect, TRUE);
+			}
+
+		}
+
 	case WM_PAINT:
 		hdc = BeginPaint(hwnd, &ps);
 		DrawingRailWays(hwnd, hdc, ps);
 		DrawTrain(hwnd, hdc, ps);
-		CityDrawing(hwnd, hdc, ps, citiesOnTheMap);
-		EndPaint(hwnd, &ps);
+		CityDrawing(hwnd, hdc, ps, &citiesOnTheMap);
+		EndPaint(hwnd, &ps);		
+
 		break;
 	case WM_RBUTTONDOWN:
 		if (rightButton == 5) {
@@ -185,7 +203,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		mouse.x = LOWORD(lParam) / 100;
 		mouse.y = HIWORD(lParam) / 100;
 
-		if (mouse.x != 0 && mouse.x != 14) {
+		if (mouse.x != 0 && mouse.x != 13) {
 			switch (rightButton)
 			{
 			case 0:
@@ -1024,9 +1042,6 @@ void DrawingRailWays(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 }
 
 void CityDrawing(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int* numberOfCities) {
-	
-	/*map[0][0].horizontal = 2;
-	map[0][0].isRoad = TRUE;*/	
 
 	RECT rect;
 
@@ -1047,16 +1062,19 @@ void CityDrawing(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int* numberOfCities) {
 
 	HPEN hOldPen = SelectObject(hdc, hPenBuild);
 
-	HBRUSH hBrushBuild = CreateSolidBrush(RGB(100, 120, 240));
+	
 	HBRUSH hBrushWindows = CreateSolidBrush(RGB(252, 252, 25));
-
-	HBRUSH hOldBrush = SelectObject(hdc, hBrushBuild);
 
 	POINT triangle[3];
 	int x, y;
 
-	for (int i = 0; i <= numberOfCities; i++) {
+	for (int i = 0; i <= *numberOfCities; i++) {
 
+		HBRUSH hBrushBuild = CreateSolidBrush(cities[i].Color);
+
+		SelectObject(hdc, hPenBuild);
+		HBRUSH hOldBrush = SelectObject(hdc, hBrushBuild);
+		
 		x = cities[i].xBlock * 100;
 		y = cities[i].yBlock * 100;
 
@@ -1069,22 +1087,22 @@ void CityDrawing(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int* numberOfCities) {
 		triangle[2].x = 62 + x;
 		triangle[2].y = 70 + y;
 
-		Rectangle(hdc, 10 + x, 10 + y, 40 + x, 50 + y);
+		Rectangle(hdc, 15 + x, 10 + y, 45 + x, 50 + y);
 
 		SelectObject(hdc, hBrushWindows);
 		SelectObject(hdc, hPenWindows);
 
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < 2; j++) {
-				Rectangle(hdc, 15 + (15 * i) + x, 15 + (20 * j) + y,
-						20 + (15 * i) + x, 25 + (20 * j) + y);
+				Rectangle(hdc, 20 + (15 * i) + x, 15 + (20 * j) + y,
+						25 + (15 * i) + x, 25 + (20 * j) + y);
 			}
 		}
 
 		SelectObject(hdc, hBrushBuild);
 		SelectObject(hdc, hPenBuild);
 
-		Rectangle(hdc, 0 + x, 40 + y, 30 + x, 80 + y);
+		Rectangle(hdc, 5 + x, 40 + y, 35 + x, 80 + y);
 		Rectangle(hdc, 40 + x, 70 + y, 60 + x, 90 + y);
 		Rectangle(hdc, 55 + x, 15 + y, 75 + x, 35 + y);
 
@@ -1096,7 +1114,7 @@ void CityDrawing(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int* numberOfCities) {
 		triangle[1].x = 65 + x;
 		triangle[1].y = 5 + y;
 
-		triangle[2].x = 77 + y;
+		triangle[2].x = 77 + x;
 		triangle[2].y = 15 + y;
 
 		Polygon(hdc, triangle, 3);
@@ -1107,22 +1125,24 @@ void CityDrawing(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int* numberOfCities) {
 
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < 2; j++) {
-				Rectangle(hdc, 5 + (15 * i) + x, 45 + (20 * j) + y,
-						10 + (15 * i) + x, 55 + (20 * j) + y);
+				Rectangle(hdc, 10 + (15 * i) + x, 45 + (20 * j) + y,
+						15 + (15 * i) + x, 55 + (20 * j) + y);
 			}
 		}
 
 		Rectangle(hdc, 45 + x, 75 + y, 50 + x, 80 + y);
 		Rectangle(hdc, 60 + x, 20 + y, 65 + x, 25 + y);
+
+		SelectObject(hdc, hOldBrush);
+		DeleteObject(hBrushBuild);
 	}
 
-	SelectObject(hdc, hOldBrush);
+	
 	SelectObject(hdc, hOldPen);
 
 	DeleteObject(hPenWindows);
 	DeleteObject(hBrushWindows);
-	DeleteObject(hPenBuild);
-	DeleteObject(hBrushBuild);
+	DeleteObject(hPenBuild);	
 }
 
 void RandomCities(const int numberCities) {
@@ -1134,15 +1154,15 @@ void RandomCities(const int numberCities) {
 	};
 
 	if (randomNumber < 7) {
-		cities[numberCities].xBlock = randomNumber;
-		cities[numberCities].yBlock = 0;
+		cities[numberCities].yBlock = randomNumber;
+		cities[numberCities].xBlock = 0;
 
 		map[0][randomNumber].horizontal = 2;
 		map[0][randomNumber].isRoad = TRUE;
 	}
 	else if (randomNumber >= 7) {
-		cities[numberCities].xBlock = randomNumber - 7;
-		cities[numberCities].yBlock = 13;
+		cities[numberCities].yBlock = randomNumber - 7;
+		cities[numberCities].xBlock = 13;
 
 		map[13][randomNumber - 7].horizontal = 2;
 		map[13][randomNumber - 7].isRoad = TRUE;
@@ -1176,14 +1196,14 @@ BYTE FindNutUsingPosition(const int* randNumber, const int* numberCities) {
 
 	if (*randNumber < 7) {
 		for (int i = 0; i < *numberCities; i++) {
-			if (cities[i].xBlock == *randNumber && cities[i].yBlock == 0) {
+			if (cities[i].yBlock == *randNumber && cities[i].xBlock == 0) {
 				result = TRUE;
 			}
 		}
 	}
 	else if (*randNumber >= 7) {
 		for (int i = 0; i <= *numberCities; i++) {
-			if (cities[i].xBlock == *randNumber && cities[i].yBlock == 13) {
+			if (cities[i].yBlock == *randNumber && cities[i].xBlock == 13) {
 				result = TRUE;
 			}
 		}
