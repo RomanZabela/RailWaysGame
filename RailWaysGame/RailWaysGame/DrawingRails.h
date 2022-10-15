@@ -2,25 +2,6 @@
 #include <math.h>
 #include <windows.h>
 
-#define TWOPI (2 * 3.14159)
-
-void RotatePoint(POINT pt[], int iAngle)
-{
-	POINT ptTemp;
-
-	for (int i = 0; i < 2; i++)
-	{
-		ptTemp.x = (int)(pt[i].x * cos(TWOPI * iAngle / 360) +
-			pt[i].y * sin(TWOPI * iAngle / 360));
-
-		ptTemp.y = (int)(pt[i].y * cos(TWOPI * iAngle / 360) -
-			pt[i].x * sin(TWOPI * iAngle / 360));
-
-		pt[i] = ptTemp;
-	}
-
-}
-
 void DrawStraightRails(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int xBlock, int yBlock, BOOL HorizontalFlag) {
 
 	LOGBRUSH brush;

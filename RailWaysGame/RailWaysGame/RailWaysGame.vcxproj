@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DrawingRails.h" />
     <ClInclude Include="DrawingRailways.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="HelpPoced.h" />

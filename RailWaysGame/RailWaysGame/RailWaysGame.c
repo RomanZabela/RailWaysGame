@@ -1,6 +1,8 @@
 #include <windows.h>
 #include <time.h>
 #include <math.h> 
+#include "HelpPoced.h"
+//#include "DrawingRailways.h"
 
 #define TWOPI (2 * 3.14159)
 
@@ -1079,7 +1081,7 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps, RECT trainRedraw[20]) {
 	//DeleteObject(hBrush);
 }
 
-void RotatePoint(POINT pt[], int iAngle)
+/*void RotatePoint(POINT pt[], int iAngle)
 {
 	POINT ptTemp;
 
@@ -1094,11 +1096,11 @@ void RotatePoint(POINT pt[], int iAngle)
 		pt[i] = ptTemp;
 	}
 	
-}
+}*/
 
 //drawing straight railways
 
-void DrawStraightRails(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int xBlock, int yBlock, BOOL HorizontalFlag) {
+/*void DrawStraightRails(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int xBlock, int yBlock, BOOL HorizontalFlag) {
 	
 	LOGBRUSH brush;
 	DWORD pen_style = PS_GEOMETRIC; // | PS_JOIN_BEVEL | PS_SOLID;
@@ -1148,7 +1150,7 @@ void DrawStraightRails(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int xBlock, int yBloc
 		for (int i = 0; i < 2; i++) {
 			xTemp = 45 + (10 * i) + xMove;
 			MoveToEx(hdc, xTemp, yMove, NULL);
-			LineTo(hdc, xTemp, (100 + yMove), NULL);
+			LineTo(hdc, xTemp, (100 + yMove));
 		};
 	};
 	
@@ -1156,7 +1158,7 @@ void DrawStraightRails(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int xBlock, int yBloc
 	SelectObject(hdc, hOldPen);
 	DeleteObject(hPenRailSteel);
 	DeleteObject(hPenRailWood);
-}
+}*/
 
 //drawing turning railways
 
