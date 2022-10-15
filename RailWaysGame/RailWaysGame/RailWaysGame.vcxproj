@@ -130,9 +130,10 @@
     <ClInclude Include="DrawingRails.h" />
     <ClInclude Include="DrawingRailways.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="HelpPoced.h" />
+    <ClInclude Include="MyStructures.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TrainMove.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RailWaysGame.c" />

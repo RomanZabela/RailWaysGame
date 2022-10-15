@@ -27,10 +27,13 @@
     <ClInclude Include="DrawingRailways.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HelpPoced.h">
+    <ClInclude Include="DrawingRails.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DrawingRails.h">
+    <ClInclude Include="TrainMove.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MyStructures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
