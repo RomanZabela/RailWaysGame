@@ -1,4 +1,4 @@
 ﻿  RailWaysGame.c
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\DrawingRails.h(108,125): warning C4029: declared formal parameter list different from definition
 C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(75,8): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(697,20): warning C4020: 'DeleteObject': too many actual parameters
   RailWaysGame.vcxproj -> C:\Projects\C\RailWaysGame\RailWaysGame\x64\Debug\RailWaysGame.exe

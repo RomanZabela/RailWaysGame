@@ -5,21 +5,28 @@
 
 #define TWOPI (2 * 3.14159)
 
-void DrawingRotedRails(HWND*, HDC*, PAINTSTRUCT*, int*, int*, int);
-void DrawStraightRails(HWND*, HDC*, PAINTSTRUCT*, int*, int*, BOOL);
+void DrawingRotedRails(HWND*, HDC*, PAINTSTRUCT*, int*, int*, int, BYTE);
+void DrawStraightRails(HWND*, HDC*, PAINTSTRUCT*, int*, int*, BYTE);
 void HelpForDrawingRoads(HWND*, HDC*, PAINTSTRUCT*, struct Road, int*, int*, int*);
 void RotatePoint(POINT[], int);
 
-void DrawingRotedRails(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, int* xBlock, int* yBlock, int iAngle) {
+void DrawingRotedRails(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, int* xBlock, int* yBlock, int iAngle, BYTE MainRoad) {
 
 	LOGBRUSH brush;
 	DWORD pen_style = PS_GEOMETRIC;
 
 	brush.lbStyle = BS_SOLID;
-	brush.lbColor = RGB(121, 121, 121);
+	
+	if (MainRoad) {
+		brush.lbColor = RGB(0, 0, 0);
+	}
+	else {
+		brush.lbColor = RGB(121, 121, 121);
+	}
+	
 	brush.lbHatch = 0;
 
-	HPEN hPenRailSteel = ExtCreatePen(pen_style, 3, &brush, 0, NULL);
+	HPEN hPenRailSteel = ExtCreatePen(pen_style, 3 + (1*MainRoad), &brush, 0, NULL);
 
 	brush.lbColor = RGB(196, 107, 29);
 	HPEN hPenRailWood = ExtCreatePen(pen_style, 4, &brush, 0, NULL);
@@ -98,16 +105,22 @@ void DrawingRotedRails(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, int* xBlock, int* 
 	DeleteObject(hPenRailWood);
 }
 
-void DrawStraightRails(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, int* xBlock, int* yBlock, BOOL HorizontalFlag) {
+void DrawStraightRails(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, int* xBlock, int* yBlock, BYTE HorizontalFlag, BYTE MainRoad) {
 
 	LOGBRUSH brush;
 	DWORD pen_style = PS_GEOMETRIC; // | PS_JOIN_BEVEL | PS_SOLID;
 
 	brush.lbStyle = BS_SOLID;
-	brush.lbColor = RGB(121, 121, 121);
+	if (MainRoad) {
+		brush.lbColor = RGB(0, 0, 0);
+	}
+	else {
+		brush.lbColor = RGB(121, 121, 121);
+	}
+	
 	brush.lbHatch = 0;
 
-	HPEN hPenRailSteel = ExtCreatePen(pen_style, 3, &brush, 0, NULL);
+	HPEN hPenRailSteel = ExtCreatePen(pen_style, 3 + (1 * MainRoad), &brush, 0, NULL);
 
 	brush.lbColor = RGB(196, 107, 29);
 	HPEN hPenRailWood = ExtCreatePen(pen_style, 4, &brush, 0, NULL);
@@ -159,24 +172,74 @@ void DrawStraightRails(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, int* xBlock, int* 
 
 void HelpForDrawingRoads(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, struct Road road, int* Type, int* BlockX, int* BlockY) {
 
+	BYTE MainRoad = FALSE; // turn main way on
+
 	if (road.isRoad) {
 		if (road.horizontal == *Type) {
-			DrawStraightRails(hwnd, hdc, ps, BlockX, BlockY, TRUE);
+
+			if (*Type == 2 && (road.leftBottom == 1 || road.leftTop == 1 || road.bottomRight == 1 || road.topRight == 1)) {
+				MainRoad = TRUE;
+			}
+			else {
+				MainRoad = FALSE;
+			}
+			DrawStraightRails(hwnd, hdc, ps, BlockX, BlockY, TRUE, MainRoad);
 		}
 		if (road.vertical == *Type) {
-			DrawStraightRails(hwnd, hdc, ps, BlockX, BlockY, FALSE);
+
+			if (*Type == 2 && (road.leftBottom == 1 || road.leftTop == 1 || road.bottomRight == 1 || road.topRight == 1)) {
+				MainRoad = TRUE;
+			}
+			else {
+				MainRoad = FALSE;
+			}
+
+			DrawStraightRails(hwnd, hdc, ps, BlockX, BlockY, FALSE, MainRoad);
+
 		}
 		if (road.leftBottom == *Type) {
-			DrawingRotedRails(hwnd, hdc, ps, BlockX, BlockY, 1);
+
+			if (*Type == 2 && (road.horizontal == 1 || road.vertical == 1 || road.leftTop == 1 || road.bottomRight == 1)) {
+				MainRoad = TRUE;
+			}
+			else {
+				MainRoad = FALSE;
+			}
+			DrawingRotedRails(hwnd, hdc, ps, BlockX, BlockY, 1, MainRoad);
+
 		}
 		if (road.bottomRight == *Type) {
-			DrawingRotedRails(hwnd, hdc, ps, BlockX, BlockY, 2);
+
+			if (*Type == 2 && (road.horizontal == 1 || road.vertical == 1 || road.leftBottom == 1 || road.topRight == 1)) {
+				MainRoad = TRUE;
+			}
+			else {
+				MainRoad = FALSE;
+			}
+
+			DrawingRotedRails(hwnd, hdc, ps, BlockX, BlockY, 2, MainRoad);
 		}
 		if (road.topRight == *Type) {
-			DrawingRotedRails(hwnd, hdc, ps, BlockX, BlockY, 3);
+
+			if (*Type == 2 && (road.horizontal == 1 || road.vertical == 1 || road.bottomRight == 1 || road.leftTop == 1)) {
+				MainRoad = TRUE;
+			}
+			else {
+				MainRoad = FALSE;
+			}
+
+			DrawingRotedRails(hwnd, hdc, ps, BlockX, BlockY, 3, MainRoad);
 		}
 		if (road.leftTop == *Type) {
-			DrawingRotedRails(hwnd, hdc, ps, BlockX, BlockY, 4);
+
+			if (*Type == 2 && (road.horizontal == 1 || road.vertical == 1 || road.topRight == 1 || road.leftBottom == 1)) {
+				MainRoad = TRUE;
+			}
+			else {
+				MainRoad = FALSE;
+			}
+
+			DrawingRotedRails(hwnd, hdc, ps, BlockX, BlockY, 4, MainRoad);
 		}
 	}
 }

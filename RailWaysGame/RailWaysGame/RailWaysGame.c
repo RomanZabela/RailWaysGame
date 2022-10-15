@@ -21,9 +21,9 @@ const COLORREF BankOfColors[] = {0x000099, 0x9999FF, 0x8000FF, 0x00994c,
 								0x4c9900, 0x990099};
 
 const int TimerID = 51;
-const int newTrainTimer = 1000;
+const int newTrainTimer = 700;
 const int newCityTimer = 3600;
-int timer = 1001;
+int timer = 501;
 int trainsOnTheMap = -1;
 int citiesOnTheMap = -1;
 
@@ -48,7 +48,7 @@ struct Train trains[20];
 
 RECT trainsRedraw[20];
 
-int rightButton;
+int rightButton, leftButton;
 POINT mouse, nextMouse;
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine, int nCmdShow) {
@@ -90,6 +90,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	case WM_CREATE:
 		RestartTimer(hwnd);
 		rightButton = -1;
+		leftButton = -1;
 		citiesOnTheMap = 1;
 
 		NewCity(0);
@@ -150,6 +151,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		EndPaint(hwnd, &ps);
 		break;
 	case WM_RBUTTONDOWN:
+
+		mouse.x = LOWORD(lParam) / 100;
+		mouse.y = HIWORD(lParam) / 100;
+
 		if (rightButton == 5) {
 			rightButton = -1;
 		}
@@ -159,10 +164,29 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		break;
 	case WM_RBUTTONUP:	
 
-		mouse.x = LOWORD(lParam) / 100;
-		mouse.y = HIWORD(lParam) / 100;
-
 		if (mouse.x != 0 && mouse.x != 13) {
+
+			if (map[mouse.x][mouse.y].isRoad) {
+				if (rightButton == 0 && map[mouse.x][mouse.y].horizontal != 0) {
+					rightButton++;
+				}
+				if (rightButton == 1 && map[mouse.x][mouse.y].vertical != 0) {
+					rightButton++;
+				}
+				if (rightButton == 2 && map[mouse.x][mouse.y].leftBottom != 0) {
+					rightButton++;
+				}
+				if (rightButton == 3 && map[mouse.x][mouse.y].bottomRight != 0) {
+					rightButton++;
+				}
+				if (rightButton == 4 && map[mouse.x][mouse.y].topRight != 0) {
+					rightButton++;
+				}
+				if (rightButton == 5 && map[mouse.x][mouse.y].leftTop != 0) {
+					rightButton = -1;
+				}
+			}
+
 			switch (rightButton)
 			{
 			case 0:
@@ -226,15 +250,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 	case WM_LBUTTONDOWN:
-		break;
-	case WM_LBUTTONUP:
-		break;
-	case WM_MOUSEMOVE:
 
-		nextMouse.x = LOWORD(lParam) / 100;
-		nextMouse.y = HIWORD(lParam) / 100;
-
-		if (&mouse != &nextMouse) {
+		if (rightButton != -1) {
 			rightButton = -1;
 
 			if (map[mouse.x][mouse.y].isRoad) {
@@ -256,7 +273,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				if (newRoadBlock.road.topRight == 1 && newRoadBlock.road.topRight != 2) {
 					map[mouse.x][mouse.y].topRight = 1;
 				};
-				
+
+				redrawingRect.left = mouse.x * 100;
+				redrawingRect.top = mouse.y * 100;
+				redrawingRect.right = (mouse.x * 100) + 100;
+				redrawingRect.bottom = (mouse.y * 100) + 100;
+
+				InvalidateRect(hwnd, &redrawingRect, TRUE);
+
 			}
 			else if (!map[mouse.x][mouse.y].isRoad) {
 				if (newRoadBlock.road.horizontal == 1) {
@@ -284,9 +308,40 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 					map[mouse.x][mouse.y].isRoad = TRUE;
 				};
 			}
-			
+
 			ResetNewRoad();
 		}
+		else {
+			if (leftButton == 3) {
+				leftButton = -1
+			}
+			else {
+				leftButton++;
+			}
+		}
+		
+		break;
+	case WM_LBUTTONUP:
+
+		break;
+	case WM_MOUSEMOVE:
+
+		nextMouse.x = LOWORD(lParam) / 100;
+		nextMouse.y = HIWORD(lParam) / 100;
+
+		if ((mouse.x != nextMouse.x) && (mouse.y != nextMouse.y) && (rightButton != -1)) {
+			rightButton = -1;
+
+			redrawingRect.left = mouse.x * 100;
+			redrawingRect.top = mouse.y * 100;
+			redrawingRect.right = (mouse.x * 100) + 100;
+			redrawingRect.bottom = (mouse.y * 100) + 100;
+
+			InvalidateRect(hwnd, &redrawingRect, TRUE);
+
+			ResetNewRoad();
+		}
+			
 
 		break;
 	case WM_DESTROY:
@@ -304,6 +359,8 @@ void ResetNewRoad() {
 	newRoadBlock.road.leftBottom = 0;
 	newRoadBlock.road.topRight = 0;
 	newRoadBlock.road.leftTop = 0;
+	mouse.x = -1;
+	mouse.y = -1;
 }
 
 void RestartTimer(HWND hwnd) {
@@ -313,6 +370,8 @@ void RestartTimer(HWND hwnd) {
 void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps, RECT trainRedraw[20]) {
 
 	RECT rect;
+
+	BYTE movingLeft, movingRight, movingUp, movingDown;
 
 	GetClientRect(hwnd, &rect);
 
@@ -327,16 +386,16 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps, RECT trainRedraw[20]) {
 			//continue moving after train stop
 			if (BlockX == -1) {
 				if (trains[i].headX % 100 == 0) {
-					if ((trains[i].headX / 100 == preBlockX + 1) && ((map[preBlockX + 1][preBlockY].horizontal == 2) ||
-						(map[preBlockX + 1][preBlockY].leftBottom == 2) || (map[preBlockX + 1][preBlockY].leftTop == 2))) {
+					if ((trains[i].headX / 100 == preBlockX + 1) && ((map[preBlockX + 1][preBlockY].horizontal != 0) ||
+						(map[preBlockX + 1][preBlockY].leftBottom != 0) || (map[preBlockX + 1][preBlockY].leftTop != 0))) {
 						trains[i].blockX = preBlockX + 1;
 						trains[i].blockY = preBlockY;
 
 						BlockX = preBlockX + 1;
 						BlockY = preBlockY;
 					}
-					if ((trains[i].headX / 100 == preBlockX) && ((map[preBlockX - 1][preBlockY].horizontal == 2) ||
-						(map[preBlockX - 1][preBlockY].topRight == 2) || (map[preBlockX - 1][preBlockY].bottomRight == 2))) {
+					if ((trains[i].headX / 100 == preBlockX) && ((map[preBlockX - 1][preBlockY].horizontal != 0) ||
+						(map[preBlockX - 1][preBlockY].topRight != 0) || (map[preBlockX - 1][preBlockY].bottomRight != 0))) {
 						trains[i].blockX = preBlockX - 1;
 						trains[i].blockY = preBlockY;
 
@@ -345,8 +404,8 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps, RECT trainRedraw[20]) {
 					}
 				}
 				else if (trains[i].headY % 100 == 0) {
-					if ((trains[i].headY / 100 == preBlockY + 1) && ((map[preBlockX][preBlockY + 1].vertical == 2) ||
-						(map[preBlockX][preBlockY + 1].leftTop == 2) || (map[preBlockX][preBlockY + 1].topRight == 2))) {
+					if ((trains[i].headY / 100 == preBlockY + 1) && ((map[preBlockX][preBlockY + 1].vertical != 0) ||
+						(map[preBlockX][preBlockY + 1].leftTop != 0) || (map[preBlockX][preBlockY + 1].topRight != 0))) {
 						trains[i].blockX = preBlockX;
 						trains[i].blockY = preBlockY + 1;
 
@@ -354,8 +413,8 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps, RECT trainRedraw[20]) {
 						BlockY = preBlockY + 1;
 					}
 
-					if ((trains[i].headY / 100 == preBlockY) && ((map[preBlockX][preBlockY - 1].vertical == 2) ||
-						(map[preBlockX][preBlockY - 1].leftBottom == 2) || (map[preBlockX][preBlockY - 1].bottomRight == 2))) {
+					if ((trains[i].headY / 100 == preBlockY) && ((map[preBlockX][preBlockY - 1].vertical != 0) ||
+						(map[preBlockX][preBlockY - 1].leftBottom != 0) || (map[preBlockX][preBlockY - 1].bottomRight != 0))) {
 						trains[i].blockX = preBlockX;
 						trains[i].blockY = preBlockY - 1;
 
@@ -443,7 +502,8 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps, RECT trainRedraw[20]) {
 			}
 
 			//Horizontal
-			if (map[BlockX][BlockY].horizontal == 2 && (BlockY - preBlockY == 0)) {
+			if ((map[BlockX][BlockY].horizontal == 2 && (BlockY - preBlockY == 0)) ||
+				(map[BlockX][BlockY].horizontal == 1 && (BlockY - preBlockY == 0) && map[BlockX][BlockY].vertical == 2)) {
 				if (DirectMoving(&i, FALSE, trains)) {
 					trainRedraw[i].left = trains[i].headX - 30;
 					trainRedraw[i].top = BlockY * 100;
@@ -461,7 +521,8 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps, RECT trainRedraw[20]) {
 			}
 
 			//Vertical
-			if (map[BlockX][BlockY].vertical == 2 && (BlockX - preBlockX == 0)) {
+			if ((map[BlockX][BlockY].vertical == 2 && (BlockX - preBlockX == 0)) ||
+				(map[BlockX][BlockY].horizontal == 2 && (BlockX - preBlockX == 0) && (map[BlockX][BlockY].vertical == 1))) {
 				if (DirectMoving(&i, TRUE, trains)) {
 					trainRedraw[i].left = BlockX * 100;
 					trainRedraw[i].top = trains[i].headY - 30;
@@ -478,13 +539,20 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps, RECT trainRedraw[20]) {
 			}
 
 			if (trains[i].headX % 100 == 0) {
-				if ((BlockX == trains[i].headX / 100) && (map[(trains[i].headX / 100) - 1][BlockY].isRoad)) {
+
+				movingLeft = ((map[(trains[i].headX / 100) - 1][BlockY].isRoad) && (map[(trains[i].headX / 100) - 1][BlockY].horizontal != 0 ||
+					map[(trains[i].headX / 100) - 1][BlockY].topRight != 0 || map[(trains[i].headX / 100) - 1][BlockY].bottomRight != 0));
+
+				movingRight = ((map[(trains[i].headX / 100)][BlockY].isRoad) && (map[(trains[i].headX / 100)][BlockY].horizontal != 0 ||
+					map[(trains[i].headX / 100)][BlockY].leftTop != 0 || map[(trains[i].headX / 100)][BlockY].leftBottom != 0));
+
+				if ((BlockX == trains[i].headX / 100) && movingLeft) { 
 					trains[i].preBlockX = BlockX;
 					trains[i].preBlockY = BlockY;
 
 					trains[i].blockX = (trains[i].headX / 100) - 1;
 				}
-				else if ((BlockX != trains[i].headX / 100) && (map[(trains[i].headX / 100)][BlockY].isRoad)) {
+				else if ((BlockX + 1 == (trains[i].headX / 100)) && movingRight) { 
 					trains[i].preBlockX = BlockX;
 					trains[i].preBlockY = BlockY;
 
@@ -493,6 +561,7 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps, RECT trainRedraw[20]) {
 				else if ((BlockX == 0 || BlockX == 13) && (cities[trains[i].Destination].xBlock == BlockX) && (cities[trains[i].Destination].yBlock == BlockY)) {
 					FinishTrain(&i, &trainsOnTheMap, trains);
 				}
+				//stop moving
 				else if (BlockX != -1) {
 					trains[i].preBlockX = BlockX;
 					trains[i].preBlockY = BlockY;
@@ -501,18 +570,26 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps, RECT trainRedraw[20]) {
 				}
 			}
 			if (trains[i].headY % 100 == 0) {
-				if ((BlockY == trains[i].headY / 100) && (map[BlockX][(trains[i].headY / 100) - 1].isRoad)) {
+
+				movingUp = (map[BlockX][(trains[i].headY / 100) - 1].isRoad && (map[BlockX][(trains[i].headY / 100) - 1].vertical != 0 ||
+					map[BlockX][(trains[i].headY / 100) - 1].bottomRight != 0 || map[BlockX][(trains[i].headY / 100) - 1].leftBottom != 0));
+
+				movingDown = (map[BlockX][(trains[i].headY / 100)].isRoad && (map[BlockX][(trains[i].headY / 100)].vertical != 0 ||
+					map[BlockX][(trains[i].headY / 100)].topRight != 0 || map[BlockX][(trains[i].headY / 100)].leftTop != 0));
+
+				if ((BlockY == trains[i].headY / 100) && movingUp) { 
 					trains[i].preBlockX = BlockX;
 					trains[i].preBlockY = BlockY;
 
 					trains[i].blockY = (trains[i].headY / 100) - 1;
 				}
-				else  if ((BlockY != trains[i].headY / 100) && (map[BlockX][trains[i].headY / 100].isRoad)) {
+				else  if ((BlockY + 1 == (trains[i].headY / 100)) && movingDown) { 
 					trains[i].preBlockX = BlockX;
 					trains[i].preBlockY = BlockY;
 
 					trains[i].blockY = trains[i].headY / 100;
 				}
+				//stop moving
 				else if (BlockY != -1) {
 					trains[i].preBlockX = BlockX;
 					trains[i].preBlockY = BlockY;
@@ -667,46 +744,10 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps, RECT trainRedraw[20]) {
 	//DeleteObject(hBrush);
 }
 
-void DrawingArrows(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
-	
-	LOGBRUSH brush;
-	DWORD pen_style = PS_GEOMETRIC; // | PS_JOIN_BEVEL | PS_SOLID;
-
-	brush.lbStyle = BS_SOLID;
-	brush.lbColor = RGB(121, 121, 121);
-	brush.lbHatch = 0;
-
-	HPEN hPenRailArrow = ExtCreatePen(pen_style, 5, &brush, 0, NULL);
-
-	HPEN hOldPen = SelectObject(hdc, hPenRailArrow);
-
-	for (int i = 0; i < 14; i++) {
-		for (int j = 0; j < 10; j++) {
-			if (map[i][j].isRoad) {
-				if (map[i][j].horizontal == 2) {
-					if (map[i][j].leftBottom == 1 || map[i][j].leftTop == 1) {
-						MoveToEx(hdc, i * 100, j * 100 + 50, NULL);
-						LineTo(hdc, i * 100 + 40, j * 100 + 50);
-					}
-				}
-			}
-		}
-	}
-
-	SelectObject(hdc, hOldPen);
-	DeleteObject(hdc, hPenRailArrow);
-}
-
 void DrawingRailWays(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
-	int type = 2;
+	int type = 1;
 
-	for (int i = 0; i < 14; i++) {
-		for (int j = 0; j < 10; j++) {
-			HelpForDrawingRoads(&hwnd, &hdc, &ps, map[i][j], &type, &i, &j);
-		}
-	}
-	type = 1;
 	for (int i = 0; i < 14; i++) {
 		for (int j = 0; j < 10; j++) {
 			HelpForDrawingRoads(&hwnd, &hdc, &ps, map[i][j], &type, &i, &j);
@@ -715,7 +756,13 @@ void DrawingRailWays(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 
 	HelpForDrawingRoads(&hwnd, &hdc, &ps, newRoadBlock.road, &type, &newRoadBlock.xBlock, &newRoadBlock.yBlock);
 
-	//DrawingArrows(hwnd, hdc, ps);
+	type = 2;
+
+	for (int i = 0; i < 14; i++) {
+		for (int j = 0; j < 10; j++) {
+			HelpForDrawingRoads(&hwnd, &hdc, &ps, map[i][j], &type, &i, &j);
+		}
+	}
 		
 }
 
