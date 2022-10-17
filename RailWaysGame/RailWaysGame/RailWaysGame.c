@@ -12,11 +12,12 @@ void CityDrawing(HWND, HDC, PAINTSTRUCT, int*);
 void NewCity(const int);
 void NewTrain(int*, int*);
 void ResetNewRoad();
+int MousePosition();
 BYTE FindNutUsingPosition(const int*, const int*);
 BYTE FindColor(const int*, const int*);
 
 const COLORREF BankOfColors[] = {0x000099, 0x9999FF, 0x8000FF, 0x00994c,
-								0x009999, 0x004c99, 0xCC0000, 0x994c00,
+								0x009999, 0x004c99, 0xCC0000, 0x99A000,
 								0x660000, 0xFF3399, 0xFF9933, 0x999900,
 								0x4c9900, 0x990099};
 
@@ -26,6 +27,8 @@ const int newCityTimer = 3600;
 int timer = 501;
 int trainsOnTheMap = -1;
 int citiesOnTheMap = -1;
+
+int finishedTrains = 0;
 
 /*map[x][y][z]
 * z: 0 = left-bottom
@@ -49,7 +52,7 @@ struct Train trains[20];
 RECT trainsRedraw[20];
 
 int rightButton, leftButton;
-POINT mouse, nextMouse;
+POINT mouse, mousePosition, Block;
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine, int nCmdShow) {
 	
@@ -84,6 +87,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	HDC hdc;
 
 	RECT redrawingRect;
+
+	DWORD color;
+
+	wchar_t* ver1 = L"Trains finished: ";
+
+	POINT nextMouse;
+
+	HFONT hFont, holdFont;
 
 	switch (msg)
 	{
@@ -148,6 +159,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		DrawingRailWays(hwnd, hdc, ps);
 		DrawTrain(hwnd, hdc, ps, trainsRedraw);
 		CityDrawing(hwnd, hdc, ps, &citiesOnTheMap);
+
+		color = GetSysColor(COLOR_BTNFACE);
+		SetBkColor(hdc, color);
+
+		hFont = CreateFontW(20, 0, 0, 0, FW_MEDIUM, 0, 0, 0, 0, 0, 0, 0, 0, L"Georgia");
+		holdFont = SelectObject(hdc, hFont);
+
+		TextOutW(hdc, 650, 5, ver1, lstrlenW(ver1));
+
 		EndPaint(hwnd, &ps);
 		break;
 	case WM_RBUTTONDOWN:
@@ -190,47 +210,42 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			switch (rightButton)
 			{
 			case 0:
+				ResetNewRoad();
 				newRoadBlock.road.horizontal = 1;
 				newRoadBlock.road.isRoad = TRUE;
 				break;
 			case 1:
-
-				newRoadBlock.road.horizontal = 0;
+				ResetNewRoad();
 				newRoadBlock.road.vertical = 1;
 				newRoadBlock.road.isRoad = TRUE;
 
 				break;
 			case 2:
-
-				newRoadBlock.road.vertical = 0;
+				ResetNewRoad();
 				newRoadBlock.road.leftBottom = 1;
 				newRoadBlock.road.isRoad = TRUE;
 
 				break;
 			case 3:
-
-				newRoadBlock.road.leftBottom = 0;
+				ResetNewRoad();
 				newRoadBlock.road.bottomRight = 1;
 				newRoadBlock.road.isRoad = TRUE;
 
 				break;
 			case 4:
-
-				newRoadBlock.road.bottomRight = 0;
+				ResetNewRoad();
 				newRoadBlock.road.topRight = 1;
 				newRoadBlock.road.isRoad = TRUE;
 
 				break;
 			case 5:
-
-				newRoadBlock.road.topRight = 0;
+				ResetNewRoad();
 				newRoadBlock.road.leftTop = 1;
 				newRoadBlock.road.isRoad = TRUE;
 
 				break;
 			case -1:
-
-				newRoadBlock.road.leftTop = 0;
+				ResetNewRoad();
 				newRoadBlock.road.isRoad = FALSE;
 
 				break;
@@ -250,6 +265,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 	case WM_LBUTTONDOWN:
+		mousePosition.x = LOWORD(lParam);
+		mousePosition.y = HIWORD(lParam);
+		Block.x = mousePosition.x / 100;
+		Block.y = mousePosition.y / 100;
 
 		if (rightButton != -1) {
 			rightButton = -1;
@@ -310,10 +329,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			}
 
 			ResetNewRoad();
+			mouse.x = -1;
+			mouse.y = -1;
 		}
 		else {
 			if (leftButton == 3) {
-				leftButton = -1
+				leftButton = -1;
 			}
 			else {
 				leftButton++;
@@ -322,6 +343,54 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		
 		break;
 	case WM_LBUTTONUP:
+
+		if (map[Block.x][Block.y].isRoad) {
+			switch (MousePosition())
+			{
+			case 1: //left
+				if (map[Block.x][Block.y].horizontal == 2) {
+					if (map[Block.x][Block.y].leftBottom == 1) {
+						map[Block.x][Block.y].leftBottom = 2;
+						map[Block.x][Block.y].horizontal = 1;
+					}
+					else if (map[Block.x][Block.y].leftTop == 1) {
+						map[Block.x][Block.y].leftTop = 2;
+						map[Block.x][Block.y].horizontal = 1;
+					}
+				}
+				else if (map[Block.x][Block.y].leftBottom == 2) {
+					if (map[Block.x][Block.y].leftTop == 1) {
+						map[Block.x][Block.y].leftTop = 2;
+						map[Block.x][Block.y].leftBottom = 1;
+					}
+					else if (map[Block.x][Block.y].horizontal == 1) {
+						map[Block.x][Block.y].horizontal = 2;
+						map[Block.x][Block.y].leftBottom = 1;
+					}
+				}
+				else if (map[Block.x][Block.y].leftTop == 2) {
+					if (map[Block.x][Block.y].horizontal == 1) {
+						map[Block.x][Block.y].horizontal = 2;
+						map[Block.x][Block.y].leftTop = 1;
+					}
+					else if (map[Block.x][Block.y].leftBottom == 1) {
+						map[Block.x][Block.y].leftBottom = 2;
+						map[Block.x][Block.y].leftTop = 1;
+					}
+				}
+				break;
+			default:
+				break;
+			}
+
+			redrawingRect.left = Block.x * 100;
+			redrawingRect.top = Block.y * 100;
+			redrawingRect.right = (Block.x * 100) + 100;
+			redrawingRect.bottom = (Block.y * 100) + 100;
+
+			InvalidateRect(hwnd, &redrawingRect, TRUE);
+
+		}
 
 		break;
 	case WM_MOUSEMOVE:
@@ -340,6 +409,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			InvalidateRect(hwnd, &redrawingRect, TRUE);
 
 			ResetNewRoad();
+			mouse.x = -1;
+			mouse.y = -1;
 		}
 			
 
@@ -352,6 +423,33 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	return DefWindowProcW(hwnd, msg, wParam, lParam);
 }
 
+
+int MousePosition() {
+	int result = -1;
+
+	if ((mousePosition.x - (Block.x * 100) > 5) && (mousePosition.x - (Block.x * 100) < 35) &&
+		(mousePosition.y - (Block.y * 100) > 40) && (mousePosition.y - (Block.y * 100) < 60)) {
+		result = 1;
+	};
+
+	if ((mousePosition.x - (Block.x * 100) > 40) && (mousePosition.x - (Block.x * 100) < 60) &&
+		(mousePosition.y - (Block.y * 100) > 65) && (mousePosition.y - (Block.y * 100) < 95)) {
+		result = 2;
+	};
+
+	if ((mousePosition.x - (Block.x * 100) > 65) && (mousePosition.x - (Block.x * 100) < 95) &&
+		(mousePosition.y - (Block.y * 100) > 40) && (mousePosition.y - (Block.y * 100) < 60)) {
+		result = 3;
+	};
+
+	if ((mousePosition.x - (Block.x * 100) > 40) && (mousePosition.x - (Block.x * 100) < 60) &&
+		(mousePosition.y - (Block.y * 100) > 5) && (mousePosition.y - (Block.y * 100) < 35)) {
+		result = 4;
+	}
+
+	return result;
+}
+
 void ResetNewRoad() {
 	newRoadBlock.road.horizontal = 0;
 	newRoadBlock.road.vertical = 0;
@@ -359,8 +457,6 @@ void ResetNewRoad() {
 	newRoadBlock.road.leftBottom = 0;
 	newRoadBlock.road.topRight = 0;
 	newRoadBlock.road.leftTop = 0;
-	mouse.x = -1;
-	mouse.y = -1;
 }
 
 void RestartTimer(HWND hwnd) {
