@@ -3,6 +3,8 @@
 #include "DrawingRails.h"
 #include "TrainMove.h"
 #include "MyStructures.h"
+#include "HelpNewCity.h"
+#include "HelpForMain.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 void DrawTrain(HWND, HDC, PAINTSTRUCT, RECT*);
@@ -11,10 +13,6 @@ void DrawingRailWays(HWND, HDC, PAINTSTRUCT);
 void CityDrawing(HWND, HDC, PAINTSTRUCT, int*);
 void NewCity(const int);
 void NewTrain(int*, int*);
-void ResetNewRoad();
-int MousePosition();
-BYTE FindNotUsingPosition(const int*, const int*);
-BYTE FindColor(const int*, const int*);
 
 const COLORREF BankOfColors[] = {0x000099, 0x9999FF, 0x8000FF, 0x00994c,
 								0x009999, 0x004c99, 0xCC0000, 0x99A000,
@@ -99,7 +97,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg)
 	{
 	case WM_CREATE:
-		RestartTimer(hwnd);
+		RestartTimer(&hwnd, &TimerID);
 		rightButton = -1;
 		leftButton = -1;
 		citiesOnTheMap = 1;
@@ -112,7 +110,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	case WM_TIMER:
 		if (wParam == TimerID) {
 			timer++;
-			RestartTimer(hwnd);
+			RestartTimer(&hwnd, &TimerID);
 
 			if (trainsOnTheMap != -1) {
 				for (int i = 0; i <= trainsOnTheMap; i++) {
@@ -210,42 +208,42 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			switch (rightButton)
 			{
 			case 0:
-				ResetNewRoad();
+				ResetNewRoad(newRoadBlock);
 				newRoadBlock.road.horizontal = 1;
 				newRoadBlock.road.isRoad = TRUE;
 				break;
 			case 1:
-				ResetNewRoad();
+				ResetNewRoad(newRoadBlock);
 				newRoadBlock.road.vertical = 1;
 				newRoadBlock.road.isRoad = TRUE;
 
 				break;
 			case 2:
-				ResetNewRoad();
+				ResetNewRoad(newRoadBlock);
 				newRoadBlock.road.leftBottom = 1;
 				newRoadBlock.road.isRoad = TRUE;
 
 				break;
 			case 3:
-				ResetNewRoad();
+				ResetNewRoad(newRoadBlock);
 				newRoadBlock.road.bottomRight = 1;
 				newRoadBlock.road.isRoad = TRUE;
 
 				break;
 			case 4:
-				ResetNewRoad();
+				ResetNewRoad(newRoadBlock);
 				newRoadBlock.road.topRight = 1;
 				newRoadBlock.road.isRoad = TRUE;
 
 				break;
 			case 5:
-				ResetNewRoad();
+				ResetNewRoad(newRoadBlock);
 				newRoadBlock.road.leftTop = 1;
 				newRoadBlock.road.isRoad = TRUE;
 
 				break;
 			case -1:
-				ResetNewRoad();
+				ResetNewRoad(newRoadBlock);
 				newRoadBlock.road.isRoad = FALSE;
 
 				break;
@@ -328,7 +326,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				};
 			}
 
-			ResetNewRoad();
+			ResetNewRoad(newRoadBlock);
 			mouse.x = -1;
 			mouse.y = -1;
 		}
@@ -345,7 +343,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	case WM_LBUTTONUP:
 
 		if (map[Block.x][Block.y].isRoad) {
-			switch (MousePosition())
+			switch (MousePosition(mousePosition, Block))
 			{
 			case 1: //left
 				if (map[Block.x][Block.y].horizontal == 2) {
@@ -511,7 +509,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 			InvalidateRect(hwnd, &redrawingRect, TRUE);
 
-			ResetNewRoad();
+			ResetNewRoad(newRoadBlock);
 			mouse.x = -1;
 			mouse.y = -1;
 		}
@@ -524,46 +522,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	};
 
 	return DefWindowProcW(hwnd, msg, wParam, lParam);
-}
-
-
-int MousePosition() {
-	int result = -1;
-
-	if ((mousePosition.x - (Block.x * 100) > 5) && (mousePosition.x - (Block.x * 100) < 35) &&
-		(mousePosition.y - (Block.y * 100) > 40) && (mousePosition.y - (Block.y * 100) < 60)) {
-		result = 1;
-	};
-
-	if ((mousePosition.x - (Block.x * 100) > 40) && (mousePosition.x - (Block.x * 100) < 60) &&
-		(mousePosition.y - (Block.y * 100) > 65) && (mousePosition.y - (Block.y * 100) < 95)) {
-		result = 2;
-	};
-
-	if ((mousePosition.x - (Block.x * 100) > 65) && (mousePosition.x - (Block.x * 100) < 95) &&
-		(mousePosition.y - (Block.y * 100) > 40) && (mousePosition.y - (Block.y * 100) < 60)) {
-		result = 3;
-	};
-
-	if ((mousePosition.x - (Block.x * 100) > 40) && (mousePosition.x - (Block.x * 100) < 60) &&
-		(mousePosition.y - (Block.y * 100) > 5) && (mousePosition.y - (Block.y * 100) < 35)) {
-		result = 4;
-	}
-
-	return result;
-}
-
-void ResetNewRoad() {
-	newRoadBlock.road.horizontal = 0;
-	newRoadBlock.road.vertical = 0;
-	newRoadBlock.road.bottomRight = 0;
-	newRoadBlock.road.leftBottom = 0;
-	newRoadBlock.road.topRight = 0;
-	newRoadBlock.road.leftTop = 0;
-}
-
-void RestartTimer(HWND hwnd) {
-	SetTimer(hwnd, TimerID, 50, NULL);
 }
 
 void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps, RECT trainRedraw[20]) {
@@ -701,7 +659,9 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps, RECT trainRedraw[20]) {
 			}
 
 			//Horizontal
-			if (map[BlockX][BlockY].horizontal == 2 && (BlockY - preBlockY == 0)) {//||(map[BlockX][BlockY].horizontal == 1 && (BlockY - preBlockY == 0) && map[BlockX][BlockY].vertical == 2)) {
+			if ((map[BlockX][BlockY].horizontal == 2 && (BlockY - preBlockY == 0))
+				||(map[BlockX][BlockY].horizontal == 1 && (BlockY - preBlockY == 0) && map[BlockX][BlockY].vertical == 2)) {
+
 				if (DirectMoving(&i, FALSE, trains)) {
 					trainRedraw[i].left = trains[i].headX - 30;
 					trainRedraw[i].top = BlockY * 100;
@@ -719,7 +679,9 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps, RECT trainRedraw[20]) {
 			}
 
 			//Vertical
-			if (map[BlockX][BlockY].vertical == 2 && (BlockX - preBlockX == 0)) {// || (map[BlockX][BlockY].horizontal == 2 && (BlockX - preBlockX == 0) && (map[BlockX][BlockY].vertical == 1))) {
+			if ((map[BlockX][BlockY].vertical == 2 && (BlockX - preBlockX == 0))
+				|| (map[BlockX][BlockY].horizontal == 2 && (BlockX - preBlockX == 0) && (map[BlockX][BlockY].vertical == 1))) {
+
 				if (DirectMoving(&i, TRUE, trains)) {
 					trainRedraw[i].left = BlockX * 100;
 					trainRedraw[i].top = trains[i].headY - 30;
@@ -1067,7 +1029,7 @@ void NewCity(const int numberCities) {
 
 	int randomNumber = rand() % 13;
 
-	while (FindNotUsingPosition(&randomNumber, &numberCities)) {
+	while (FindNotUsingPosition(&randomNumber, &numberCities, cities)) {
 		randomNumber = rand() % 13;
 	};
 
@@ -1088,46 +1050,11 @@ void NewCity(const int numberCities) {
 
 	randomNumber = rand() % 13;
 
-	while (FindColor(&randomNumber, &numberCities)) {
+	while (FindColor(&randomNumber, &numberCities, &BankOfColors, cities)) {
 		randomNumber = rand() % 13;
 	}
 
 	cities[numberCities].Color = BankOfColors[randomNumber];
-}
-
-BYTE FindColor(const int* ColorNumber, const int* numberCities) {
-
-	BYTE result = FALSE;
-
-	for (int i = 0; i < *numberCities; i++) {
-		if (BankOfColors[*ColorNumber] == cities[i].Color) {
-			result = TRUE;
-		}
-	}
-
-	return result;
-}
-
-BYTE FindNotUsingPosition(const int* randNumber, const int* numberCities) {
-	
-	BYTE result = FALSE;
-
-	if (*randNumber < 7) {
-		for (int i = 0; i < *numberCities; i++) {
-			if (cities[i].yBlock == *randNumber && cities[i].xBlock == 0) {
-				result = TRUE;
-			}
-		}
-	}
-	else if (*randNumber >= 7) {
-		for (int i = 0; i <= *numberCities; i++) {
-			if (cities[i].yBlock == *randNumber && cities[i].xBlock == 13) {
-				result = TRUE;
-			}
-		}
-	}
-
-	return result;
 }
 
 void NewTrain(int* numberOfTrains, int* numberOfCities) {

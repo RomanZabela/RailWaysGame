@@ -36,6 +36,12 @@
     <ClInclude Include="MyStructures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="HelpNewCity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HelpForMain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RailWaysGame.c">
