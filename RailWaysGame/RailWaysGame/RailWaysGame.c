@@ -7,10 +7,9 @@
 #include "HelpForMain.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-void DrawTrain(HWND, HDC, PAINTSTRUCT, RECT*);
-void RestartTimer(HWND);
+void DrawTrain(HWND*, HDC*, PAINTSTRUCT*, RECT*);
 void DrawingRailWays(HWND, HDC, PAINTSTRUCT);
-void CityDrawing(HWND, HDC, PAINTSTRUCT, int*);
+void CityDrawing(HDC*, int*);
 void NewCity(const int);
 void NewTrain(int*, int*);
 
@@ -86,13 +85,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 	RECT redrawingRect;
 
-	DWORD color;
-
-	wchar_t* ver1 = L"Trains finished: ";
-
 	POINT nextMouse;
-
-	HFONT hFont, holdFont;
 
 	switch (msg)
 	{
@@ -155,16 +148,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	case WM_PAINT:
 		hdc = BeginPaint(hwnd, &ps);
 		DrawingRailWays(hwnd, hdc, ps);
-		DrawTrain(hwnd, hdc, ps, trainsRedraw);
-		CityDrawing(hwnd, hdc, ps, &citiesOnTheMap);
-
-		color = GetSysColor(COLOR_BTNFACE);
-		SetBkColor(hdc, color);
-
-		hFont = CreateFontW(20, 0, 0, 0, FW_MEDIUM, 0, 0, 0, 0, 0, 0, 0, 0, L"Georgia");
-		holdFont = SelectObject(hdc, hFont);
-
-		TextOutW(hdc, 650, 5, ver1, lstrlenW(ver1));
+		DrawTrain(&hwnd, &hdc, &ps, trainsRedraw);
+		CityDrawing(&hdc, &citiesOnTheMap);
 
 		EndPaint(hwnd, &ps);
 		break;
@@ -208,42 +193,42 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			switch (rightButton)
 			{
 			case 0:
-				ResetNewRoad(newRoadBlock);
+				newRoadBlock = ResetNewRoad(newRoadBlock);
 				newRoadBlock.road.horizontal = 1;
 				newRoadBlock.road.isRoad = TRUE;
 				break;
 			case 1:
-				ResetNewRoad(newRoadBlock);
+				newRoadBlock = ResetNewRoad(newRoadBlock);
 				newRoadBlock.road.vertical = 1;
 				newRoadBlock.road.isRoad = TRUE;
 
 				break;
 			case 2:
-				ResetNewRoad(newRoadBlock);
+				newRoadBlock = ResetNewRoad(newRoadBlock);
 				newRoadBlock.road.leftBottom = 1;
 				newRoadBlock.road.isRoad = TRUE;
 
 				break;
 			case 3:
-				ResetNewRoad(newRoadBlock);
+				newRoadBlock = ResetNewRoad(newRoadBlock);
 				newRoadBlock.road.bottomRight = 1;
 				newRoadBlock.road.isRoad = TRUE;
 
 				break;
 			case 4:
-				ResetNewRoad(newRoadBlock);
+				newRoadBlock = ResetNewRoad(newRoadBlock);
 				newRoadBlock.road.topRight = 1;
 				newRoadBlock.road.isRoad = TRUE;
 
 				break;
 			case 5:
-				ResetNewRoad(newRoadBlock);
+				newRoadBlock = ResetNewRoad(newRoadBlock);
 				newRoadBlock.road.leftTop = 1;
 				newRoadBlock.road.isRoad = TRUE;
 
 				break;
 			case -1:
-				ResetNewRoad(newRoadBlock);
+				newRoadBlock = ResetNewRoad(newRoadBlock);
 				newRoadBlock.road.isRoad = FALSE;
 
 				break;
@@ -326,7 +311,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				};
 			}
 
-			ResetNewRoad(newRoadBlock);
+			newRoadBlock = ResetNewRoad(newRoadBlock);
 			mouse.x = -1;
 			mouse.y = -1;
 		}
@@ -509,7 +494,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 			InvalidateRect(hwnd, &redrawingRect, TRUE);
 
-			ResetNewRoad(newRoadBlock);
+			newRoadBlock = ResetNewRoad(newRoadBlock);
 			mouse.x = -1;
 			mouse.y = -1;
 		}
@@ -524,13 +509,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	return DefWindowProcW(hwnd, msg, wParam, lParam);
 }
 
-void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps, RECT trainRedraw[20]) {
+void DrawTrain(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, RECT trainRedraw[20]) {
 
 	RECT rect;
 
 	BYTE movingLeft, movingRight, movingUp, movingDown;
 
-	GetClientRect(hwnd, &rect);
+	GetClientRect(*hwnd, &rect);
 
 	if (trainsOnTheMap != -1) {
 		for (int i = 0; i <= trainsOnTheMap; i++) {
@@ -719,6 +704,7 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps, RECT trainRedraw[20]) {
 				}
 				else if ((BlockX == 0 || BlockX == 13) && (cities[trains[i].Destination].xBlock == BlockX) && (cities[trains[i].Destination].yBlock == BlockY)) {
 					FinishTrain(&i, &trainsOnTheMap, trains);
+					finishedTrains++;
 				}
 				//stop moving
 				else if (BlockX != -1) {
@@ -769,12 +755,12 @@ void DrawTrain(HWND hwnd, HDC hdc, PAINTSTRUCT ps, RECT trainRedraw[20]) {
 
 				HPEN hPen = ExtCreatePen(pen_style, 25, &brush, 0, NULL);
 
-				HPEN hOldPen = SelectObject(hdc, hPen);
+				HPEN hOldPen = SelectObject(*hdc, hPen);
 
-				MoveToEx(hdc, trains[i].headX, trains[i].headY, NULL); //530; 350
-				LineTo(hdc, trains[i].tailX, trains[i].tailY);			//580; 350
+				MoveToEx(*hdc, trains[i].headX, trains[i].headY, NULL); //530; 350
+				LineTo(*hdc, trains[i].tailX, trains[i].tailY);			//580; 350
 
-				SelectObject(hdc, hOldPen);
+				SelectObject(*hdc, hOldPen);
 
 				DeleteObject(hPen);
 			}
@@ -925,7 +911,7 @@ void DrawingRailWays(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 		
 }
 
-void CityDrawing(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int* numberOfCities) {
+void CityDrawing(HDC* hdc, int* numberOfCities) {
 
 	LOGBRUSH brush;
 	DWORD pen_style = PS_SOLID | PS_GEOMETRIC | PS_JOIN_ROUND;
@@ -940,7 +926,7 @@ void CityDrawing(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int* numberOfCities) {
 
 	HPEN hPenWindows = ExtCreatePen(pen_style, 1, &brush, 0, NULL);
 
-	HPEN hOldPen = SelectObject(hdc, hPenBuild);
+	HPEN hOldPen = SelectObject(*hdc, hPenBuild);
 
 	
 	HBRUSH hBrushWindows = CreateSolidBrush(RGB(252, 252, 25));
@@ -952,8 +938,8 @@ void CityDrawing(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int* numberOfCities) {
 
 		HBRUSH hBrushBuild = CreateSolidBrush(cities[i].Color);
 
-		SelectObject(hdc, hPenBuild);
-		HBRUSH hOldBrush = SelectObject(hdc, hBrushBuild);
+		SelectObject(*hdc, hPenBuild);
+		HBRUSH hOldBrush = SelectObject(*hdc, hBrushBuild);
 		
 		x = cities[i].xBlock * 100;
 		y = cities[i].yBlock * 100;
@@ -967,26 +953,26 @@ void CityDrawing(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int* numberOfCities) {
 		triangle[2].x = 62 + x;
 		triangle[2].y = 70 + y;
 
-		Rectangle(hdc, 15 + x, 10 + y, 45 + x, 50 + y);
+		Rectangle(*hdc, 15 + x, 10 + y, 45 + x, 50 + y);
 
-		SelectObject(hdc, hBrushWindows);
-		SelectObject(hdc, hPenWindows);
+		SelectObject(*hdc, hBrushWindows);
+		SelectObject(*hdc, hPenWindows);
 
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < 2; j++) {
-				Rectangle(hdc, 20 + (15 * i) + x, 15 + (20 * j) + y,
+				Rectangle(*hdc, 20 + (15 * i) + x, 15 + (20 * j) + y,
 						25 + (15 * i) + x, 25 + (20 * j) + y);
 			}
 		}
 
-		SelectObject(hdc, hBrushBuild);
-		SelectObject(hdc, hPenBuild);
+		SelectObject(*hdc, hBrushBuild);
+		SelectObject(*hdc, hPenBuild);
 
-		Rectangle(hdc, 5 + x, 40 + y, 35 + x, 80 + y);
-		Rectangle(hdc, 40 + x, 70 + y, 60 + x, 90 + y);
-		Rectangle(hdc, 55 + x, 15 + y, 75 + x, 35 + y);
+		Rectangle(*hdc, 5 + x, 40 + y, 35 + x, 80 + y);
+		Rectangle(*hdc, 40 + x, 70 + y, 60 + x, 90 + y);
+		Rectangle(*hdc, 55 + x, 15 + y, 75 + x, 35 + y);
 
-		Polygon(hdc, triangle, 3);
+		Polygon(*hdc, triangle, 3);
 
 		triangle[0].x = 51 + x;
 		triangle[0].y = 15 + y;
@@ -997,28 +983,28 @@ void CityDrawing(HWND hwnd, HDC hdc, PAINTSTRUCT ps, int* numberOfCities) {
 		triangle[2].x = 77 + x;
 		triangle[2].y = 15 + y;
 
-		Polygon(hdc, triangle, 3);
+		Polygon(*hdc, triangle, 3);
 
-		SelectObject(hdc, hPenWindows);
+		SelectObject(*hdc, hPenWindows);
 
-		SelectObject(hdc, hBrushWindows);
+		SelectObject(*hdc, hBrushWindows);
 
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < 2; j++) {
-				Rectangle(hdc, 10 + (15 * i) + x, 45 + (20 * j) + y,
+				Rectangle(*hdc, 10 + (15 * i) + x, 45 + (20 * j) + y,
 						15 + (15 * i) + x, 55 + (20 * j) + y);
 			}
 		}
 
-		Rectangle(hdc, 45 + x, 75 + y, 50 + x, 80 + y);
-		Rectangle(hdc, 60 + x, 20 + y, 65 + x, 25 + y);
+		Rectangle(*hdc, 45 + x, 75 + y, 50 + x, 80 + y);
+		Rectangle(*hdc, 60 + x, 20 + y, 65 + x, 25 + y);
 
-		SelectObject(hdc, hOldBrush);
+		SelectObject(*hdc, hOldBrush);
 		DeleteObject(hBrushBuild);
 	}
 
 	
-	SelectObject(hdc, hOldPen);
+	SelectObject(*hdc, hOldPen);
 
 	DeleteObject(hPenWindows);
 	DeleteObject(hBrushWindows);
@@ -1092,4 +1078,21 @@ void NewTrain(int* numberOfTrains, int* numberOfCities) {
 		trains[*numberOfTrains].Destination = cityDest;
 		trains[*numberOfTrains].Color = cities[cityDest].Color;
 	}
+}
+
+void DrawLabelFinishedTrain(HDC* hdc) {
+	DWORD color;
+	HFONT hFont, holdFont;
+
+	wchar_t buf[21];
+
+	color = GetSysColor(COLOR_BTNFACE);
+	SetBkColor(hdc, color);
+
+	hFont = CreateFontW(20, 0, 0, 0, FW_MEDIUM, 0, 0, 0, 0, 0, 0, 0, 0, L"Georgia");
+	holdFont = SelectObject(hdc, hFont);
+
+	wsprintfW(buf, L"Trains finished: %ld", finishedTrains);
+
+	TextOutW(hdc, 600, 5, buf, lstrlenW(buf));
 }

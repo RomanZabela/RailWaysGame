@@ -3,7 +3,7 @@
 #include "MyStructures.h"
 
 int MousePosition(POINT, POINT);
-void ResetNewRoad(struct NewRoad);
+struct NewRoad ResetNewRoad(struct NewRoad);
 void RestartTimer(HWND*, int*);
 
 int MousePosition(POINT mousePosition, POINT Block) {
@@ -32,13 +32,15 @@ int MousePosition(POINT mousePosition, POINT Block) {
 	return result;
 }
 
-void ResetNewRoad(struct NewRoad newRoadBlock) {
+struct NewRoad ResetNewRoad(struct NewRoad newRoadBlock) {
 	newRoadBlock.road.horizontal = 0;
 	newRoadBlock.road.vertical = 0;
 	newRoadBlock.road.bottomRight = 0;
 	newRoadBlock.road.leftBottom = 0;
 	newRoadBlock.road.topRight = 0;
 	newRoadBlock.road.leftTop = 0;
+
+	return newRoadBlock;
 }
 
 void RestartTimer(HWND* hwnd, int* TimerID) {
