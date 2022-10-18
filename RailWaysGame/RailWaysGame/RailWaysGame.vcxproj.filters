@@ -27,6 +27,15 @@
     <ClInclude Include="DrawingRailways.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DrawingRails.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TrainMove.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MyStructures.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RailWaysGame.c">
