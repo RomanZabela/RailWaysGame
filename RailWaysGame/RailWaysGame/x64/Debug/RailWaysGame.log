@@ -1,14 +1,9 @@
 ﻿  RailWaysGame.c
 C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\DrawingRails.h(108,125): warning C4029: declared formal parameter list different from definition
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(75,8): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(93,31): warning C4090: 'function': different 'const' qualifiers
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(106,32): warning C4090: 'function': different 'const' qualifiers
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1039,62): warning C4047: 'function': 'const COLORREF *' differs in levels of indirection from 'const COLORREF (*)[14]'
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1039,49): warning C4024: 'FindColor': different types for formal and actual parameter 3
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1090,16): warning C4047: 'function': 'HDC' differs in levels of indirection from 'HDC *'
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1090,13): warning C4024: 'SetBkColor': different types for formal and actual parameter 1
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1093,29): warning C4047: 'function': 'HDC' differs in levels of indirection from 'HDC *'
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1093,26): warning C4024: 'SelectObject': different types for formal and actual parameter 1
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1097,14): warning C4047: 'function': 'HDC' differs in levels of indirection from 'HDC *'
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1097,11): warning C4024: 'TextOutW': different types for formal and actual parameter 1
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(76,8): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(94,31): warning C4090: 'function': different 'const' qualifiers
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(107,32): warning C4090: 'function': different 'const' qualifiers
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1050,62): warning C4047: 'function': 'const COLORREF *' differs in levels of indirection from 'const COLORREF (*)[14]'
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1050,49): warning C4024: 'FindColor': different types for formal and actual parameter 3
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1112,21): warning C4020: 'DeleteObject': too many actual parameters
   RailWaysGame.vcxproj -> C:\Projects\C\RailWaysGame\RailWaysGame\x64\Debug\RailWaysGame.exe

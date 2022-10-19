@@ -46,3 +46,15 @@ struct NewRoad ResetNewRoad(struct NewRoad newRoadBlock) {
 void RestartTimer(HWND* hwnd, int* TimerID) {
 	SetTimer(*hwnd, *TimerID, 50, NULL);
 }
+
+BYTE TrainNotInTheBlock(struct Train train[], POINT Block, int* trainOnTheMap) {
+	BYTE result = TRUE;
+
+	for (int i = 0; i <= *trainOnTheMap; i++) {
+		if (train[i].blockX == Block.x && train[i].blockY == Block.y) {
+			result = FALSE;
+		}
+	}
+
+	return result;
+}

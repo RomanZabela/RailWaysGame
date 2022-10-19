@@ -12,6 +12,7 @@ void DrawingRailWays(HWND, HDC, PAINTSTRUCT);
 void CityDrawing(HDC*, int*);
 void NewCity(const int);
 void NewTrain(int*, int*);
+void DrawLabelFinishedTrain(HDC*);
 
 const COLORREF BankOfColors[] = {0x000099, 0x9999FF, 0x8000FF, 0x00994c,
 								0x009999, 0x004c99, 0xCC0000, 0x99A000,
@@ -110,6 +111,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 					InvalidateRect(hwnd, &trainsRedraw[i], TRUE);
 				}
 			}
+
+			redrawingRect.left = 5;
+			redrawingRect.top = 600;
+			redrawingRect.right = 900;
+			redrawingRect.bottom = 30;
+
+			InvalidateRect(hwnd, &redrawingRect, TRUE);
 			
 		}
 		if (timer % newTrainTimer == 0) {
@@ -150,7 +158,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		DrawingRailWays(hwnd, hdc, ps);
 		DrawTrain(&hwnd, &hdc, &ps, trainsRedraw);
 		CityDrawing(&hdc, &citiesOnTheMap);
-
+		DrawLabelFinishedTrain(&hdc);
 		EndPaint(hwnd, &ps);
 		break;
 	case WM_RBUTTONDOWN:
@@ -327,7 +335,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		break;
 	case WM_LBUTTONUP:
 
-		if (map[Block.x][Block.y].isRoad) {
+		if (map[Block.x][Block.y].isRoad && TrainNotInTheBlock(trains, Block, &trainsOnTheMap)) {
 			switch (MousePosition(mousePosition, Block))
 			{
 			case 1: //left
@@ -511,11 +519,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 void DrawTrain(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, RECT trainRedraw[20]) {
 
-	RECT rect;
+	//RECT rect;
 
 	BYTE movingLeft, movingRight, movingUp, movingDown;
 
-	GetClientRect(*hwnd, &rect);
+	//GetClientRect(*hwnd, &rect);
 
 	if (trainsOnTheMap != -1) {
 		for (int i = 0; i <= trainsOnTheMap; i++) {
@@ -528,16 +536,18 @@ void DrawTrain(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, RECT trainRedraw[20]) {
 			//continue moving after train stop
 			if (BlockX == -1) {
 				if (trains[i].headX % 100 == 0) {
-					if ((trains[i].headX / 100 == preBlockX + 1) && ((map[preBlockX + 1][preBlockY].horizontal != 0) ||
-						(map[preBlockX + 1][preBlockY].leftBottom != 0) || (map[preBlockX + 1][preBlockY].leftTop != 0))) {
+					if ((trains[i].headX / 100 == preBlockX + 1) && ((map[preBlockX + 1][preBlockY].horizontal == 2) ||
+						(map[preBlockX + 1][preBlockY].leftBottom == 2) || (map[preBlockX + 1][preBlockY].leftTop == 2)) ||
+						(map[preBlockX + 1][preBlockY].horizontal == 1 && map[preBlockX + 1][preBlockY].vertical == 2) ) {
 						trains[i].blockX = preBlockX + 1;
 						trains[i].blockY = preBlockY;
 
 						BlockX = preBlockX + 1;
 						BlockY = preBlockY;
 					}
-					if ((trains[i].headX / 100 == preBlockX) && ((map[preBlockX - 1][preBlockY].horizontal != 0) ||
-						(map[preBlockX - 1][preBlockY].topRight != 0) || (map[preBlockX - 1][preBlockY].bottomRight != 0))) {
+					if ((trains[i].headX / 100 == preBlockX) && ((map[preBlockX - 1][preBlockY].horizontal == 2) ||
+						(map[preBlockX - 1][preBlockY].topRight == 2) || (map[preBlockX - 1][preBlockY].bottomRight == 2)) ||
+						(map[preBlockX - 1][preBlockY].horizontal == 1 && map[preBlockX - 1][preBlockY].vertical == 2)) {
 						trains[i].blockX = preBlockX - 1;
 						trains[i].blockY = preBlockY;
 
@@ -547,7 +557,8 @@ void DrawTrain(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, RECT trainRedraw[20]) {
 				}
 				else if (trains[i].headY % 100 == 0) {
 					if ((trains[i].headY / 100 == preBlockY + 1) && ((map[preBlockX][preBlockY + 1].vertical != 0) ||
-						(map[preBlockX][preBlockY + 1].leftTop != 0) || (map[preBlockX][preBlockY + 1].topRight != 0))) {
+						(map[preBlockX][preBlockY + 1].leftTop != 0) || (map[preBlockX][preBlockY + 1].topRight != 0)) ||
+						(map[preBlockX][preBlockY + 1].horizontal == 2 && map[preBlockX][preBlockY + 1].vertical == 1)) {
 						trains[i].blockX = preBlockX;
 						trains[i].blockY = preBlockY + 1;
 
@@ -556,7 +567,8 @@ void DrawTrain(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, RECT trainRedraw[20]) {
 					}
 
 					if ((trains[i].headY / 100 == preBlockY) && ((map[preBlockX][preBlockY - 1].vertical != 0) ||
-						(map[preBlockX][preBlockY - 1].leftBottom != 0) || (map[preBlockX][preBlockY - 1].bottomRight != 0))) {
+						(map[preBlockX][preBlockY - 1].leftBottom != 0) || (map[preBlockX][preBlockY - 1].bottomRight != 0)) || 
+						(map[preBlockX][preBlockY - 1].horizontal == 2 && map[preBlockX][preBlockY - 1].vertical == 1)) {
 						trains[i].blockX = preBlockX;
 						trains[i].blockY = preBlockY - 1;
 
@@ -684,11 +696,11 @@ void DrawTrain(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, RECT trainRedraw[20]) {
 
 			if (trains[i].headX % 100 == 0) {
 
-				movingLeft = ((map[(trains[i].headX / 100) - 1][BlockY].isRoad) && (map[(trains[i].headX / 100) - 1][BlockY].horizontal != 0 ||
-					map[(trains[i].headX / 100) - 1][BlockY].topRight != 0 || map[(trains[i].headX / 100) - 1][BlockY].bottomRight != 0));
+				movingLeft = ((map[(trains[i].headX / 100) - 1][BlockY].isRoad) && (map[(trains[i].headX / 100) - 1][BlockY].horizontal == 2 ||
+					map[(trains[i].headX / 100) - 1][BlockY].topRight == 2 || map[(trains[i].headX / 100) - 1][BlockY].bottomRight == 2));
 
-				movingRight = ((map[(trains[i].headX / 100)][BlockY].isRoad) && (map[(trains[i].headX / 100)][BlockY].horizontal != 0 ||
-					map[(trains[i].headX / 100)][BlockY].leftTop != 0 || map[(trains[i].headX / 100)][BlockY].leftBottom != 0));
+				movingRight = ((map[(trains[i].headX / 100)][BlockY].isRoad) && (map[(trains[i].headX / 100)][BlockY].horizontal == 2 ||
+					map[(trains[i].headX / 100)][BlockY].leftTop == 2 || map[(trains[i].headX / 100)][BlockY].leftBottom == 2));
 
 				if ((BlockX == trains[i].headX / 100) && movingLeft) { 
 					trains[i].preBlockX = BlockX;
@@ -931,8 +943,7 @@ void CityDrawing(HDC* hdc, int* numberOfCities) {
 	
 	HBRUSH hBrushWindows = CreateSolidBrush(RGB(252, 252, 25));
 
-	POINT triangle[3];
-	int x, y;
+	POINT triangle[3], coordinates;
 
 	for (int i = 0; i <= *numberOfCities; i++) {
 
@@ -941,47 +952,47 @@ void CityDrawing(HDC* hdc, int* numberOfCities) {
 		SelectObject(*hdc, hPenBuild);
 		HBRUSH hOldBrush = SelectObject(*hdc, hBrushBuild);
 		
-		x = cities[i].xBlock * 100;
-		y = cities[i].yBlock * 100;
+		coordinates.x = cities[i].xBlock * 100;
+		coordinates.y = cities[i].yBlock * 100;
 
-		triangle[0].x = 36 + x;
-		triangle[0].y = 70 + y;
+		triangle[0].x = 36 + coordinates.x;
+		triangle[0].y = 70 + coordinates.y;
 
-		triangle[1].x = 50 + x;
-		triangle[1].y = 60 + y;
+		triangle[1].x = 50 + coordinates.x;
+		triangle[1].y = 60 + coordinates.y;
 
-		triangle[2].x = 62 + x;
-		triangle[2].y = 70 + y;
+		triangle[2].x = 62 + coordinates.x;
+		triangle[2].y = 70 + coordinates.y;
 
-		Rectangle(*hdc, 15 + x, 10 + y, 45 + x, 50 + y);
+		Rectangle(*hdc, 15 + coordinates.x, 10 + coordinates.y, 45 + coordinates.x, 50 + coordinates.y);
 
 		SelectObject(*hdc, hBrushWindows);
 		SelectObject(*hdc, hPenWindows);
 
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < 2; j++) {
-				Rectangle(*hdc, 20 + (15 * i) + x, 15 + (20 * j) + y,
-						25 + (15 * i) + x, 25 + (20 * j) + y);
+				Rectangle(*hdc, 20 + (15 * i) + coordinates.x, 15 + (20 * j) + coordinates.y,
+						25 + (15 * i) + coordinates.x, 25 + (20 * j) + coordinates.y);
 			}
 		}
 
 		SelectObject(*hdc, hBrushBuild);
 		SelectObject(*hdc, hPenBuild);
 
-		Rectangle(*hdc, 5 + x, 40 + y, 35 + x, 80 + y);
-		Rectangle(*hdc, 40 + x, 70 + y, 60 + x, 90 + y);
-		Rectangle(*hdc, 55 + x, 15 + y, 75 + x, 35 + y);
+		Rectangle(*hdc, 5 + coordinates.x, 40 + coordinates.y, 35 + coordinates.x, 80 + coordinates.y);
+		Rectangle(*hdc, 40 + coordinates.x, 70 + coordinates.y, 60 + coordinates.x, 90 + coordinates.y);
+		Rectangle(*hdc, 55 + coordinates.x, 15 + coordinates.y, 75 + coordinates.x, 35 + coordinates.y);
 
 		Polygon(*hdc, triangle, 3);
 
-		triangle[0].x = 51 + x;
-		triangle[0].y = 15 + y;
+		triangle[0].x = 51 + coordinates.x;
+		triangle[0].y = 15 + coordinates.y;
 
-		triangle[1].x = 65 + x;
-		triangle[1].y = 5 + y;
+		triangle[1].x = 65 + coordinates.x;
+		triangle[1].y = 5 + coordinates.y;
 
-		triangle[2].x = 77 + x;
-		triangle[2].y = 15 + y;
+		triangle[2].x = 77 + coordinates.x;
+		triangle[2].y = 15 + coordinates.y;
 
 		Polygon(*hdc, triangle, 3);
 
@@ -991,13 +1002,13 @@ void CityDrawing(HDC* hdc, int* numberOfCities) {
 
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < 2; j++) {
-				Rectangle(*hdc, 10 + (15 * i) + x, 45 + (20 * j) + y,
-						15 + (15 * i) + x, 55 + (20 * j) + y);
+				Rectangle(*hdc, 10 + (15 * i) + coordinates.x, 45 + (20 * j) + coordinates.y,
+						15 + (15 * i) + coordinates.x, 55 + (20 * j) + coordinates.y);
 			}
 		}
 
-		Rectangle(*hdc, 45 + x, 75 + y, 50 + x, 80 + y);
-		Rectangle(*hdc, 60 + x, 20 + y, 65 + x, 25 + y);
+		Rectangle(*hdc, 45 + coordinates.x, 75 + coordinates.y, 50 + coordinates.x, 80 + coordinates.y);
+		Rectangle(*hdc, 60 + coordinates.x, 20 + coordinates.y, 65 + coordinates.x, 25 + coordinates.y);
 
 		SelectObject(*hdc, hOldBrush);
 		DeleteObject(hBrushBuild);
@@ -1081,18 +1092,22 @@ void NewTrain(int* numberOfTrains, int* numberOfCities) {
 }
 
 void DrawLabelFinishedTrain(HDC* hdc) {
+	
 	DWORD color;
 	HFONT hFont, holdFont;
 
 	wchar_t buf[21];
 
 	color = GetSysColor(COLOR_BTNFACE);
-	SetBkColor(hdc, color);
+	SetBkColor(*hdc, color);
 
 	hFont = CreateFontW(20, 0, 0, 0, FW_MEDIUM, 0, 0, 0, 0, 0, 0, 0, 0, L"Georgia");
-	holdFont = SelectObject(hdc, hFont);
+	holdFont = SelectObject(*hdc, hFont);
 
 	wsprintfW(buf, L"Trains finished: %ld", finishedTrains);
 
-	TextOutW(hdc, 600, 5, buf, lstrlenW(buf));
+	TextOutW(*hdc, 600, 5, buf, lstrlenW(buf));
+
+	SelectObject(*hdc, holdFont);
+	DeleteObject(*hdc, hFont);	
 }
