@@ -2,14 +2,10 @@
 #include <Windows.h>
 
 struct Train {
-	int headX;
-	int headY;
-	int tailX;
-	int tailY;
-	int blockX;
-	int blockY;
-	int preBlockX;
-	int preBlockY;
+	POINT head;
+	POINT tail;
+	POINT block;
+	POINT preBlock;
 	int Destination;
 	COLORREF Color;
 };
@@ -26,13 +22,15 @@ struct Road {
 
 struct NewRoad
 {
-	int xBlock;
-	int yBlock;
+	/*int xBlock;
+	int yBlock;*/
+	POINT block;
 	struct Road road;
 };
 
 struct City {
-	int xBlock;
-	int yBlock;
+	/*int xBlock;
+	int yBlock;*/
+	POINT block;
 	COLORREF Color; //BGR
 };

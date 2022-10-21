@@ -12,16 +12,16 @@ void DrawingRailWays(HWND, HDC, PAINTSTRUCT);
 void CityDrawing(HDC*, int*);
 void NewCity(const int);
 void NewTrain(int*, int*);
-void DrawLabelFinishedTrain(HDC*);
+void DrawingLabelFinishedTrains(HDC*);
 
 const COLORREF BankOfColors[] = {0x000099, 0x9999FF, 0x8000FF, 0x00994c,
 								0x009999, 0x004c99, 0xCC0000, 0x99A000,
 								0x660000, 0xFF3399, 0xFF9933, 0x999900,
 								0x4c9900, 0x990099};
 
-const int TimerID = 51;
+const int TimerID = 26;
 const int newTrainTimer = 700;
-const int newCityTimer = 3600;
+const int newCityTimer = 2600;
 int timer = 501;
 int trainsOnTheMap = -1;
 int citiesOnTheMap = -1;
@@ -51,6 +51,8 @@ RECT trainsRedraw[20];
 
 int rightButton, leftButton;
 POINT mouse, mousePosition, Block;
+
+HWND hLaFinishedTrains;
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine, int nCmdShow) {
 	
@@ -96,6 +98,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		leftButton = -1;
 		citiesOnTheMap = 1;
 
+		hLaFinishedTrains = CreateWindowW(L"Static", L"0", WS_CHILD | WS_VISIBLE, 650, 5, 750, 30, hwnd, (HMENU)1, NULL, NULL);
+
 		NewCity(0);
 		NewCity(1);
 
@@ -112,13 +116,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				}
 			}
 
-			redrawingRect.left = 5;
+			/*redrawingRect.left = 5;
 			redrawingRect.top = 600;
 			redrawingRect.right = 900;
 			redrawingRect.bottom = 30;
 
-			InvalidateRect(hwnd, &redrawingRect, TRUE);
+			InvalidateRect(hwnd, &redrawingRect, TRUE);*/
 			
+		}
+		if (timer % 4 == 0) {
+
 		}
 		if (timer % newTrainTimer == 0) {
 			
@@ -143,10 +150,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 			if (citiesOnTheMap < 13) {
 
-				redrawingRect.left = cities[citiesOnTheMap].xBlock * 100;
-				redrawingRect.top = cities[citiesOnTheMap].yBlock * 100;
-				redrawingRect.right = cities[citiesOnTheMap].xBlock * 100 + 100;
-				redrawingRect.bottom = cities[citiesOnTheMap].yBlock * 100 + 100;
+				redrawingRect.left = cities[citiesOnTheMap].block.x * 100;
+				redrawingRect.top = cities[citiesOnTheMap].block.y * 100;
+				redrawingRect.right = cities[citiesOnTheMap].block.x * 100 + 100;
+				redrawingRect.bottom = cities[citiesOnTheMap].block.y * 100 + 100;
 
 				InvalidateRect(hwnd, &redrawingRect, TRUE);
 			}
@@ -158,7 +165,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		DrawingRailWays(hwnd, hdc, ps);
 		DrawTrain(&hwnd, &hdc, &ps, trainsRedraw);
 		CityDrawing(&hdc, &citiesOnTheMap);
-		DrawLabelFinishedTrain(&hdc);
+		DrawingLabelFinishedTrains(&hdc);
 		EndPaint(hwnd, &ps);
 		break;
 	case WM_RBUTTONDOWN:
@@ -244,8 +251,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				break;
 			}
 
-			newRoadBlock.xBlock = mouse.x;
-			newRoadBlock.yBlock = mouse.y;
+			newRoadBlock.block.x = mouse.x;
+			newRoadBlock.block.y = mouse.y;
 
 			redrawingRect.left = mouse.x * 100;
 			redrawingRect.top = mouse.y * 100;
@@ -528,49 +535,49 @@ void DrawTrain(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, RECT trainRedraw[20]) {
 	if (trainsOnTheMap != -1) {
 		for (int i = 0; i <= trainsOnTheMap; i++) {
 
-			int BlockX = trains[i].blockX;
-			int BlockY = trains[i].blockY;
-			int preBlockX = trains[i].preBlockX;
-			int preBlockY = trains[i].preBlockY;
+			int BlockX = trains[i].block.x;
+			int BlockY = trains[i].block.y;
+			int preBlockX = trains[i].preBlock.x;
+			int preBlockY = trains[i].preBlock.y;
 
 			//continue moving after train stop
 			if (BlockX == -1) {
-				if (trains[i].headX % 100 == 0) {
-					if ((trains[i].headX / 100 == preBlockX + 1) && ((map[preBlockX + 1][preBlockY].horizontal == 2) ||
+				if (trains[i].head.x % 100 == 0) {
+					if ((trains[i].head.x / 100 == preBlockX + 1) && ((map[preBlockX + 1][preBlockY].horizontal == 2) ||
 						(map[preBlockX + 1][preBlockY].leftBottom == 2) || (map[preBlockX + 1][preBlockY].leftTop == 2)) ||
 						(map[preBlockX + 1][preBlockY].horizontal == 1 && map[preBlockX + 1][preBlockY].vertical == 2) ) {
-						trains[i].blockX = preBlockX + 1;
-						trains[i].blockY = preBlockY;
+						trains[i].block.x = preBlockX + 1;
+						trains[i].block.y = preBlockY;
 
 						BlockX = preBlockX + 1;
 						BlockY = preBlockY;
 					}
-					if ((trains[i].headX / 100 == preBlockX) && ((map[preBlockX - 1][preBlockY].horizontal == 2) ||
+					if ((trains[i].head.x / 100 == preBlockX) && ((map[preBlockX - 1][preBlockY].horizontal == 2) ||
 						(map[preBlockX - 1][preBlockY].topRight == 2) || (map[preBlockX - 1][preBlockY].bottomRight == 2)) ||
 						(map[preBlockX - 1][preBlockY].horizontal == 1 && map[preBlockX - 1][preBlockY].vertical == 2)) {
-						trains[i].blockX = preBlockX - 1;
-						trains[i].blockY = preBlockY;
+						trains[i].block.x = preBlockX - 1;
+						trains[i].block.y = preBlockY;
 
 						BlockX = preBlockX - 1;
 						BlockY = preBlockY;
 					}
 				}
-				else if (trains[i].headY % 100 == 0) {
-					if ((trains[i].headY / 100 == preBlockY + 1) && ((map[preBlockX][preBlockY + 1].vertical != 0) ||
-						(map[preBlockX][preBlockY + 1].leftTop != 0) || (map[preBlockX][preBlockY + 1].topRight != 0)) ||
+				else if (trains[i].head.y % 100 == 0) {
+					if ((trains[i].head.y / 100 == preBlockY + 1) && ((map[preBlockX][preBlockY + 1].vertical == 2) ||
+						(map[preBlockX][preBlockY + 1].leftTop == 2) || (map[preBlockX][preBlockY + 1].topRight == 2)) ||
 						(map[preBlockX][preBlockY + 1].horizontal == 2 && map[preBlockX][preBlockY + 1].vertical == 1)) {
-						trains[i].blockX = preBlockX;
-						trains[i].blockY = preBlockY + 1;
+						trains[i].block.x = preBlockX;
+						trains[i].block.y = preBlockY + 1;
 
 						BlockX = preBlockX;
 						BlockY = preBlockY + 1;
 					}
 
-					if ((trains[i].headY / 100 == preBlockY) && ((map[preBlockX][preBlockY - 1].vertical != 0) ||
-						(map[preBlockX][preBlockY - 1].leftBottom != 0) || (map[preBlockX][preBlockY - 1].bottomRight != 0)) || 
+					if ((trains[i].head.y / 100 == preBlockY) && ((map[preBlockX][preBlockY - 1].vertical == 2) ||
+						(map[preBlockX][preBlockY - 1].leftBottom == 2) || (map[preBlockX][preBlockY - 1].bottomRight == 2)) || 
 						(map[preBlockX][preBlockY - 1].horizontal == 2 && map[preBlockX][preBlockY - 1].vertical == 1)) {
-						trains[i].blockX = preBlockX;
-						trains[i].blockY = preBlockY - 1;
+						trains[i].block.x = preBlockX;
+						trains[i].block.y = preBlockY - 1;
 
 						BlockX = preBlockX;
 						BlockY = preBlockY - 1;
@@ -660,15 +667,15 @@ void DrawTrain(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, RECT trainRedraw[20]) {
 				||(map[BlockX][BlockY].horizontal == 1 && (BlockY - preBlockY == 0) && map[BlockX][BlockY].vertical == 2)) {
 
 				if (DirectMoving(&i, FALSE, trains)) {
-					trainRedraw[i].left = trains[i].headX - 30;
+					trainRedraw[i].left = trains[i].head.x - 30;
 					trainRedraw[i].top = BlockY * 100;
-					trainRedraw[i].right = trains[i].tailX + 30;
+					trainRedraw[i].right = trains[i].tail.x + 30;
 					trainRedraw[i].bottom = BlockY * 100 + 100;
 				}
 				else {
-					trainRedraw[i].left = trains[i].tailX - 30;
+					trainRedraw[i].left = trains[i].tail.x - 30;
 					trainRedraw[i].top = BlockY * 100;
-					trainRedraw[i].right = trains[i].headX + 30;
+					trainRedraw[i].right = trains[i].head.x + 30;
 					trainRedraw[i].bottom = BlockY * 100 + 100;
 				}
 
@@ -681,77 +688,79 @@ void DrawTrain(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, RECT trainRedraw[20]) {
 
 				if (DirectMoving(&i, TRUE, trains)) {
 					trainRedraw[i].left = BlockX * 100;
-					trainRedraw[i].top = trains[i].headY - 30;
+					trainRedraw[i].top = trains[i].head.y - 30;
 					trainRedraw[i].right = BlockX * 100 + 100;
-					trainRedraw[i].bottom = trains[i].tailY + 30;
+					trainRedraw[i].bottom = trains[i].tail.y + 30;
 				}
 				else
 				{
 					trainRedraw[i].left = BlockX * 100;
-					trainRedraw[i].top = trains[i].tailY - 30;
+					trainRedraw[i].top = trains[i].tail.y - 30;
 					trainRedraw[i].right = BlockX * 100 + 100;
-					trainRedraw[i].bottom = trains[i].headY + 30;
+					trainRedraw[i].bottom = trains[i].head.y + 30;
 				}
 			}
 
-			if (trains[i].headX % 100 == 0) {
+			if (trains[i].head.x % 100 == 0) {
 
-				movingLeft = ((map[(trains[i].headX / 100) - 1][BlockY].isRoad) && (map[(trains[i].headX / 100) - 1][BlockY].horizontal == 2 ||
-					map[(trains[i].headX / 100) - 1][BlockY].topRight == 2 || map[(trains[i].headX / 100) - 1][BlockY].bottomRight == 2));
+				movingLeft = ((map[(trains[i].head.x / 100) - 1][BlockY].isRoad) && (map[(trains[i].head.x / 100) - 1][BlockY].horizontal == 2 ||
+					map[(trains[i].head.x / 100) - 1][BlockY].topRight == 2 || map[(trains[i].head.x / 100) - 1][BlockY].bottomRight == 2));
 
-				movingRight = ((map[(trains[i].headX / 100)][BlockY].isRoad) && (map[(trains[i].headX / 100)][BlockY].horizontal == 2 ||
-					map[(trains[i].headX / 100)][BlockY].leftTop == 2 || map[(trains[i].headX / 100)][BlockY].leftBottom == 2));
+				movingRight = ((map[(trains[i].head.x / 100)][BlockY].isRoad) && (map[(trains[i].head.x / 100)][BlockY].horizontal == 2 ||
+					map[(trains[i].head.x / 100)][BlockY].leftTop == 2 || map[(trains[i].head.x / 100)][BlockY].leftBottom == 2));
 
-				if ((BlockX == trains[i].headX / 100) && movingLeft) { 
-					trains[i].preBlockX = BlockX;
-					trains[i].preBlockY = BlockY;
+				if ((BlockX == trains[i].head.x / 100) && movingLeft) { 
+					trains[i].preBlock.x = BlockX;
+					trains[i].preBlock.y = BlockY;
 
-					trains[i].blockX = (trains[i].headX / 100) - 1;
+					trains[i].block.x = (trains[i].head.x / 100) - 1;
 				}
-				else if ((BlockX + 1 == (trains[i].headX / 100)) && movingRight) { 
-					trains[i].preBlockX = BlockX;
-					trains[i].preBlockY = BlockY;
+				else if ((BlockX + 1 == (trains[i].head.x / 100)) && movingRight) { 
+					trains[i].preBlock.x = BlockX;
+					trains[i].preBlock.y = BlockY;
 
-					trains[i].blockX = trains[i].headX / 100;
+					trains[i].block.x = trains[i].head.x / 100;
 				}
-				else if ((BlockX == 0 || BlockX == 13) && (cities[trains[i].Destination].xBlock == BlockX) && (cities[trains[i].Destination].yBlock == BlockY)) {
+				else if ((BlockX == 0 || BlockX == 13) && (cities[trains[i].Destination].block.x == BlockX) && (cities[trains[i].Destination].block.y == BlockY)) {
 					FinishTrain(&i, &trainsOnTheMap, trains);
-					finishedTrains++;
+					if (trains[i].head.x == -1 || trains[i].head.x == 1401) {
+						finishedTrains++;
+					}
 				}
 				//stop moving
 				else if (BlockX != -1) {
-					trains[i].preBlockX = BlockX;
-					trains[i].preBlockY = BlockY;
-					trains[i].blockX = -1;
-					trains[i].blockY = -1;
+					trains[i].preBlock.x = BlockX;
+					trains[i].preBlock.y = BlockY;
+					trains[i].block.x = -1;
+					trains[i].block.y = -1;
 				}
 			}
-			if (trains[i].headY % 100 == 0) {
+			if (trains[i].head.y % 100 == 0) {
 
-				movingUp = (map[BlockX][(trains[i].headY / 100) - 1].isRoad && (map[BlockX][(trains[i].headY / 100) - 1].vertical != 0 ||
-					map[BlockX][(trains[i].headY / 100) - 1].bottomRight != 0 || map[BlockX][(trains[i].headY / 100) - 1].leftBottom != 0));
+				movingUp = (map[BlockX][(trains[i].head.y / 100) - 1].isRoad && (map[BlockX][(trains[i].head.y / 100) - 1].vertical == 2 ||
+					map[BlockX][(trains[i].head.y / 100) - 1].bottomRight == 2 || map[BlockX][(trains[i].head.y / 100) - 1].leftBottom == 2));
 
-				movingDown = (map[BlockX][(trains[i].headY / 100)].isRoad && (map[BlockX][(trains[i].headY / 100)].vertical != 0 ||
-					map[BlockX][(trains[i].headY / 100)].topRight != 0 || map[BlockX][(trains[i].headY / 100)].leftTop != 0));
+				movingDown = (map[BlockX][(trains[i].head.y / 100)].isRoad && (map[BlockX][(trains[i].head.y / 100)].vertical == 2 ||
+					map[BlockX][(trains[i].head.y / 100)].topRight == 2 || map[BlockX][(trains[i].head.y / 100)].leftTop == 2));
 
-				if ((BlockY == trains[i].headY / 100) && movingUp) { 
-					trains[i].preBlockX = BlockX;
-					trains[i].preBlockY = BlockY;
+				if ((BlockY == trains[i].head.y / 100) && movingUp) { 
+					trains[i].preBlock.x = BlockX;
+					trains[i].preBlock.y = BlockY;
 
-					trains[i].blockY = (trains[i].headY / 100) - 1;
+					trains[i].block.y = (trains[i].head.y / 100) - 1;
 				}
-				else  if ((BlockY + 1 == (trains[i].headY / 100)) && movingDown) { 
-					trains[i].preBlockX = BlockX;
-					trains[i].preBlockY = BlockY;
+				else  if ((BlockY + 1 == (trains[i].head.y / 100)) && movingDown) { 
+					trains[i].preBlock.x = BlockX;
+					trains[i].preBlock.y = BlockY;
 
-					trains[i].blockY = trains[i].headY / 100;
+					trains[i].block.y = trains[i].head.y / 100;
 				}
 				//stop moving
 				else if (BlockY != -1) {
-					trains[i].preBlockX = BlockX;
-					trains[i].preBlockY = BlockY;
-					trains[i].blockX = -1;
-					trains[i].blockY = -1;
+					trains[i].preBlock.x = BlockX;
+					trains[i].preBlock.y = BlockY;
+					trains[i].block.x = -1;
+					trains[i].block.y = -1;
 				}
 
 			}
@@ -769,8 +778,8 @@ void DrawTrain(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, RECT trainRedraw[20]) {
 
 				HPEN hOldPen = SelectObject(*hdc, hPen);
 
-				MoveToEx(*hdc, trains[i].headX, trains[i].headY, NULL); //530; 350
-				LineTo(*hdc, trains[i].tailX, trains[i].tailY);			//580; 350
+				MoveToEx(*hdc, trains[i].head.x, trains[i].head.y, NULL); //530; 350
+				LineTo(*hdc, trains[i].tail.x, trains[i].tail.y);			//580; 350
 
 				SelectObject(*hdc, hOldPen);
 
@@ -911,7 +920,7 @@ void DrawingRailWays(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
 		}
 	}
 
-	HelpForDrawingRoads(&hwnd, &hdc, &ps, newRoadBlock.road, &type, &newRoadBlock.xBlock, &newRoadBlock.yBlock);
+	HelpForDrawingRoads(&hwnd, &hdc, &ps, newRoadBlock.road, &type, &newRoadBlock.block.x, &newRoadBlock.block.y);
 
 	type = 2;
 
@@ -952,8 +961,8 @@ void CityDrawing(HDC* hdc, int* numberOfCities) {
 		SelectObject(*hdc, hPenBuild);
 		HBRUSH hOldBrush = SelectObject(*hdc, hBrushBuild);
 		
-		coordinates.x = cities[i].xBlock * 100;
-		coordinates.y = cities[i].yBlock * 100;
+		coordinates.x = cities[i].block.x * 100;
+		coordinates.y = cities[i].block.y * 100;
 
 		triangle[0].x = 36 + coordinates.x;
 		triangle[0].y = 70 + coordinates.y;
@@ -1031,15 +1040,15 @@ void NewCity(const int numberCities) {
 	};
 
 	if (randomNumber < 7) {
-		cities[numberCities].yBlock = randomNumber;
-		cities[numberCities].xBlock = 0;
+		cities[numberCities].block.y = randomNumber;
+		cities[numberCities].block.x = 0;
 
 		map[0][randomNumber].horizontal = 2;
 		map[0][randomNumber].isRoad = TRUE;
 	}
 	else if (randomNumber >= 7) {
-		cities[numberCities].yBlock = randomNumber - 7;
-		cities[numberCities].xBlock = 13;
+		cities[numberCities].block.y = randomNumber - 7;
+		cities[numberCities].block.y = 13;
 
 		map[13][randomNumber - 7].horizontal = 2;
 		map[13][randomNumber - 7].isRoad = TRUE;
@@ -1065,49 +1074,37 @@ void NewTrain(int* numberOfTrains, int* numberOfCities) {
 		cityDest = rand() % (* numberOfCities + 1);
 	};
 
-	if (cities[citySource].xBlock == 0) {
-		trains[*numberOfTrains].headX = cities[citySource].xBlock * 100;
-		trains[*numberOfTrains].headY = cities[citySource].yBlock * 100 + 50;
-		trains[*numberOfTrains].tailX = cities[citySource].xBlock * 100 - 50;
-		trains[*numberOfTrains].tailY = cities[citySource].yBlock * 100 + 50;
-		trains[*numberOfTrains].blockX = cities[citySource].xBlock;
-		trains[*numberOfTrains].blockY = cities[citySource].yBlock;
-		trains[*numberOfTrains].preBlockX = cities[citySource].xBlock;
-		trains[*numberOfTrains].preBlockY = cities[citySource].yBlock;
+	if (cities[citySource].block.x == 0) {
+		trains[*numberOfTrains].head.x = cities[citySource].block.x * 100;
+		trains[*numberOfTrains].head.y = cities[citySource].block.y * 100 + 50;
+		trains[*numberOfTrains].tail.x = cities[citySource].block.x * 100 - 50;
+		trains[*numberOfTrains].tail.y = cities[citySource].block.y * 100 + 50;
+		trains[*numberOfTrains].block.x = cities[citySource].block.x;
+		trains[*numberOfTrains].block.y = cities[citySource].block.y;
+		trains[*numberOfTrains].preBlock.x = cities[citySource].block.x;
+		trains[*numberOfTrains].preBlock.y = cities[citySource].block.y;
 		trains[*numberOfTrains].Destination = cityDest;
 		trains[*numberOfTrains].Color = cities[cityDest].Color;
 	}
-	else if (cities[citySource].xBlock == 13) {
-		trains[*numberOfTrains].headX = cities[citySource].xBlock * 100 + 100 - 1;
-		trains[*numberOfTrains].headY = cities[citySource].yBlock * 100 + 50;
-		trains[*numberOfTrains].tailX = cities[citySource].xBlock * 100 + 100 + 50 - 1;
-		trains[*numberOfTrains].tailY = cities[citySource].yBlock * 100 + 50;
-		trains[*numberOfTrains].blockX = cities[citySource].xBlock;
-		trains[*numberOfTrains].blockY = cities[citySource].yBlock;
-		trains[*numberOfTrains].preBlockX = cities[citySource].xBlock + 1;
-		trains[*numberOfTrains].preBlockY = cities[citySource].yBlock;
+	else if (cities[citySource].block.y == 13) {
+		trains[*numberOfTrains].head.x = cities[citySource].block.x * 100 + 100 - 1;
+		trains[*numberOfTrains].head.y = cities[citySource].block.y * 100 + 50;
+		trains[*numberOfTrains].tail.x = cities[citySource].block.x * 100 + 100 + 50 - 1;
+		trains[*numberOfTrains].tail.y = cities[citySource].block.y * 100 + 50;
+		trains[*numberOfTrains].block.x = cities[citySource].block.x;
+		trains[*numberOfTrains].block.y = cities[citySource].block.y;
+		trains[*numberOfTrains].preBlock.x = cities[citySource].block.x + 1;
+		trains[*numberOfTrains].preBlock.y = cities[citySource].block.y;
 		trains[*numberOfTrains].Destination = cityDest;
 		trains[*numberOfTrains].Color = cities[cityDest].Color;
 	}
 }
 
-void DrawLabelFinishedTrain(HDC* hdc) {
-	
-	DWORD color;
-	HFONT hFont, holdFont;
+void DrawingLabelFinishedTrains(HDC* hdc) {
 
 	wchar_t buf[21];
 
-	color = GetSysColor(COLOR_BTNFACE);
-	SetBkColor(*hdc, color);
-
-	hFont = CreateFontW(20, 0, 0, 0, FW_MEDIUM, 0, 0, 0, 0, 0, 0, 0, 0, L"Georgia");
-	holdFont = SelectObject(*hdc, hFont);
-
 	wsprintfW(buf, L"Trains finished: %ld", finishedTrains);
 
-	TextOutW(*hdc, 600, 5, buf, lstrlenW(buf));
-
-	SelectObject(*hdc, holdFont);
-	DeleteObject(*hdc, hFont);	
+	SetWindowTextW(hLaFinishedTrains, buf);
 }

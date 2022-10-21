@@ -24,14 +24,14 @@ BYTE FindNotUsingPosition(const int* randNumber, const int* numberCities, struct
 
 	if (*randNumber < 7) {
 		for (int i = 0; i < *numberCities; i++) {
-			if (cities[i].yBlock == *randNumber && cities[i].xBlock == 0) {
+			if (cities[i].block.y == *randNumber && cities[i].block.x == 0) {
 				result = TRUE;
 			}
 		}
 	}
 	else if (*randNumber >= 7) {
 		for (int i = 0; i <= *numberCities; i++) {
-			if (cities[i].yBlock == *randNumber && cities[i].xBlock == 13) {
+			if (cities[i].block.y == *randNumber && cities[i].block.x == 13) {
 				result = TRUE;
 			}
 		}
