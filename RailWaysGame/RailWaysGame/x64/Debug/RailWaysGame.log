@@ -3,6 +3,6 @@ C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\DrawingRails.h(108,125): wa
 C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(78,8): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
 C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(96,31): warning C4090: 'function': different 'const' qualifiers
 C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(111,32): warning C4090: 'function': different 'const' qualifiers
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1059,62): warning C4047: 'function': 'const COLORREF *' differs in levels of indirection from 'const COLORREF (*)[14]'
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1059,49): warning C4024: 'FindColor': different types for formal and actual parameter 3
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1046,62): warning C4047: 'function': 'const COLORREF *' differs in levels of indirection from 'const COLORREF (*)[14]'
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1046,49): warning C4024: 'FindColor': different types for formal and actual parameter 3
   RailWaysGame.vcxproj -> C:\Projects\C\RailWaysGame\RailWaysGame\x64\Debug\RailWaysGame.exe

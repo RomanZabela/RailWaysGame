@@ -1,6 +1,6 @@
 #pragma once
 #include <Windows.h>
-#include "MyStructures.h"
+#include "Structures.h"
 
 int MousePosition(POINT, POINT);
 struct NewRoad ResetNewRoad(struct NewRoad);
@@ -44,7 +44,7 @@ struct NewRoad ResetNewRoad(struct NewRoad newRoadBlock) {
 }
 
 void RestartTimer(HWND* hwnd, int* TimerID) {
-	SetTimer(*hwnd, *TimerID, 25, NULL);
+	SetTimer(*hwnd, *TimerID, 60, NULL);
 }
 
 BYTE TrainNotInTheBlock(struct Train train[], POINT Block, int* trainOnTheMap) {

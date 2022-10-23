@@ -24,16 +24,13 @@
     <ClInclude Include="Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DrawingRailways.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DrawingRails.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TrainMove.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MyStructures.h">
+    <ClInclude Include="Structures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="HelpNewCity.h">

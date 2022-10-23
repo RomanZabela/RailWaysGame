@@ -1,7 +1,7 @@
 #pragma once
 #include <windows.h>
 #include <math.h>
-#include "MyStructures.h"
+#include "Structures.h"
 
 #define TWOPI (2 * 3.14159)
 

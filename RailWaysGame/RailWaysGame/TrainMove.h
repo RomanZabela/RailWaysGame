@@ -1,5 +1,5 @@
 #pragma once
-#include "MyStructures.h"
+#include "Structures.h"
 
 BYTE DirectMoving(int*, byte, struct Train[]);
 void TurningTrainLeftBottom(int*, struct Train[]);

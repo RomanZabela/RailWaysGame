@@ -1,6 +1,6 @@
 #pragma once
 #include <Windows.h>
-#include "MyStructures.h"
+#include "Structures.h"
 
 BYTE FindColor(const int*, const int*, const COLORREF*, struct City[]);
 BYTE FindNotUsingPosition(const int*, const int*, struct City[]);

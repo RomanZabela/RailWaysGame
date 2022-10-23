@@ -8,6 +8,7 @@ struct Train {
 	POINT preBlock;
 	int Destination;
 	COLORREF Color;
+	byte Stop;
 };
 
 struct Road {
@@ -20,17 +21,12 @@ struct Road {
 	byte isRoad;
 };
 
-struct NewRoad
-{
-	/*int xBlock;
-	int yBlock;*/
+struct NewRoad {
 	POINT block;
 	struct Road road;
 };
 
 struct City {
-	/*int xBlock;
-	int yBlock;*/
 	POINT block;
 	COLORREF Color; //BGR
 };
