@@ -265,7 +265,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		mapBlock.x = mousePosition.x / 100;
 		mapBlock.y = mousePosition.y / 100;
 
-		if (rightButton != -1) {
+		if (rightButton != -1 && !TrainInTheBlock(trains, mapBlock, &trainsOnTheMap, &foundTrain)) {
+			
 			rightButton = -1;
 
 			if (map[mouse.x][mouse.y].isRoad) {
@@ -492,6 +493,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			InvalidateRect(hwnd, &redrawingRect, TRUE);
 
 		}
+		//stop the train
 		else if (trainInTheBlockResult) {
 			if ((mousePosition.x >= trains[foundTrain].tail.x && mousePosition.x <= trains[foundTrain].head.x &&		//moving right
 				mousePosition.y >= trains[foundTrain].head.y - 10 && mousePosition.y <= trains[foundTrain].head.y + 10) ||
@@ -516,7 +518,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		nextMouse.x = LOWORD(lParam) / 100;
 		nextMouse.y = HIWORD(lParam) / 100;
 
-		if ((mouse.x != nextMouse.x) && (mouse.y != nextMouse.y) && (rightButton != -1)) {
+		if (((mouse.x != nextMouse.x) || (mouse.y != nextMouse.y)) && (rightButton != -1)) {
 			rightButton = -1;
 
 			redrawingRect.left = mouse.x * 100;
@@ -726,12 +728,21 @@ void DrawTrain(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, RECT trainRedraw[20]) {
 
 						trains[i].block.x = trains[i].head.x / 100;
 					}
-					else if ((drawTrainBlock.x == 0 || drawTrainBlock.x == 13) && (cities[trains[i].Destination].block.x == drawTrainBlock.x) && (cities[trains[i].Destination].block.y == drawTrainBlock.y)) {
+					else if ((drawTrainBlock.x == 0 || drawTrainBlock.x == 13) && (cities[trains[i].Destination].block.x == drawTrainBlock.x) &&
+						(cities[trains[i].Destination].block.y == drawTrainBlock.y)) {
 						FinishTrain(&i, &trainsOnTheMap, trains);
 						if (trains[i].head.x == -1 || trains[i].head.x == 1401) {
 							finishedTrains++;
 							DrawingLabelFinishedTrains(hdc);
 						}
+					}
+					//if wrong city, need to turn arround the train
+					else if ((drawTrainBlock.x == 0 || drawTrainBlock.x == 13) && (trains[i].head.x == 0 || trains[i].head.x == 1400) &&
+						(cities[trains[i].Destination].block.x != drawTrainBlock.x || cities[trains[i].Destination].block.y != drawTrainBlock.y)) {
+						drawTrainBlock = trains[i].head;
+						trains[i].head = trains[i].tail;
+						trains[i].tail = drawTrainBlock;
+						trains[i].preBlock = trains[i].block;
 					}
 					//stop moving
 					else if (!trains[i].Stop) {
@@ -1091,10 +1102,8 @@ void NewTrain(int* numberOfTrains, int* numberOfCities) {
 		trains[*numberOfTrains].head.y = cities[citySource].block.y * 100 + 50;
 		trains[*numberOfTrains].tail.x = cities[citySource].block.x * 100 - 50;
 		trains[*numberOfTrains].tail.y = cities[citySource].block.y * 100 + 50;
-		trains[*numberOfTrains].block.x = cities[citySource].block.x;
-		trains[*numberOfTrains].block.y = cities[citySource].block.y;
-		trains[*numberOfTrains].preBlock.x = cities[citySource].block.x;
-		trains[*numberOfTrains].preBlock.y = cities[citySource].block.y;
+		trains[*numberOfTrains].block = cities[citySource].block;
+		trains[*numberOfTrains].preBlock = cities[citySource].block;
 		trains[*numberOfTrains].Destination = cityDest;
 		trains[*numberOfTrains].Color = cities[cityDest].Color;
 		trains[*numberOfTrains].Stop = FALSE;
@@ -1106,9 +1115,8 @@ void NewTrain(int* numberOfTrains, int* numberOfCities) {
 		trains[*numberOfTrains].head.y = cities[citySource].block.y * 100 + 50;
 		trains[*numberOfTrains].tail.x = cities[citySource].block.x * 100 + 100 + 50 - 1;
 		trains[*numberOfTrains].tail.y = cities[citySource].block.y * 100 + 50;
-		trains[*numberOfTrains].block.x = cities[citySource].block.x;
-		trains[*numberOfTrains].block.y = cities[citySource].block.y;
-		trains[*numberOfTrains].preBlock.x = cities[citySource].block.x + 1;
+		trains[*numberOfTrains].block = cities[citySource].block;
+		trains[*numberOfTrains].preBlock.x = cities[citySource].block.x;// +1;
 		trains[*numberOfTrains].preBlock.y = cities[citySource].block.y;
 		trains[*numberOfTrains].Destination = cityDest;
 		trains[*numberOfTrains].Color = cities[cityDest].Color;
