@@ -1,8 +1,9 @@
-<<<<<<< HEAD
-﻿  LINK : C:\Projects\C\RailWaysGame\RailWaysGame\x64\Debug\RailWaysGame.exe not found or not built by the last incremental link; performing full link
-=======
 ﻿  RailWaysGame.c
 C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\DrawingRails.h(108,125): warning C4029: declared formal parameter list different from definition
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\HelpForMain.h(51,35): warning C4028: formal parameter 1 different from declaration
 C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(78,8): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
->>>>>>> 080229d4af890af93379865b998edf6540270306
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(100,31): warning C4090: 'function': different 'const' qualifiers
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(117,32): warning C4090: 'function': different 'const' qualifiers
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1070,62): warning C4047: 'function': 'const COLORREF *' differs in levels of indirection from 'const COLORREF (*)[14]'
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1070,49): warning C4024: 'FindColor': different types for formal and actual parameter 3
   RailWaysGame.vcxproj -> C:\Projects\C\RailWaysGame\RailWaysGame\x64\Debug\RailWaysGame.exe

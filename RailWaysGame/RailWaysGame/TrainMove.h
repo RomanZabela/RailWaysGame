@@ -1,5 +1,5 @@
 #pragma once
-#include "MyStructures.h"
+#include "Structures.h"
 
 BYTE DirectMoving(int*, byte, struct Train[]);
 void TurningTrainLeftBottom(int*, struct Train[]);
@@ -27,17 +27,17 @@ int CorrectTail(int* Tail, const int* Block) {
 
 BYTE DirectMoving(int* numberTrain, byte Vertical, struct Train trains[]) {
 
-	int headX = trains[*numberTrain].headX;
-	int headY = trains[*numberTrain].headY;
-	int tailX = trains[*numberTrain].tailX;
-	int tailY = trains[*numberTrain].tailY;
-	int blockX = (trains[*numberTrain].blockX * 100);
-	int blockY = (trains[*numberTrain].blockY * 100);
+	int headX = trains[*numberTrain].head.x;
+	int headY = trains[*numberTrain].head.y;
+	int tailX = trains[*numberTrain].tail.x;
+	int tailY = trains[*numberTrain].tail.y;
+	int blockX = (trains[*numberTrain].block.x * 100);
+	int blockY = (trains[*numberTrain].block.y * 100);
 
 	byte forwardVertical, forwardHorizontal;
 
-	forwardVertical = trains[*numberTrain].blockY - trains[*numberTrain].preBlockY < 0;
-	forwardHorizontal = trains[*numberTrain].blockX - trains[*numberTrain].preBlockX < 0;
+	forwardVertical = trains[*numberTrain].block.y - trains[*numberTrain].preBlock.y < 0;
+	forwardHorizontal = trains[*numberTrain].block.x - trains[*numberTrain].preBlock.x < 0;
 
 	if (Vertical) {
 		if (forwardVertical) {
@@ -70,22 +70,22 @@ BYTE DirectMoving(int* numberTrain, byte Vertical, struct Train trains[]) {
 		}
 	}
 
-	trains[*numberTrain].headX = headX;
-	trains[*numberTrain].headY = headY;
-	trains[*numberTrain].tailX = tailX;
-	trains[*numberTrain].tailY = tailY;
+	trains[*numberTrain].head.x = headX;
+	trains[*numberTrain].head.y = headY;
+	trains[*numberTrain].tail.x = tailX;
+	trains[*numberTrain].tail.y = tailY;
 
 	return forwardHorizontal || forwardVertical;
 }
 
 void TurningTrainLeftBottom(int* numberTrain, struct Train trains[]) {
 
-	int headX = trains[*numberTrain].headX;
-	int headY = trains[*numberTrain].headY;
-	int tailX = trains[*numberTrain].tailX;
-	int tailY = trains[*numberTrain].tailY;
-	int blockX = (trains[*numberTrain].blockX * 100);
-	int blockY = (trains[*numberTrain].blockY * 100);
+	int headX = trains[*numberTrain].head.x;
+	int headY = trains[*numberTrain].head.y;
+	int tailX = trains[*numberTrain].tail.x;
+	int tailY = trains[*numberTrain].tail.y;
+	int blockX = (trains[*numberTrain].block.x * 100);
+	int blockY = (trains[*numberTrain].block.y * 100);
 
 	tailY = CorrectTail(&tailY, &blockY);
 
@@ -105,20 +105,20 @@ void TurningTrainLeftBottom(int* numberTrain, struct Train trains[]) {
 		headY += 2;
 	}
 
-	trains[*numberTrain].headX = headX;
-	trains[*numberTrain].headY = headY;
-	trains[*numberTrain].tailX = tailX;
-	trains[*numberTrain].tailY = tailY;
+	trains[*numberTrain].head.x = headX;
+	trains[*numberTrain].head.y = headY;
+	trains[*numberTrain].tail.x = tailX;
+	trains[*numberTrain].tail.y = tailY;
 }
 
 void TurningTrainBottomLeft(int* numberTrain, struct Train trains[]) {
 
-	int headX = trains[*numberTrain].headX;
-	int headY = trains[*numberTrain].headY;
-	int tailX = trains[*numberTrain].tailX;
-	int tailY = trains[*numberTrain].tailY;
-	int blockX = (trains[*numberTrain].blockX * 100);
-	int blockY = (trains[*numberTrain].blockY * 100 + 100);
+	int headX = trains[*numberTrain].head.x;
+	int headY = trains[*numberTrain].head.y;
+	int tailX = trains[*numberTrain].tail.x;
+	int tailY = trains[*numberTrain].tail.y;
+	int blockX = (trains[*numberTrain].block.x * 100);
+	int blockY = (trains[*numberTrain].block.y * 100 + 100);
 
 	tailX = CorrectTail(&tailX, &blockX);
 
@@ -138,20 +138,20 @@ void TurningTrainBottomLeft(int* numberTrain, struct Train trains[]) {
 		headX -= 2;
 	}
 
-	trains[*numberTrain].headX = headX;
-	trains[*numberTrain].headY = headY;
-	trains[*numberTrain].tailX = tailX;
-	trains[*numberTrain].tailY = tailY;
+	trains[*numberTrain].head.x = headX;
+	trains[*numberTrain].head.y = headY;
+	trains[*numberTrain].tail.x = tailX;
+	trains[*numberTrain].tail.y = tailY;
 }
 
 void TurningTrainTopRight(int* numberTrain, struct Train trains[]) {
 
-	int headX = trains[*numberTrain].headX;
-	int headY = trains[*numberTrain].headY;
-	int tailX = trains[*numberTrain].tailX;
-	int tailY = trains[*numberTrain].tailY;
-	int blockX = (trains[*numberTrain].blockX * 100);
-	int blockY = (trains[*numberTrain].blockY * 100);
+	int headX = trains[*numberTrain].head.x;
+	int headY = trains[*numberTrain].head.y;
+	int tailX = trains[*numberTrain].tail.x;
+	int tailY = trains[*numberTrain].tail.y;
+	int blockX = (trains[*numberTrain].block.x * 100);
+	int blockY = (trains[*numberTrain].block.y * 100);
 
 	tailX = CorrectTail(&tailX, &blockX);
 
@@ -171,20 +171,20 @@ void TurningTrainTopRight(int* numberTrain, struct Train trains[]) {
 		headX += 2;
 	}
 
-	trains[*numberTrain].headX = headX;
-	trains[*numberTrain].headY = headY;
-	trains[*numberTrain].tailX = tailX;
-	trains[*numberTrain].tailY = tailY;
+	trains[*numberTrain].head.x = headX;
+	trains[*numberTrain].head.y = headY;
+	trains[*numberTrain].tail.x = tailX;
+	trains[*numberTrain].tail.y = tailY;
 }
 
 void TurningTrainRightTop(int* numberTrain, struct Train trains[]) {
 
-	int headX = trains[*numberTrain].headX;
-	int headY = trains[*numberTrain].headY;
-	int tailX = trains[*numberTrain].tailX;
-	int tailY = trains[*numberTrain].tailY;
-	int blockX = (trains[*numberTrain].blockX * 100 + 100);
-	int blockY = (trains[*numberTrain].blockY * 100);
+	int headX = trains[*numberTrain].head.x;
+	int headY = trains[*numberTrain].head.y;
+	int tailX = trains[*numberTrain].tail.x;
+	int tailY = trains[*numberTrain].tail.y;
+	int blockX = (trains[*numberTrain].block.x * 100 + 100);
+	int blockY = (trains[*numberTrain].block.y * 100);
 
 	tailY = CorrectTail(&tailY, &blockY);
 
@@ -204,20 +204,20 @@ void TurningTrainRightTop(int* numberTrain, struct Train trains[]) {
 		headY -= 2;
 	}
 
-	trains[*numberTrain].headX = headX;
-	trains[*numberTrain].headY = headY;
-	trains[*numberTrain].tailX = tailX;
-	trains[*numberTrain].tailY = tailY;
+	trains[*numberTrain].head.x = headX;
+	trains[*numberTrain].head.y = headY;
+	trains[*numberTrain].tail.x = tailX;
+	trains[*numberTrain].tail.y = tailY;
 }
 
 void TurningTrainLeftTop(int* numberTrain, struct Train trains[]) {
 
-	int headX = trains[*numberTrain].headX;
-	int headY = trains[*numberTrain].headY;
-	int tailX = trains[*numberTrain].tailX;
-	int tailY = trains[*numberTrain].tailY;
-	int blockX = (trains[*numberTrain].blockX * 100);
-	int blockY = (trains[*numberTrain].blockY * 100);
+	int headX = trains[*numberTrain].head.x;
+	int headY = trains[*numberTrain].head.y;
+	int tailX = trains[*numberTrain].tail.x;
+	int tailY = trains[*numberTrain].tail.y;
+	int blockX = (trains[*numberTrain].block.x * 100);
+	int blockY = (trains[*numberTrain].block.y * 100);
 
 	tailY = CorrectTail(&tailY, &blockY);
 
@@ -237,20 +237,20 @@ void TurningTrainLeftTop(int* numberTrain, struct Train trains[]) {
 		headY -= 2;
 	}
 
-	trains[*numberTrain].headX = headX;
-	trains[*numberTrain].headY = headY;
-	trains[*numberTrain].tailX = tailX;
-	trains[*numberTrain].tailY = tailY;
+	trains[*numberTrain].head.x = headX;
+	trains[*numberTrain].head.y = headY;
+	trains[*numberTrain].tail.x = tailX;
+	trains[*numberTrain].tail.y = tailY;
 }
 
 void TurningTrainTopLeft(int* numberTrain, struct Train trains[]) {
 
-	int headX = trains[*numberTrain].headX;
-	int headY = trains[*numberTrain].headY;
-	int tailX = trains[*numberTrain].tailX;
-	int tailY = trains[*numberTrain].tailY;
-	int blockX = (trains[*numberTrain].blockX * 100);
-	int blockY = (trains[*numberTrain].blockY * 100);
+	int headX = trains[*numberTrain].head.x;
+	int headY = trains[*numberTrain].head.y;
+	int tailX = trains[*numberTrain].tail.x;
+	int tailY = trains[*numberTrain].tail.y;
+	int blockX = (trains[*numberTrain].block.x * 100);
+	int blockY = (trains[*numberTrain].block.y * 100);
 
 	tailX = CorrectTail(&tailX, &blockX);
 
@@ -270,20 +270,20 @@ void TurningTrainTopLeft(int* numberTrain, struct Train trains[]) {
 		headX -= 2;
 	}
 
-	trains[*numberTrain].headX = headX;
-	trains[*numberTrain].headY = headY;
-	trains[*numberTrain].tailX = tailX;
-	trains[*numberTrain].tailY = tailY;
+	trains[*numberTrain].head.x = headX;
+	trains[*numberTrain].head.y = headY;
+	trains[*numberTrain].tail.x = tailX;
+	trains[*numberTrain].tail.y = tailY;
 }
 
 void TurningTrainRightBottom(int* numberTrain, struct Train trains[]) {
 
-	int headX = trains[*numberTrain].headX;
-	int headY = trains[*numberTrain].headY;
-	int tailX = trains[*numberTrain].tailX;
-	int tailY = trains[*numberTrain].tailY;
-	int blockX = (trains[*numberTrain].blockX * 100 + 100);
-	int blockY = (trains[*numberTrain].blockY * 100);
+	int headX = trains[*numberTrain].head.x;
+	int headY = trains[*numberTrain].head.y;
+	int tailX = trains[*numberTrain].tail.x;
+	int tailY = trains[*numberTrain].tail.y;
+	int blockX = (trains[*numberTrain].block.x * 100 + 100);
+	int blockY = (trains[*numberTrain].block.y * 100);
 
 	tailY = CorrectTail(&tailY, &blockY);
 
@@ -303,20 +303,20 @@ void TurningTrainRightBottom(int* numberTrain, struct Train trains[]) {
 		headY += 2;
 	}
 
-	trains[*numberTrain].headX = headX;
-	trains[*numberTrain].headY = headY;
-	trains[*numberTrain].tailX = tailX;
-	trains[*numberTrain].tailY = tailY;
+	trains[*numberTrain].head.x = headX;
+	trains[*numberTrain].head.y = headY;
+	trains[*numberTrain].tail.x = tailX;
+	trains[*numberTrain].tail.y = tailY;
 }
 
 void TurningTrainBottomRight(int* numberTrain, struct Train trains[]) {
 
-	int headX = trains[*numberTrain].headX;
-	int headY = trains[*numberTrain].headY;
-	int tailX = trains[*numberTrain].tailX;
-	int tailY = trains[*numberTrain].tailY;
-	int blockX = (trains[*numberTrain].blockX * 100);
-	int blockY = (trains[*numberTrain].blockY * 100 + 100);
+	int headX = trains[*numberTrain].head.x;
+	int headY = trains[*numberTrain].head.y;
+	int tailX = trains[*numberTrain].tail.x;
+	int tailY = trains[*numberTrain].tail.y;
+	int blockX = (trains[*numberTrain].block.x * 100);
+	int blockY = (trains[*numberTrain].block.y * 100 + 100);
 
 	tailX = CorrectTail(&tailX, &blockX);
 
@@ -336,33 +336,33 @@ void TurningTrainBottomRight(int* numberTrain, struct Train trains[]) {
 		headX += 2;
 	}
 
-	trains[*numberTrain].headX = headX;
-	trains[*numberTrain].headY = headY;
-	trains[*numberTrain].tailX = tailX;
-	trains[*numberTrain].tailY = tailY;
+	trains[*numberTrain].head.x = headX;
+	trains[*numberTrain].head.y = headY;
+	trains[*numberTrain].tail.x = tailX;
+	trains[*numberTrain].tail.y = tailY;
 }
 
 void FinishTrain(int* finishedTrain, int* trainsOnTheMap, struct Train trains[]) {
 
-	if (trains[*finishedTrain].blockX == 0) {
+	if (trains[*finishedTrain].block.x == 0) {
 
-		if (trains[*finishedTrain].tailX > 0) {
-			trains[*finishedTrain].headX--;
-			trains[*finishedTrain].tailX--;
+		if (trains[*finishedTrain].tail.x > 0) {
+			trains[*finishedTrain].head.x--;
+			trains[*finishedTrain].tail.x--;
 		}
-		else if (trains[*finishedTrain].tailX == -50) {
+		else if (trains[*finishedTrain].tail.x == -50) {
 			trains[*finishedTrain] = trains[*trainsOnTheMap];
 			(*trainsOnTheMap)--;
 		}
 	}
 
-	if (trains[*finishedTrain].blockX == 0) {
+	if (trains[*finishedTrain].block.x == 0) {
 
-		if (trains[*finishedTrain].tailX < 1400 && trains[*finishedTrain].tailX > 1300) {
-			trains[*finishedTrain].headX++;
-			trains[*finishedTrain].tailX++;
+		if (trains[*finishedTrain].tail.x < 1400 && trains[*finishedTrain].tail.x > 1300) {
+			trains[*finishedTrain].head.x++;
+			trains[*finishedTrain].tail.x++;
 		}
-		else if (trains[*finishedTrain].tailX == 1450) {
+		else if (trains[*finishedTrain].tail.x == 1450) {
 			trains[*finishedTrain] = trains[*trainsOnTheMap];
 			(*trainsOnTheMap)--;
 		}
