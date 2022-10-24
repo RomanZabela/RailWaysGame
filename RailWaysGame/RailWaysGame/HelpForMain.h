@@ -5,6 +5,7 @@
 int MousePosition(POINT, POINT);
 struct NewRoad ResetNewRoad(struct NewRoad);
 void RestartTimer(HWND*, int*);
+BYTE TrainInTheBlock(struct Train, POINT, const int*, int*);
 
 int MousePosition(POINT mousePosition, POINT Block) {
 	int result = -1;
@@ -47,12 +48,13 @@ void RestartTimer(HWND* hwnd, int* TimerID) {
 	SetTimer(*hwnd, *TimerID, 60, NULL);
 }
 
-BYTE TrainNotInTheBlock(struct Train train[], POINT Block, int* trainOnTheMap) {
-	BYTE result = TRUE;
+BYTE TrainInTheBlock(struct Train train[], POINT Block, const int* trainOnTheMap, int* foundTrain) {
+	BYTE result = FALSE;
 
 	for (int i = 0; i <= *trainOnTheMap; i++) {
 		if (train[i].block.x == Block.x && train[i].block.y == Block.y) {
-			result = FALSE;
+			result = TRUE;
+			*foundTrain = i;
 		}
 	}
 

@@ -9,6 +9,7 @@ struct Train {
 	int Destination;
 	COLORREF Color;
 	byte Stop;
+	byte MouseStop;
 };
 
 struct Road {
