@@ -128,9 +128,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DrawingRails.h" />
-    <ClInclude Include="DrawingRailways.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="MyStructures.h" />
+    <ClInclude Include="HelpForMain.h" />
+    <ClInclude Include="HelpNewCity.h" />
+    <ClInclude Include="Structures.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TrainMove.h" />
