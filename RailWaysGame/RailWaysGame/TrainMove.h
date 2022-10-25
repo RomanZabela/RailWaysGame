@@ -356,9 +356,9 @@ void FinishTrain(int* finishedTrain, int* trainsOnTheMap, struct Train trains[])
 		}
 	}
 
-	if (trains[*finishedTrain].block.x == 0) {
+	if (trains[*finishedTrain].block.x == 13) {
 
-		if (trains[*finishedTrain].tail.x < 1400 && trains[*finishedTrain].tail.x > 1300) {
+		if (trains[*finishedTrain].tail.x < 1400) {
 			trains[*finishedTrain].head.x++;
 			trains[*finishedTrain].tail.x++;
 		}
