@@ -19,9 +19,9 @@ const COLORREF BankOfColors[] = { 0x300055, 0x9999FF, 0x8000FF, 0x00554c,
 								0x660000, 0xFF3399, 0xFF9933, 0x999900,
 								0x4cBB00, 0xAA5599 };
 
-const int TimerID = 61;
-const int newTrainTimer = 700;
-const int newCityTimer = 2600;
+const int TIMERID = 61;
+const int NEWTRAINTIMER = 700;
+const int NEWCITYTIMER = 2600;
 int timer = 501;
 int trainsOnTheMap = -1;
 int citiesOnTheMap = -1;
@@ -40,7 +40,7 @@ int finishedTrains = 0;
 *		0 = no road;
 */
 
-Road map[14][10];
+Road map[14][10]; // client zone
 NewRoad newRoadBlock;
 
 City cities[14];
@@ -97,7 +97,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg)
 	{
 	case WM_CREATE:
-		RestartTimer(&hwnd, &TimerID);
+		RestartTimer(&hwnd, &TIMERID);
 		rightButton = -1;
 		leftButton = -1;
 		citiesOnTheMap = 1;
@@ -112,9 +112,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	case WM_TIMER:
 
 		//redraw the Trains
-		if (wParam == TimerID) {
+		if (wParam == TIMERID) {
 			timer++;
-			RestartTimer(&hwnd, &TimerID);
+			RestartTimer(&hwnd, &TIMERID);
 
 			if (trainsOnTheMap != -1) {
 				for (int i = 0; i <= trainsOnTheMap; i++) {
@@ -124,7 +124,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			
 		}
 		//adding new Train
-		if (timer % newTrainTimer == 0) {
+		if (timer % NEWTRAINTIMER == 0) {
 			
 			if (trainsOnTheMap < 20) {
 
@@ -135,7 +135,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			
 		}
 		//creating new City
-		if (timer % newCityTimer == 0) {
+		if (timer % NEWCITYTIMER == 0) {
 
 			if (citiesOnTheMap < 13) {
 				citiesOnTheMap++;
@@ -144,7 +144,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			}
 
 		}
-		if (timer % (newCityTimer + 1) == 0) {
+		if (timer % (NEWCITYTIMER + 1) == 0) {
 
 			if (citiesOnTheMap < 13) {
 

@@ -6,4 +6,5 @@ C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(100,31): war
 C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(117,32): warning C4090: 'function': different 'const' qualifiers
 C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1081,62): warning C4047: 'function': 'const COLORREF *' differs in levels of indirection from 'const COLORREF (*)[14]'
 C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(1081,49): warning C4024: 'FindColor': different types for formal and actual parameter 3
+  LINK : C:\Projects\C\RailWaysGame\RailWaysGame\x64\Debug\RailWaysGame.exe not found or not built by the last incremental link; performing full link
   RailWaysGame.vcxproj -> C:\Projects\C\RailWaysGame\RailWaysGame\x64\Debug\RailWaysGame.exe
