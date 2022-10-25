@@ -25,31 +25,15 @@ const int NEWCITYTIMER = 2600;
 int timer = 501;
 int trainsOnTheMap = -1;
 int citiesOnTheMap = -1;
-
 int finishedTrains = 0;
-
-/*map[x][y][z]
-* z: 0 = left-bottom
-*	1 = bottom-right
-*	2 = top-right
-*	3 = left-top
-*	4 = horizontal
-*	5 = vertical
-* def: 2 = train can ride
-*		1 = road not available now
-*		0 = no road;
-*/
+int rightButton, leftButton;
 
 Road map[14][10]; // client zone
 NewRoad newRoadBlock;
-
 City cities[14];
-
 Train trains[20];
 
 RECT trainsRedraw[20];
-
-int rightButton, leftButton;
 POINT mouse, mousePosition, mapBlock;
 
 HWND hLaFinishedTrains;
@@ -83,13 +67,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {	
 	
 	PAINTSTRUCT ps;
-
 	HDC hdc;
-
 	RECT redrawingRect;
-
 	POINT nextMouse;
-
 	BYTE trainInTheBlockResult;
 
 	int foundTrain = -1;
