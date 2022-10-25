@@ -2,10 +2,10 @@
 #include <Windows.h>
 #include "Structures.h"
 
-BYTE FindColor(const int*, const int*, const COLORREF*, struct City[]);
-BYTE FindNotUsingPosition(const int*, const int*, struct City[]);
+BYTE FindColor(const int*, const int*, const COLORREF*, City[]);
+BYTE FindNotUsingPosition(const int*, const int*, City[]);
 
-BYTE FindColor(const int* ColorNumber, const int* numberCities, const COLORREF* BankOfColors, struct City cities[]) {
+BYTE FindColor(const int* ColorNumber, const int* numberCities, const COLORREF* BankOfColors, City cities[]) {
 
 	BYTE result = FALSE;
 
@@ -18,7 +18,7 @@ BYTE FindColor(const int* ColorNumber, const int* numberCities, const COLORREF* 
 	return result;
 }
 
-BYTE FindNotUsingPosition(const int* randNumber, const int* numberCities, struct City cities[]) {
+BYTE FindNotUsingPosition(const int* randNumber, const int* numberCities, City cities[]) {
 
 	BYTE result = FALSE;
 

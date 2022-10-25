@@ -2,10 +2,10 @@
 #include <Windows.h>
 #include "Structures.h"
 
-int MousePosition(POINT, POINT);
-struct NewRoad ResetNewRoad(struct NewRoad);
 void RestartTimer(HWND*, int*);
-BYTE TrainInTheBlock(struct Train, POINT, const int*, int*);
+BYTE TrainInTheBlock(Train, POINT, const int*, int*);
+int MousePosition(POINT, POINT);
+NewRoad ResetNewRoad(NewRoad);
 
 int MousePosition(POINT mousePosition, POINT Block) {
 	int result = -1;
@@ -33,7 +33,7 @@ int MousePosition(POINT mousePosition, POINT Block) {
 	return result;
 }
 
-struct NewRoad ResetNewRoad(struct NewRoad newRoadBlock) {
+struct NewRoad ResetNewRoad(NewRoad newRoadBlock) {
 	newRoadBlock.road.horizontal = 0;
 	newRoadBlock.road.vertical = 0;
 	newRoadBlock.road.bottomRight = 0;
@@ -48,7 +48,7 @@ void RestartTimer(HWND* hwnd, int* TimerID) {
 	SetTimer(*hwnd, *TimerID, 60, NULL);
 }
 
-BYTE TrainInTheBlock(struct Train train[], POINT Block, const int* trainOnTheMap, int* foundTrain) {
+BYTE TrainInTheBlock(Train train[], POINT Block, const int* trainOnTheMap, int* foundTrain) {
 	BYTE result = FALSE;
 
 	for (int i = 0; i <= *trainOnTheMap; i++) {

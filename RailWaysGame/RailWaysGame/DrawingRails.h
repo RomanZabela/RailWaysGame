@@ -7,7 +7,7 @@
 
 void DrawingRotedRails(HWND*, HDC*, PAINTSTRUCT*, int*, int*, int, BYTE);
 void DrawStraightRails(HWND*, HDC*, PAINTSTRUCT*, int*, int*, BYTE);
-void HelpForDrawingRoads(HWND*, HDC*, PAINTSTRUCT*, struct Road, int*, int*, int*);
+void HelpForDrawingRoads(HWND*, HDC*, PAINTSTRUCT*, Road, int*, int*, int*);
 void RotatePoint(POINT[], int);
 
 void DrawingRotedRails(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, int* xBlock, int* yBlock, int iAngle, BYTE MainRoad) {
@@ -170,7 +170,7 @@ void DrawStraightRails(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, int* xBlock, int* 
 	DeleteObject(hPenRailWood);
 }
 
-void HelpForDrawingRoads(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, struct Road road, int* Type, int* BlockX, int* BlockY) {
+void HelpForDrawingRoads(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, Road road, int* Type, int* BlockX, int* BlockY) {
 
 	BYTE MainRoad = FALSE; // turn main way on
 
