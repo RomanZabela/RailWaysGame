@@ -1,16 +1,16 @@
 #pragma once
 #include "Structures.h"
 
-BYTE DirectMoving(int*, byte, struct Train[]);
-void TurningTrainLeftBottom(int*, struct Train[]);
-void TurningTrainBottomLeft(int*, struct Train[]);
-void TurningTrainTopRight(int*, struct Train[]);
-void TurningTrainRightTop(int*, struct Train[]);
-void TurningTrainLeftTop(int*, struct Train[]);
-void TurningTrainTopLeft(int*, struct Train[]);
-void TurningTrainRightBottom(int*, struct Train[]);
-void TurningTrainBottomRight(int*, struct Train[]);
-void FinishTrain(int*, int*, struct Train[]);
+BYTE DirectMoving(int*, byte, Train[]);
+void TurningTrainLeftBottom(int*, Train[]);
+void TurningTrainBottomLeft(int*, Train[]);
+void TurningTrainTopRight(int*, Train[]);
+void TurningTrainRightTop(int*, Train[]);
+void TurningTrainLeftTop(int*, Train[]);
+void TurningTrainTopLeft(int*, Train[]);
+void TurningTrainRightBottom(int*, Train[]);
+void TurningTrainBottomRight(int*, Train[]);
+void FinishTrain(int*, int*, Train[]);
 
 int CorrectTail(int* Tail, const int* Block) {
 
@@ -25,7 +25,7 @@ int CorrectTail(int* Tail, const int* Block) {
 	}
 }
 
-BYTE DirectMoving(int* numberTrain, byte Vertical, struct Train trains[]) {
+BYTE DirectMoving(int* numberTrain, byte Vertical, Train trains[]) {
 
 	int headX = trains[*numberTrain].head.x;
 	int headY = trains[*numberTrain].head.y;
@@ -78,7 +78,7 @@ BYTE DirectMoving(int* numberTrain, byte Vertical, struct Train trains[]) {
 	return forwardHorizontal || forwardVertical;
 }
 
-void TurningTrainLeftBottom(int* numberTrain, struct Train trains[]) {
+void TurningTrainLeftBottom(int* numberTrain, Train trains[]) {
 
 	int headX = trains[*numberTrain].head.x;
 	int headY = trains[*numberTrain].head.y;
@@ -111,7 +111,7 @@ void TurningTrainLeftBottom(int* numberTrain, struct Train trains[]) {
 	trains[*numberTrain].tail.y = tailY;
 }
 
-void TurningTrainBottomLeft(int* numberTrain, struct Train trains[]) {
+void TurningTrainBottomLeft(int* numberTrain, Train trains[]) {
 
 	int headX = trains[*numberTrain].head.x;
 	int headY = trains[*numberTrain].head.y;
@@ -144,7 +144,7 @@ void TurningTrainBottomLeft(int* numberTrain, struct Train trains[]) {
 	trains[*numberTrain].tail.y = tailY;
 }
 
-void TurningTrainTopRight(int* numberTrain, struct Train trains[]) {
+void TurningTrainTopRight(int* numberTrain, Train trains[]) {
 
 	int headX = trains[*numberTrain].head.x;
 	int headY = trains[*numberTrain].head.y;
@@ -177,7 +177,7 @@ void TurningTrainTopRight(int* numberTrain, struct Train trains[]) {
 	trains[*numberTrain].tail.y = tailY;
 }
 
-void TurningTrainRightTop(int* numberTrain, struct Train trains[]) {
+void TurningTrainRightTop(int* numberTrain, Train trains[]) {
 
 	int headX = trains[*numberTrain].head.x;
 	int headY = trains[*numberTrain].head.y;
@@ -210,7 +210,7 @@ void TurningTrainRightTop(int* numberTrain, struct Train trains[]) {
 	trains[*numberTrain].tail.y = tailY;
 }
 
-void TurningTrainLeftTop(int* numberTrain, struct Train trains[]) {
+void TurningTrainLeftTop(int* numberTrain, Train trains[]) {
 
 	int headX = trains[*numberTrain].head.x;
 	int headY = trains[*numberTrain].head.y;
@@ -243,7 +243,7 @@ void TurningTrainLeftTop(int* numberTrain, struct Train trains[]) {
 	trains[*numberTrain].tail.y = tailY;
 }
 
-void TurningTrainTopLeft(int* numberTrain, struct Train trains[]) {
+void TurningTrainTopLeft(int* numberTrain, Train trains[]) {
 
 	int headX = trains[*numberTrain].head.x;
 	int headY = trains[*numberTrain].head.y;
@@ -276,7 +276,7 @@ void TurningTrainTopLeft(int* numberTrain, struct Train trains[]) {
 	trains[*numberTrain].tail.y = tailY;
 }
 
-void TurningTrainRightBottom(int* numberTrain, struct Train trains[]) {
+void TurningTrainRightBottom(int* numberTrain, Train trains[]) {
 
 	int headX = trains[*numberTrain].head.x;
 	int headY = trains[*numberTrain].head.y;
@@ -309,7 +309,7 @@ void TurningTrainRightBottom(int* numberTrain, struct Train trains[]) {
 	trains[*numberTrain].tail.y = tailY;
 }
 
-void TurningTrainBottomRight(int* numberTrain, struct Train trains[]) {
+void TurningTrainBottomRight(int* numberTrain, Train trains[]) {
 
 	int headX = trains[*numberTrain].head.x;
 	int headY = trains[*numberTrain].head.y;
@@ -342,7 +342,7 @@ void TurningTrainBottomRight(int* numberTrain, struct Train trains[]) {
 	trains[*numberTrain].tail.y = tailY;
 }
 
-void FinishTrain(int* finishedTrain, int* trainsOnTheMap, struct Train trains[]) {
+void FinishTrain(int* finishedTrain, int* trainsOnTheMap, Train trains[]) {
 
 	if (trains[*finishedTrain].block.x == 0) {
 

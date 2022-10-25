@@ -1,7 +1,7 @@
 #pragma once
 #include <Windows.h>
 
-struct Train {
+typedef struct Train {
 	POINT head;
 	POINT tail;
 	POINT block;
@@ -10,9 +10,9 @@ struct Train {
 	COLORREF Color;
 	byte Stop;
 	byte MouseStop;
-};
+} Train;
 
-struct Road {
+typedef struct Road {
 	int leftBottom;
 	int bottomRight;
 	int topRight;
@@ -20,14 +20,14 @@ struct Road {
 	int horizontal;
 	int vertical;
 	byte isRoad;
-};
+} Road;
 
-struct NewRoad {
+typedef struct NewRoad {
 	POINT block;
 	struct Road road;
-};
+} NewRoad;
 
-struct City {
+typedef struct City {
 	POINT block;
 	COLORREF Color; //BGR
-};
+} City;

@@ -1,6 +1,6 @@
 ﻿  RailWaysGame.c
 C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\DrawingRails.h(108,125): warning C4029: declared formal parameter list different from definition
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\HelpForMain.h(51,35): warning C4028: formal parameter 1 different from declaration
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\HelpForMain.h(51,28): warning C4028: formal parameter 1 different from declaration
 C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(78,8): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
 C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(100,31): warning C4090: 'function': different 'const' qualifiers
 C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(117,32): warning C4090: 'function': different 'const' qualifiers

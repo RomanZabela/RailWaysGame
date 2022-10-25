@@ -40,12 +40,12 @@ int finishedTrains = 0;
 *		0 = no road;
 */
 
-struct Road map[14][10];
-struct NewRoad newRoadBlock;
+Road map[14][10];
+NewRoad newRoadBlock;
 
-struct City cities[14];
+City cities[14];
 
-struct Train trains[20];
+Train trains[20];
 
 RECT trainsRedraw[20];
 
