@@ -34,10 +34,8 @@ BYTE DirectMoving(int* numberTrain, byte Vertical, Train trains[]) {
 	int blockX = (trains[*numberTrain].block.x * 100);
 	int blockY = (trains[*numberTrain].block.y * 100);
 
-	byte forwardVertical, forwardHorizontal;
-
-	forwardVertical = trains[*numberTrain].block.y - trains[*numberTrain].preBlock.y < 0;
-	forwardHorizontal = trains[*numberTrain].block.x - trains[*numberTrain].preBlock.x < 0;
+	byte forwardVertical = trains[*numberTrain].block.y - trains[*numberTrain].preBlock.y < 0;
+	byte forwardHorizontal = trains[*numberTrain].block.x - trains[*numberTrain].preBlock.x < 0;
 
 	if (Vertical) {
 		if (forwardVertical) {

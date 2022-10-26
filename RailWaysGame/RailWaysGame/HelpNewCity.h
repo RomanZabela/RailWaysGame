@@ -31,7 +31,7 @@ BYTE FindNotUsingPosition(const int* randNumber, const int* numberCities, City c
 	}
 	else if (*randNumber >= 7) {
 		for (int i = 0; i <= *numberCities; i++) {
-			if (cities[i].block.y == *randNumber && cities[i].block.x == 13) {
+			if (cities[i].block.y == (*randNumber) - 7 && cities[i].block.x == 13) {
 				result = TRUE;
 			}
 		}

@@ -20,15 +20,16 @@ const COLORREF BankOfColors[] = { 0x300055, 0x9999FF, 0x8000FF, 0x00554c,
 								0x4cBB00, 0xAA5599 };
 
 const int TIMERID = 61;
-const int NEWTRAINTIMER = 700;
-const int NEWCITYTIMER = 2600;
-int timer = 501;
+const int NEWTRAINTIMER = 500;
+const int NEWCITYTIMER = 1800;
+
+int timer = 301;
 int trainsOnTheMap = -1;
 int citiesOnTheMap = -1;
 int finishedTrains = 0;
 int rightButton, leftButton;
 
-Road map[14][10]; // client zone
+Road map[14][9]; // client zone
 NewRoad newRoadBlock;
 City cities[14];
 Train trains[20];
@@ -51,7 +52,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
 	wc.hCursor = LoadCursor(0, IDC_ARROW);
 
 	RegisterClassW(&wc);
-	CreateWindowW(wc.lpszClassName, L"RailWays", WS_SYSMENU | WS_MINIMIZEBOX| WS_VISIBLE, 200, 25, 1400, 1050, NULL, NULL, hInstance, NULL);
+	CreateWindowW(wc.lpszClassName, L"RailWays", WS_SYSMENU | WS_MINIMIZEBOX| WS_VISIBLE, 200, 25, 1400, 950, NULL, NULL, hInstance, NULL);
 
 	while (GetMessage(&msg, NULL, 0, 0)) 
 	{
@@ -103,7 +104,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			}
 			
 		}
+
+		//if (timer % 2) {
+		//	if (trainsOnTheMap != -1) {
+		//		for (int i = 0; i <= trainsOnTheMap; i++) {
+		//			InvalidateRect(hwnd, &trainsRedraw[i], TRUE);
+		//		}
+		//	}
+		//}
+		
 		//adding new Train
+
 		if (timer % NEWTRAINTIMER == 0) {
 			
 			if (trainsOnTheMap < 20) {
@@ -117,7 +128,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		//creating new City
 		if (timer % NEWCITYTIMER == 0) {
 
-			if (citiesOnTheMap < 13) {
+			if (citiesOnTheMap <= 13) {
 				citiesOnTheMap++;
 
 				NewCity(citiesOnTheMap);
@@ -126,7 +137,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		}
 		if (timer % (NEWCITYTIMER + 1) == 0) {
 
-			if (citiesOnTheMap < 13) {
+			if (citiesOnTheMap <= 13) {
 
 				redrawingRect.left = cities[citiesOnTheMap].block.x * 100;
 				redrawingRect.top = cities[citiesOnTheMap].block.y * 100;
@@ -532,6 +543,7 @@ void DrawTrain(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, RECT trainRedraw[20]) {
 			if (!trains[i].MouseStop) {
 				POINT drawTrainBlock = trains[i].block;
 				POINT drawPreBlock = trains[i].preBlock;
+				POINT tempTrainBlock;
 
 				if (map[drawTrainBlock.x][drawTrainBlock.y].leftBottom == 2 && !trains[i].Stop) {
 					if (drawTrainBlock.y - drawPreBlock.y == 0) {
@@ -687,14 +699,14 @@ void DrawTrain(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, RECT trainRedraw[20]) {
 				}
 
 				if (trains[i].head.x % 100 == 0) {
-
+					
 					movingLeft = ((map[(trains[i].head.x / 100) - 1][drawTrainBlock.y].isRoad) && (map[(trains[i].head.x / 100) - 1][drawTrainBlock.y].horizontal == 2 ||
 						map[(trains[i].head.x / 100) - 1][drawTrainBlock.y].topRight == 2 || map[(trains[i].head.x / 100) - 1][drawTrainBlock.y].bottomRight == 2) ||
-						(map[(trains[i].head.x / 100) - 1][drawTrainBlock.y].horizontal == 1 && map[trains[i].head.x - 1][drawTrainBlock.y].vertical == 2));
+						(map[(trains[i].head.x / 100) - 1][drawTrainBlock.y].horizontal == 1 && map[(trains[i].head.x / 100) - 1][drawTrainBlock.y].vertical == 2));
 
-					movingRight = ((map[(trains[i].head.x / 100)][drawTrainBlock.y].isRoad) && (map[(trains[i].head.x / 100)][drawTrainBlock.y].horizontal == 2 ||
+					movingRight = ((map[(trains[i].head.x / 100)][drawTrainBlock.y].isRoad) && ((map[(trains[i].head.x / 100)][drawTrainBlock.y].horizontal == 2 ||
 						map[(trains[i].head.x / 100)][drawTrainBlock.y].leftTop == 2 || map[(trains[i].head.x / 100)][drawTrainBlock.y].leftBottom == 2) ||
-						(map[(trains[i].head.x / 100)][drawTrainBlock.y].horizontal == 1 && map[trains[i].head.x][drawTrainBlock.y].vertical == 2));
+						(map[(trains[i].head.x / 100)][drawTrainBlock.y].horizontal == 1 && map[trains[i].head.x / 100][drawTrainBlock.y].vertical == 2)));
 
 					if ((trains[i].head.x - trains[i].tail.x < 0) && movingLeft) {
 						trains[i].preBlock.x = drawTrainBlock.x;
@@ -719,10 +731,14 @@ void DrawTrain(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, RECT trainRedraw[20]) {
 					//if wrong city, need to turn arround the train
 					else if ((drawTrainBlock.x == 0 || drawTrainBlock.x == 13) && (trains[i].head.x == 0 || trains[i].head.x == 1400) &&
 						(cities[trains[i].Destination].block.x != drawTrainBlock.x || cities[trains[i].Destination].block.y != drawTrainBlock.y)) {
-						drawTrainBlock = trains[i].head;
+						tempTrainBlock = trains[i].head;
 						trains[i].head = trains[i].tail;
-						trains[i].tail = drawTrainBlock;
+						trains[i].tail = tempTrainBlock;
 						trains[i].preBlock = trains[i].block;
+
+						if (drawTrainBlock.x == 13) {
+							trains[i].preBlock.x++;
+						}
 					}
 					//stop moving
 					else if (!trains[i].Stop) {
@@ -1033,10 +1049,10 @@ void CityDrawing(HDC* hdc, int* numberOfCities) {
 
 void NewCity(const int numberCities) {
 
- 	int randomNumber = rand() % 13;
+ 	int randomNumber = rand() % 14;
 
 	while (FindNotUsingPosition(&randomNumber, &numberCities, cities)) {
-		randomNumber = rand() % 13;
+		randomNumber = rand() % 14;
 	};
 
 	//drawing in the left side
@@ -1056,10 +1072,10 @@ void NewCity(const int numberCities) {
 		map[13][randomNumber - 7].isRoad = TRUE;
 	};
 
-	randomNumber = rand() % 13;
+	randomNumber = rand() % 14;
 
 	while (FindColor(&randomNumber, &numberCities, &BankOfColors, cities)) {
-		randomNumber = rand() % 13;
+		randomNumber = rand() % 14;
 	}
 
 	cities[numberCities].Color = BankOfColors[randomNumber];
@@ -1091,12 +1107,12 @@ void NewTrain(int* numberOfTrains, int* numberOfCities) {
 	}
 	//train sarts from right side
 	else if (cities[citySource].block.x == 13) {
-		trains[*numberOfTrains].head.x = cities[citySource].block.x * 100 + 100 - 1;
+		trains[*numberOfTrains].head.x = cities[citySource].block.x * 100 + (100 - 1);
 		trains[*numberOfTrains].head.y = cities[citySource].block.y * 100 + 50;
-		trains[*numberOfTrains].tail.x = cities[citySource].block.x * 100 + 100 + 50 - 1;
+		trains[*numberOfTrains].tail.x = cities[citySource].block.x * 100 + (100 + 50 - 1);
 		trains[*numberOfTrains].tail.y = cities[citySource].block.y * 100 + 50;
 		trains[*numberOfTrains].block = cities[citySource].block;
-		trains[*numberOfTrains].preBlock.x = cities[citySource].block.x;// +1;
+		trains[*numberOfTrains].preBlock.x = cities[citySource].block.x + 1;
 		trains[*numberOfTrains].preBlock.y = cities[citySource].block.y;
 		trains[*numberOfTrains].Destination = cityDest;
 		trains[*numberOfTrains].Color = cities[cityDest].Color;
