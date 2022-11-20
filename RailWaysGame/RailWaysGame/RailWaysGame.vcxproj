@@ -130,14 +130,18 @@
     <ClInclude Include="DrawingRails.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="HelpForMain.h" />
-    <ClInclude Include="HelpNewCity.h" />
+    <ClInclude Include="CreateNewCity.h" />
     <ClInclude Include="Structures.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TrainMove.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CreateNewCity.c" />
+    <ClCompile Include="DrawingRails.c" />
+    <ClCompile Include="HelpForMain.c" />
     <ClCompile Include="RailWaysGame.c" />
+    <ClCompile Include="TrainMove.c" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="RailWaysGame.rc" />

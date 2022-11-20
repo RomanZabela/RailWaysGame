@@ -1,16 +1,14 @@
-#include <windows.h>
-#include <time.h>
+#include "Structures.h"
 #include "DrawingRails.h"
 #include "TrainMove.h"
-#include "Structures.h"
-#include "HelpNewCity.h"
+#include "CreateNewCity.h"
 #include "HelpForMain.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 void DrawTrain(HWND*, HDC*, PAINTSTRUCT*, RECT*);
-void DrawingRailWays(HWND, HDC, PAINTSTRUCT);
+
 void CityDrawing(HDC*, int*);
-void NewCity(const int);
+
 void NewTrain(int*, int*);
 void DrawingLabelFinishedTrains(HDC*);
 
@@ -29,9 +27,9 @@ int citiesOnTheMap = -1;
 int finishedTrains = 0;
 int rightButton, leftButton;
 
-Road map[14][9]; // client zone
+Road map[CLIENT_AREA_X][CLIENT_AREA_Y]; // client zone
 NewRoad newRoadBlock;
-City cities[14];
+City cities[CITIES_ON_THE_AREA];
 Train trains[20];
 
 RECT trainsRedraw[20];
@@ -39,7 +37,7 @@ POINT mouse, mousePosition, mapBlock;
 
 HWND hLaFinishedTrains;
 
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine, int nCmdShow) {
+int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ PWSTR lpCmdLine, _In_ int nCmdShow) {
 	
 	MSG msg;
 	WNDCLASS wc = { 0 };
@@ -60,8 +58,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
 		DispatchMessage(&msg);
 	}
 
-	srand(time(NULL));
-
 	return (int)msg.wParam;
 }
 
@@ -69,8 +65,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	
 	PAINTSTRUCT ps;
 	HDC hdc;
-	RECT redrawingRect;
-	POINT nextMouse;
+	RECT redrawingRect = {0};
+	POINT nextMouse = {0};
 	BYTE trainInTheBlockResult;
 
 	int foundTrain = -1;
@@ -85,8 +81,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 		hLaFinishedTrains = CreateWindowW(L"Static", L"No Finished Trains Yet", WS_CHILD | WS_VISIBLE, 650, 5, 750, 30, hwnd, (HMENU)1, NULL, NULL);
 
-		NewCity(0);
-		NewCity(1);
+		NewCity(0, cities, map, &BankOfColors);
+		NewCity(1, cities, map, &BankOfColors);
 
 		break;
 
@@ -131,7 +127,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			if (citiesOnTheMap <= 13) {
 				citiesOnTheMap++;
 
-				NewCity(citiesOnTheMap);
+				NewCity(citiesOnTheMap, cities, map, &BankOfColors);
 			}
 
 		}
@@ -146,12 +142,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 				InvalidateRect(hwnd, &redrawingRect, TRUE);
 			}
-
 		}
 
 	case WM_PAINT:
 		hdc = BeginPaint(hwnd, &ps);
-		DrawingRailWays(hwnd, hdc, ps);
+		DrawingRailWays(hwnd, hdc, ps, map, newRoadBlock);
 		DrawTrain(&hwnd, &hdc, &ps, trainsRedraw);
 		CityDrawing(&hdc, &citiesOnTheMap);
 		EndPaint(hwnd, &ps);
@@ -334,7 +329,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		trainInTheBlockResult = TrainInTheBlock(trains, mapBlock, &trainsOnTheMap, &foundTrain);
 
 		if (map[mapBlock.x][mapBlock.y].isRoad && !trainInTheBlockResult) {
-			switch (MousePosition(mousePosition, mapBlock))
+			switch (MousePositionBlock(mousePosition, mapBlock))
 			{
 			case 1: //left
 				if (map[mapBlock.x][mapBlock.y].horizontal == 2) {
@@ -779,7 +774,7 @@ void DrawTrain(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, RECT trainRedraw[20]) {
 
 			if (trainsOnTheMap != -1) {
 
-				LOGBRUSH brush;
+				LOGBRUSH brush = {0};
 				DWORD pen_style = PS_GEOMETRIC; //PS_SOLID | PS_GEOMETRIC | PS_JOIN_BEVEL;
 
 				brush.lbStyle = BS_SOLID;
@@ -923,34 +918,9 @@ void DrawTrain(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, RECT trainRedraw[20]) {
 	//DeleteObject(hBrush);
 }
 
-void DrawingRailWays(HWND hwnd, HDC hdc, PAINTSTRUCT ps) {
-	
-	//drawing unactive rails
-	int type = 1;
-
-	for (int i = 0; i < 14; i++) {
-		for (int j = 0; j < 10; j++) {
-			HelpForDrawingRoads(&hwnd, &hdc, &ps, map[i][j], &type, &i, &j);
-		}
-	}
-
-	//drawing building rails
-	HelpForDrawingRoads(&hwnd, &hdc, &ps, newRoadBlock.road, &type, &newRoadBlock.block.x, &newRoadBlock.block.y);
-
-	//drawing active rails
-	type = 2;
-
-	for (int i = 0; i < 14; i++) {
-		for (int j = 0; j < 10; j++) {
-			HelpForDrawingRoads(&hwnd, &hdc, &ps, map[i][j], &type, &i, &j);
-		}
-	}
-		
-}
-
 void CityDrawing(HDC* hdc, int* numberOfCities) {
 
-	LOGBRUSH brush;
+	LOGBRUSH brush = {0};
 	DWORD pen_style = PS_SOLID | PS_GEOMETRIC | PS_JOIN_ROUND;
 
 	brush.lbStyle = BS_SOLID;
@@ -968,7 +938,7 @@ void CityDrawing(HDC* hdc, int* numberOfCities) {
 	
 	HBRUSH hBrushWindows = CreateSolidBrush(RGB(252, 252, 25));
 
-	POINT triangle[3], coordinates;
+	POINT triangle[3] = {0}, coordinates = {0};
 
 	for (int i = 0; i <= *numberOfCities; i++) {
 
@@ -1047,41 +1017,9 @@ void CityDrawing(HDC* hdc, int* numberOfCities) {
 	DeleteObject(hPenBuild);	
 }
 
-void NewCity(const int numberCities) {
-
- 	int randomNumber = rand() % 14;
-
-	while (FindNotUsingPosition(&randomNumber, &numberCities, cities)) {
-		randomNumber = rand() % 14;
-	};
-
-	//drawing in the left side
-	if (randomNumber < 7) {
-		cities[numberCities].block.y = randomNumber;
-		cities[numberCities].block.x = 0;
-
-		map[0][randomNumber].horizontal = 2;
-		map[0][randomNumber].isRoad = TRUE;
-	}
-	//drawing in the right side
-	else if (randomNumber >= 7) {
-		cities[numberCities].block.y = randomNumber - 7;
-		cities[numberCities].block.x = 13;
-
-		map[13][randomNumber - 7].horizontal = 2;
-		map[13][randomNumber - 7].isRoad = TRUE;
-	};
-
-	randomNumber = rand() % 14;
-
-	while (FindColor(&randomNumber, &numberCities, &BankOfColors, cities)) {
-		randomNumber = rand() % 14;
-	}
-
-	cities[numberCities].Color = BankOfColors[randomNumber];
-}
-
 void NewTrain(int* numberOfTrains, int* numberOfCities) {
+
+	srand((unsigned int)time(NULL));
 
 	int citySource, cityDest;
 
@@ -1106,7 +1044,7 @@ void NewTrain(int* numberOfTrains, int* numberOfCities) {
 		trains[*numberOfTrains].MouseStop = FALSE;
 	}
 	//train sarts from right side
-	else if (cities[citySource].block.x == 13) {
+	else if (cities[citySource].block.x == CLIENT_AREA_X - 1) {
 		trains[*numberOfTrains].head.x = cities[citySource].block.x * 100 + (100 - 1);
 		trains[*numberOfTrains].head.y = cities[citySource].block.y * 100 + 50;
 		trains[*numberOfTrains].tail.x = cities[citySource].block.x * 100 + (100 + 50 - 1);

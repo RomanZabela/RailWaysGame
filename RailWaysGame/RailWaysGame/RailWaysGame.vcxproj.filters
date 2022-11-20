@@ -33,7 +33,7 @@
     <ClInclude Include="Structures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HelpNewCity.h">
+    <ClInclude Include="CreateNewCity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="HelpForMain.h">
@@ -42,6 +42,18 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RailWaysGame.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawingRails.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HelpForMain.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CreateNewCity.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TrainMove.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
