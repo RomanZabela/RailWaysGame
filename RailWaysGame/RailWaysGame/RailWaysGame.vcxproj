@@ -130,22 +130,20 @@
     <ClInclude Include="DrawingInterface.h" />
     <ClInclude Include="DrawingRails.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="CreateNewCity.h" />
+    <ClInclude Include="CreateCityAndDrawing.h" />
     <ClInclude Include="MousePosition.h" />
     <ClInclude Include="Structures.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Timer.h" />
-    <ClInclude Include="TrainMove.h" />
+    <ClInclude Include="CreatNewTrainAndMove.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CreateNewCity.c" />
+    <ClCompile Include="CreateCityAndDrawing.c" />
     <ClCompile Include="DrawingInterface.c" />
     <ClCompile Include="DrawingRails.c" />
     <ClCompile Include="MousePosition.c" />
     <ClCompile Include="RailWaysGame.c" />
-    <ClCompile Include="Timer.c" />
-    <ClCompile Include="TrainMove.c" />
+    <ClCompile Include="CreatNewTrainAndMove.c" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="RailWaysGame.rc" />

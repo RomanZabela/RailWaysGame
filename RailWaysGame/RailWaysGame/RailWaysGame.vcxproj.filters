@@ -27,16 +27,13 @@
     <ClInclude Include="DrawingRails.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TrainMove.h">
+    <ClInclude Include="CreatNewTrainAndMove.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Structures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CreateNewCity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Timer.h">
+    <ClInclude Include="CreateCityAndDrawing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MousePosition.h">
@@ -53,13 +50,10 @@
     <ClCompile Include="DrawingRails.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CreateNewCity.c">
+    <ClCompile Include="CreateCityAndDrawing.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TrainMove.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Timer.c">
+    <ClCompile Include="CreatNewTrainAndMove.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MousePosition.c">

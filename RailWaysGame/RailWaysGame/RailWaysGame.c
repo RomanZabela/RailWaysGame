@@ -1,20 +1,17 @@
 #include "Structures.h"
 #include "Timer.h"
-#include "TrainMove.h"
+#include "CreatNewTrainAndMove.h"
 #include "DrawingRails.h"
-#include "CreateNewCity.h"
+#include "CreateCityAndDrawing.h"
 #include "MousePosition.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-
-void CityDrawing(HDC*, int*);
-
-void NewTrain(int*, int*);
+void RestartTimer(HWND*, const int*);
 
 const COLORREF BankOfColors[] = { 0x300055, 0x9999FF, 0x8000FF, 0x00554c,
 								0x00AA99, 0x004c99, 0xCC0000, 0x99A000,
-								0x660000, 0xFF3399, 0xFF9933, 0x999900,
-								0x4cBB00, 0xAA5599 };
+								0x660066, 0xFF3399, 0xFF9933, 0x995500,
+								0x4cBB00, 0x70F0A2 };
 
 const int MIN_TIMER_FOR_REDRAW_OBJECTS = 61;
 const int CREATE_NEW_TRAIN_TIMER = 500;
@@ -116,7 +113,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 				amountTrainsOnTheMap++;
 
-				NewTrain(&amountTrainsOnTheMap, &amountCitiesOnTheMap);
+				AddNewTrain(&amountTrainsOnTheMap, &amountCitiesOnTheMap, cities, trains);
 			}
 			
 		}
@@ -147,7 +144,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		hdc = BeginPaint(hwnd, &ps);
 		DrawingRailWays(hwnd, hdc, ps, map, newRoadBlock);
 		DrawTrains(&hwnd, &hLaFinishedTrains, &hdc, &ps, trainsRedraw, &amountTrainsOnTheMap, trains, map, cities, &finishedTrains);
-		CityDrawing(&hdc, &amountCitiesOnTheMap);
+		CityDrawing(&hdc, &amountCitiesOnTheMap, cities);
 		EndPaint(hwnd, &ps);
 		break;
 	case WM_RBUTTONDOWN:
@@ -527,143 +524,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	return DefWindowProcW(hwnd, msg, wParam, lParam);
 }
 
-void CityDrawing(HDC* hdc, int* numberOfCities) {
-
-	LOGBRUSH brush = {0};
-	DWORD pen_style = PS_SOLID | PS_GEOMETRIC | PS_JOIN_ROUND;
-
-	brush.lbStyle = BS_SOLID;
-	brush.lbColor = RGB(0, 0, 0);
-	brush.lbHatch = 0;
-
-	HPEN hPenBuild = ExtCreatePen(pen_style, 2, &brush, 0, NULL);
-
-	brush.lbColor = RGB(252, 252, 25);
-
-	HPEN hPenWindows = ExtCreatePen(pen_style, 1, &brush, 0, NULL);
-
-	HPEN hOldPen = SelectObject(*hdc, hPenBuild);
-
-	
-	HBRUSH hBrushWindows = CreateSolidBrush(RGB(252, 252, 25));
-
-	POINT triangle[3] = {0}, coordinates = {0};
-
-	for (int i = 0; i <= *numberOfCities; i++) {
-
-		HBRUSH hBrushBuild = CreateSolidBrush(cities[i].Color);
-
-		SelectObject(*hdc, hPenBuild);
-		HBRUSH hOldBrush = SelectObject(*hdc, hBrushBuild);
-		
-		coordinates.x = cities[i].block.x * 100;
-		coordinates.y = cities[i].block.y * 100;
-
-		triangle[0].x = 36 + coordinates.x;
-		triangle[0].y = 70 + coordinates.y;
-
-		triangle[1].x = 50 + coordinates.x;
-		triangle[1].y = 60 + coordinates.y;
-
-		triangle[2].x = 62 + coordinates.x;
-		triangle[2].y = 70 + coordinates.y;
-
-		Rectangle(*hdc, 15 + coordinates.x, 10 + coordinates.y, 45 + coordinates.x, 50 + coordinates.y);
-
-		SelectObject(*hdc, hBrushWindows);
-		SelectObject(*hdc, hPenWindows);
-
-		for (int i = 0; i < 2; i++) {
-			for (int j = 0; j < 2; j++) {
-				Rectangle(*hdc, 20 + (15 * i) + coordinates.x, 15 + (20 * j) + coordinates.y,
-						25 + (15 * i) + coordinates.x, 25 + (20 * j) + coordinates.y);
-			}
-		}
-
-		SelectObject(*hdc, hBrushBuild);
-		SelectObject(*hdc, hPenBuild);
-
-		Rectangle(*hdc, 5 + coordinates.x, 40 + coordinates.y, 35 + coordinates.x, 80 + coordinates.y);
-		Rectangle(*hdc, 40 + coordinates.x, 70 + coordinates.y, 60 + coordinates.x, 90 + coordinates.y);
-		Rectangle(*hdc, 55 + coordinates.x, 15 + coordinates.y, 75 + coordinates.x, 35 + coordinates.y);
-
-		Polygon(*hdc, triangle, 3);
-
-		triangle[0].x = 51 + coordinates.x;
-		triangle[0].y = 15 + coordinates.y;
-
-		triangle[1].x = 65 + coordinates.x;
-		triangle[1].y = 5 + coordinates.y;
-
-		triangle[2].x = 77 + coordinates.x;
-		triangle[2].y = 15 + coordinates.y;
-
-		Polygon(*hdc, triangle, 3);
-
-		SelectObject(*hdc, hPenWindows);
-
-		SelectObject(*hdc, hBrushWindows);
-
-		for (int i = 0; i < 2; i++) {
-			for (int j = 0; j < 2; j++) {
-				Rectangle(*hdc, 10 + (15 * i) + coordinates.x, 45 + (20 * j) + coordinates.y,
-						15 + (15 * i) + coordinates.x, 55 + (20 * j) + coordinates.y);
-			}
-		}
-
-		Rectangle(*hdc, 45 + coordinates.x, 75 + coordinates.y, 50 + coordinates.x, 80 + coordinates.y);
-		Rectangle(*hdc, 60 + coordinates.x, 20 + coordinates.y, 65 + coordinates.x, 25 + coordinates.y);
-
-		SelectObject(*hdc, hOldBrush);
-		DeleteObject(hBrushBuild);
-	}
-
-	
-	SelectObject(*hdc, hOldPen);
-
-	DeleteObject(hPenWindows);
-	DeleteObject(hBrushWindows);
-	DeleteObject(hPenBuild);	
-}
-
-void NewTrain(int* numberOfTrains, int* numberOfCities) {
-
-	srand((unsigned int)time(NULL));
-
-	int citySource, cityDest;
-
-	citySource = rand() % (*numberOfCities + 1);
-	cityDest = rand() % (*numberOfCities + 1);
-
-	while (citySource == cityDest) {
-		cityDest = rand() % (* numberOfCities + 1);
-	};
-
-	//train starts from left side
-	if (cities[citySource].block.x == 0) {
-		trains[*numberOfTrains].head.x = cities[citySource].block.x * 100;
-		trains[*numberOfTrains].head.y = cities[citySource].block.y * 100 + 50;
-		trains[*numberOfTrains].tail.x = cities[citySource].block.x * 100 - 50;
-		trains[*numberOfTrains].tail.y = cities[citySource].block.y * 100 + 50;
-		trains[*numberOfTrains].block = cities[citySource].block;
-		trains[*numberOfTrains].preBlock = cities[citySource].block;
-		trains[*numberOfTrains].Destination = cityDest;
-		trains[*numberOfTrains].Color = cities[cityDest].Color;
-		trains[*numberOfTrains].Stop = FALSE;
-		trains[*numberOfTrains].MouseStop = FALSE;
-	}
-	//train sarts from right side
-	else if (cities[citySource].block.x == CLIENT_AREA_X - 1) {
-		trains[*numberOfTrains].head.x = cities[citySource].block.x * 100 + (100 - 1);
-		trains[*numberOfTrains].head.y = cities[citySource].block.y * 100 + 50;
-		trains[*numberOfTrains].tail.x = cities[citySource].block.x * 100 + (100 + 50 - 1);
-		trains[*numberOfTrains].tail.y = cities[citySource].block.y * 100 + 50;
-		trains[*numberOfTrains].block = cities[citySource].block;
-		trains[*numberOfTrains].preBlock.x = cities[citySource].block.x + 1;
-		trains[*numberOfTrains].preBlock.y = cities[citySource].block.y;
-		trains[*numberOfTrains].Destination = cityDest;
-		trains[*numberOfTrains].Color = cities[cityDest].Color;
-		trains[*numberOfTrains].Stop = FALSE;
-		trains[*numberOfTrains].MouseStop = FALSE;
-	}
+void RestartTimer(HWND* hwnd, const int* TimerID) {
+	SetTimer(*hwnd, *TimerID, 60, NULL);
 }
