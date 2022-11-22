@@ -127,20 +127,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DrawingInterface.h" />
     <ClInclude Include="DrawingRails.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="HelpForMain.h" />
     <ClInclude Include="CreateNewCity.h" />
+    <ClInclude Include="MousePosition.h" />
     <ClInclude Include="Structures.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Timer.h" />
     <ClInclude Include="TrainMove.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CreateNewCity.c" />
+    <ClCompile Include="DrawingInterface.c" />
     <ClCompile Include="DrawingRails.c" />
-    <ClCompile Include="HelpForMain.c" />
+    <ClCompile Include="MousePosition.c" />
     <ClCompile Include="RailWaysGame.c" />
+    <ClCompile Include="Timer.c" />
     <ClCompile Include="TrainMove.c" />
   </ItemGroup>
   <ItemGroup>

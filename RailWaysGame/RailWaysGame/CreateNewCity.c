@@ -36,7 +36,7 @@ BYTE FindNotUsingPosition(const int* randNumber, const int* numberCities, City c
 	return result;
 }
 
-void NewCity(const int numberCities, City cities[CITIES_ON_THE_AREA], Road map[CLIENT_AREA_X][CLIENT_AREA_Y], const COLORREF* BankOfColors) {
+void NewCity(const int numberCities, City cities[MAX_CITIES_ON_THE_AREA], Road map[CLIENT_AREA_X][CLIENT_AREA_Y], const COLORREF* BankOfColors) {
 
 	srand((unsigned int)time(NULL));
 	
@@ -65,7 +65,7 @@ void NewCity(const int numberCities, City cities[CITIES_ON_THE_AREA], Road map[C
 
 	randomNumber = rand() % 14;
 
-	while (FindColor(&randomNumber, &numberCities, &BankOfColors, cities)) {
+	while (FindColor(&randomNumber, &numberCities, BankOfColors, cities)) {
 		randomNumber = rand() % 14;
 	}
 

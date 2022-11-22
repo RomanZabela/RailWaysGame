@@ -5,7 +5,7 @@
 
 #define CLIENT_AREA_X 14
 #define CLIENT_AREA_Y 9
-#define CITIES_ON_THE_AREA 14
+#define MAX_CITIES_ON_THE_AREA 14
 
 typedef struct Train {
 	POINT head;

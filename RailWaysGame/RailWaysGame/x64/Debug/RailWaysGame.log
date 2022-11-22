@@ -1,10 +1,1 @@
-﻿  RailWaysGame.c
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(77,31): warning C4090: 'function': different 'const' qualifiers
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(84,40): warning C4047: 'function': 'const COLORREF *' differs in levels of indirection from 'const COLORREF (*)[14]'
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(84,27): warning C4024: 'NewCity': different types for formal and actual parameter 4
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(85,40): warning C4047: 'function': 'const COLORREF *' differs in levels of indirection from 'const COLORREF (*)[14]'
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(85,27): warning C4024: 'NewCity': different types for formal and actual parameter 4
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(94,32): warning C4090: 'function': different 'const' qualifiers
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(130,55): warning C4047: 'function': 'const COLORREF *' differs in levels of indirection from 'const COLORREF (*)[14]'
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(130,42): warning C4024: 'NewCity': different types for formal and actual parameter 4
-  RailWaysGame.vcxproj -> C:\Projects\C\RailWaysGame\RailWaysGame\x64\Debug\RailWaysGame.exe
+﻿  RailWaysGame.vcxproj -> C:\Projects\C\RailWaysGame\RailWaysGame\x64\Debug\RailWaysGame.exe
