@@ -3,7 +3,7 @@
 
 void DrawingLabelFinishedTrains(HWND* hLaFinishedTrains, HDC* hdc, const int* finishedTrains) {
 
-	wchar_t buf[21];
+	wchar_t buf[21]; //amount of symbols in the string for drawing
 
 	wsprintfW(buf, L"Trains finished: %ld", *finishedTrains);
 
