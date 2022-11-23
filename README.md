@@ -8,16 +8,16 @@ The Train game created for learning C while studying on the Full Stack program f
 
 Version 1.0.0:
 
-- In the beginng there are two cities on the area. Time to time new city appered.
+- In the beginng there are two cities on the area. From time to time new city appers.
 
-- The colorfull trains started randomly from one of the cities. The trains should arrived in destination city whith the same color.
+- The colorfull trains start randomly from one of the cities. The trains should arriv to destination city of the same color.
 
-- User can build railways, switch arrows and stop trains.
+- User can build the railways, switch any arrows and stop the trains.
 
 
 Version 1.0.1:
 
-1. Change colors for better visualisation
+1. Changed the colors for better visualisation
 2. Separated function from the file HelpForMain.c and removed the file
 3. Rebuilt Main RailWaysGame.c file:
 	a. Moved all procedures to specific files:
