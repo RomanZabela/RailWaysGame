@@ -27,3 +27,4 @@ Version 1.0.1:
 	b. Fixed all warnings
 	c. Kept in place the procedures responsible for main logics and connected with system
 3. Isolated all Moving procedures into CreatNewTrainAndMove.c: Turning left and right, Moving up and down
+4. Moved client area down to 30px
