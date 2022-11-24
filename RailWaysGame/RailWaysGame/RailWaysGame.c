@@ -46,7 +46,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	wc.hCursor = LoadCursor(0, IDC_ARROW);
 
 	RegisterClassW(&wc);
-	CreateWindowW(wc.lpszClassName, L"RailWays", WS_SYSMENU | WS_MINIMIZEBOX| WS_VISIBLE, 200, 25, 1400, 950, NULL, NULL, hInstance, NULL);
+	CreateWindowW(wc.lpszClassName, L"RailWays", WS_SYSMENU | WS_MINIMIZEBOX| WS_VISIBLE, 200, 25, 1400, 980, NULL, NULL, hInstance, NULL);
 
 	while (GetMessage(&msg, NULL, 0, 0)) 
 	{
@@ -132,9 +132,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			if (amountCitiesOnTheMap <= 13) {
 
 				redrawingRect.left = cities[amountCitiesOnTheMap].block.x * 100;
-				redrawingRect.top = cities[amountCitiesOnTheMap].block.y * 100;
+				redrawingRect.top = cities[amountCitiesOnTheMap].block.y * 100 + 30;
 				redrawingRect.right = cities[amountCitiesOnTheMap].block.x * 100 + 100;
-				redrawingRect.bottom = cities[amountCitiesOnTheMap].block.y * 100 + 100;
+				redrawingRect.bottom = cities[amountCitiesOnTheMap].block.y * 100 + 100 + 30;
 
 				InvalidateRect(hwnd, &redrawingRect, TRUE);
 			}
@@ -142,15 +142,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 	case WM_PAINT:
 		hdc = BeginPaint(hwnd, &ps);
-		DrawingRailWays(hwnd, hdc, ps, map, newRoadBlock);
-		DrawTrains(&hwnd, &hLaFinishedTrains, &hdc, &ps, trainsRedraw, &amountTrainsOnTheMap, trains, map, cities, &finishedTrains);
+		DrawingRailWays(&hdc, &ps, map, &newRoadBlock);
+		DrawTrains(&hLaFinishedTrains, &hdc, &ps, trainsRedraw, &amountTrainsOnTheMap, trains, map, cities, &finishedTrains);
 		CityDrawing(&hdc, &amountCitiesOnTheMap, cities);
 		EndPaint(hwnd, &ps);
 		break;
 	case WM_RBUTTONDOWN:
 
 		mouse.x = LOWORD(lParam) / 100;
-		mouse.y = HIWORD(lParam) / 100;
+		mouse.y = (HIWORD(lParam) - 30) / 100;
 
 		if (rightButton == 5) {
 			rightButton = -1;
@@ -187,42 +187,42 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			switch (rightButton)
 			{
 			case 0:
-				newRoadBlock = ResetNewRoad(newRoadBlock);
+				newRoadBlock = ResetNewRoad(&newRoadBlock);
 				newRoadBlock.road.horizontal = 1;
 				newRoadBlock.road.isRoad = TRUE;
 				break;
 			case 1:
-				newRoadBlock = ResetNewRoad(newRoadBlock);
+				newRoadBlock = ResetNewRoad(&newRoadBlock);
 				newRoadBlock.road.vertical = 1;
 				newRoadBlock.road.isRoad = TRUE;
 
 				break;
 			case 2:
-				newRoadBlock = ResetNewRoad(newRoadBlock);
+				newRoadBlock = ResetNewRoad(&newRoadBlock);
 				newRoadBlock.road.leftBottom = 1;
 				newRoadBlock.road.isRoad = TRUE;
 
 				break;
 			case 3:
-				newRoadBlock = ResetNewRoad(newRoadBlock);
+				newRoadBlock = ResetNewRoad(&newRoadBlock);
 				newRoadBlock.road.bottomRight = 1;
 				newRoadBlock.road.isRoad = TRUE;
 
 				break;
 			case 4:
-				newRoadBlock = ResetNewRoad(newRoadBlock);
+				newRoadBlock = ResetNewRoad(&newRoadBlock);
 				newRoadBlock.road.topRight = 1;
 				newRoadBlock.road.isRoad = TRUE;
 
 				break;
 			case 5:
-				newRoadBlock = ResetNewRoad(newRoadBlock);
+				newRoadBlock = ResetNewRoad(&newRoadBlock);
 				newRoadBlock.road.leftTop = 1;
 				newRoadBlock.road.isRoad = TRUE;
 
 				break;
 			case -1:
-				newRoadBlock = ResetNewRoad(newRoadBlock);
+				newRoadBlock = ResetNewRoad(&newRoadBlock);
 				newRoadBlock.road.isRoad = FALSE;
 
 				break;
@@ -234,16 +234,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			newRoadBlock.block.y = mouse.y;
 
 			redrawingRect.left = mouse.x * 100;
-			redrawingRect.top = mouse.y * 100;
+			redrawingRect.top = mouse.y * 100 + 30;
 			redrawingRect.right = (mouse.x * 100) + 100;
-			redrawingRect.bottom = (mouse.y * 100) + 100;
+			redrawingRect.bottom = (mouse.y * 100) + 100 + 30;
 
 			InvalidateRect(hwnd, &redrawingRect, TRUE);
 		}
 		break;
 	case WM_LBUTTONDOWN:
 		mousePosition.x = LOWORD(lParam);
-		mousePosition.y = HIWORD(lParam);
+		mousePosition.y = HIWORD(lParam) - 30;
 		mapBlock.x = mousePosition.x / 100;
 		mapBlock.y = mousePosition.y / 100;
 
@@ -272,9 +272,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				};
 
 				redrawingRect.left = mouse.x * 100;
-				redrawingRect.top = mouse.y * 100;
+				redrawingRect.top = mouse.y * 100 + 30;
 				redrawingRect.right = (mouse.x * 100) + 100;
-				redrawingRect.bottom = (mouse.y * 100) + 100;
+				redrawingRect.bottom = (mouse.y * 100) + 100 + 30;
 
 				InvalidateRect(hwnd, &redrawingRect, TRUE);
 
@@ -306,7 +306,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				};
 			}
 
-			newRoadBlock = ResetNewRoad(newRoadBlock);
+			newRoadBlock = ResetNewRoad(&newRoadBlock);
 			mouse.x = -1;
 			mouse.y = -1;
 		}
@@ -468,9 +468,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			} 
 
 			redrawingRect.left = mapBlock.x * 100;
-			redrawingRect.top = mapBlock.y * 100;
+			redrawingRect.top = mapBlock.y * 100 + 30;
 			redrawingRect.right = (mapBlock.x * 100) + 100;
-			redrawingRect.bottom = (mapBlock.y * 100) + 100;
+			redrawingRect.bottom = (mapBlock.y * 100) + 100 + 30;
 
 			InvalidateRect(hwnd, &redrawingRect, TRUE);
 
@@ -498,19 +498,19 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	case WM_MOUSEMOVE:
 
 		nextMouse.x = LOWORD(lParam) / 100;
-		nextMouse.y = HIWORD(lParam) / 100;
+		nextMouse.y = (HIWORD(lParam) - 30) / 100;
 
 		if (((mouse.x != nextMouse.x) || (mouse.y != nextMouse.y)) && (rightButton != -1)) {
 			rightButton = -1;
 
 			redrawingRect.left = mouse.x * 100;
-			redrawingRect.top = mouse.y * 100;
+			redrawingRect.top = mouse.y * 100 + 30;
 			redrawingRect.right = (mouse.x * 100) + 100;
-			redrawingRect.bottom = (mouse.y * 100) + 100;
+			redrawingRect.bottom = (mouse.y * 100) + 100 + 30;
 
 			InvalidateRect(hwnd, &redrawingRect, TRUE);
 
-			newRoadBlock = ResetNewRoad(newRoadBlock);
+			newRoadBlock = ResetNewRoad(&newRoadBlock);
 			mouse.x = -1;
 			mouse.y = -1;
 		}

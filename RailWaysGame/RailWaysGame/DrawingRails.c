@@ -4,8 +4,9 @@
 #define TWOPI (2 * 3.14159)
 
 void RotatePoint(POINT[], int);
+void DrawingRoads(HDC*, PAINTSTRUCT*, Road*, int*, int*, int*);
 
-void DrawingRotedRails(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, int* xBlock, int* yBlock, int iAngle, BYTE MainRoad) {
+void DrawingRotedRails(HDC* hdc, PAINTSTRUCT* ps, int* xBlock, int* yBlock, int iAngle, BYTE MainRoad) {
 
 	LOGBRUSH brush = {0};
 	DWORD pen_style = PS_GEOMETRIC;
@@ -64,8 +65,8 @@ void DrawingRotedRails(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, int* xBlock, int* 
 		pt[1].x = pt[1].x + x;
 		pt[1].y = pt[1].y + y;
 
-		MoveToEx(*hdc, pt[0].x, pt[0].y, NULL);
-		LineTo(*hdc, pt[1].x, pt[1].y);
+		MoveToEx(*hdc, pt[0].x, pt[0].y + 30, NULL);
+		LineTo(*hdc, pt[1].x, pt[1].y + 30);
 	};
 
 	SelectObject(*hdc, hPenRailSteel);
@@ -76,20 +77,20 @@ void DrawingRotedRails(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, int* xBlock, int* 
 		switch (iAngle)
 		{
 		case 1:
-			Arc(*hdc, (x - 55 + (i * 10)), (y - 55 + (i * 10)), (x + 55 - (i * 10)),
-				(y + 55 - (i * 10)), (x + 55 - (i * 10)), y, x, (y - 55 + (i * 10)));
+			Arc(*hdc, (x - 55 + (i * 10)), (y - 55 + (i * 10) + 30), (x + 55 - (i * 10)),
+				(y + 55 - (i * 10) + 30), (x + 55 - (i * 10)), y + 30, x, (y - 55 + (i * 10)));
 			break;
 		case 2:
-			Arc(*hdc, (x - 55 + (i * 10)), (y - 55 + (i * 10)), (x + 55 - (i * 10)),
-				(y + 55 - (i * 10)), x, (y - 55 + (i * 10)), (x - 55 + (i * 10)), y);
+			Arc(*hdc, (x - 55 + (i * 10)), (y - 55 + (i * 10) + 30), (x + 55 - (i * 10)),
+				(y + 55 - (i * 10) + 30), x, (y - 55 + (i * 10)), (x - 55 + (i * 10)), y + 30);
 			break;
 		case 3:
-			Arc(*hdc, (x - 55 + (i * 10)), (y - 55 + (i * 10)), (x + 55 - (i * 10)),
-				(y + 55 - (i * 10)), (x - 55 + (i * 10)), y, x, (y + 45 + (i * 10)));
+			Arc(*hdc, (x - 55 + (i * 10)), (y - 55 + (i * 10) + 30), (x + 55 - (i * 10)),
+				(y + 55 - (i * 10) + 30), (x - 55 + (i * 10)), y + 30, x, (y + 45 + (i * 10)));
 			break;
 		case 4:
-			Arc(*hdc, (x - 55 + (i * 10)), (y - 55 + (i * 10)), (x + 55 - (i * 10)),
-				(y + 55 - (i * 10)), x, (y + 55 - (i * 10)), (x + 55 - (i * 10)), y);
+			Arc(*hdc, (x - 55 + (i * 10)), (y - 55 + (i * 10) + 30), (x + 55 - (i * 10)),
+				(y + 55 - (i * 10) + 30), x, (y + 55 - (i * 10)), (x + 55 - (i * 10)), y + 30);
 			break;
 
 		}
@@ -100,7 +101,7 @@ void DrawingRotedRails(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, int* xBlock, int* 
 	DeleteObject(hPenRailWood);
 }
 
-void DrawStraightRails(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, int* xBlock, int* yBlock, BYTE HorizontalFlag, BYTE MainRoad) {
+void DrawStraightRails(HDC* hdc, PAINTSTRUCT* ps, int* xBlock, int* yBlock, BYTE HorizontalFlag, BYTE MainRoad) {
 
 	LOGBRUSH brush = {0};
 	DWORD pen_style = PS_GEOMETRIC; // | PS_JOIN_BEVEL | PS_SOLID;
@@ -129,14 +130,14 @@ void DrawStraightRails(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, int* xBlock, int* 
 		for (int i = 0; i < 10; i++)
 		{
 			xTemp = (i * 10) + 5 + xMove;
-			MoveToEx(*hdc, xTemp, (40 + yMove), NULL);
-			LineTo(*hdc, xTemp, (60 + yMove));
+			MoveToEx(*hdc, xTemp, (70 + yMove), NULL);
+			LineTo(*hdc, xTemp, (90 + yMove));
 		};
 	}
 	else {
 		for (int i = 0; i < 10; i++)
 		{
-			yTemp = (i * 10) + 5 + yMove;
+			yTemp = (i * 10) + 35 + yMove;
 			MoveToEx(*hdc, (40 + xMove), yTemp, NULL);
 			LineTo(*hdc, (60 + xMove), yTemp);
 		};
@@ -146,7 +147,7 @@ void DrawStraightRails(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, int* xBlock, int* 
 
 	if (HorizontalFlag) {
 		for (int i = 0; i < 2; i++) {
-			yTemp = 45 + (10 * i) + yMove;
+			yTemp = 75 + (10 * i) + yMove;
 			MoveToEx(*hdc, (xMove), (yTemp), NULL);
 			LineTo(*hdc, (100 + xMove), (yTemp));
 		}
@@ -154,8 +155,8 @@ void DrawStraightRails(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, int* xBlock, int* 
 	else {
 		for (int i = 0; i < 2; i++) {
 			xTemp = 45 + (10 * i) + xMove;
-			MoveToEx(*hdc, xTemp, yMove, NULL);
-			LineTo(*hdc, xTemp, (100 + yMove));
+			MoveToEx(*hdc, xTemp, (yMove + 30), NULL);
+			LineTo(*hdc, xTemp, (100 + yMove + 30));
 		};
 	};
 
@@ -165,76 +166,76 @@ void DrawStraightRails(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, int* xBlock, int* 
 	DeleteObject(hPenRailWood);
 }
 
-void DrawingRoads(HWND* hwnd, HDC* hdc, PAINTSTRUCT* ps, Road road, int* Type, int* BlockX, int* BlockY) {
+void DrawingRoads(HDC* hdc, PAINTSTRUCT* ps, Road* road, int* Type, int* BlockX, int* BlockY) {
 
 	BYTE MainRoad = FALSE; // turn main way on
 
-	if (road.isRoad) {
-		if (road.horizontal == *Type) {
+	if ((*road).isRoad) {
+		if ((*road).horizontal == *Type) {
 
-			if (*Type == 2 && (road.leftBottom == 1 || road.leftTop == 1 || road.bottomRight == 1 || road.topRight == 1)) {
+			if (*Type == 2 && ((*road).leftBottom == 1 || (*road).leftTop == 1 || (*road).bottomRight == 1 || (*road).topRight == 1)) {
 				MainRoad = TRUE;
 			}
 			else {
 				MainRoad = FALSE;
 			}
-			DrawStraightRails(hwnd, hdc, ps, BlockX, BlockY, TRUE, MainRoad);
+			DrawStraightRails(hdc, ps, BlockX, BlockY, TRUE, MainRoad);
 		}
-		if (road.vertical == *Type) {
+		if ((*road).vertical == *Type) {
 
-			if (*Type == 2 && (road.leftBottom == 1 || road.leftTop == 1 || road.bottomRight == 1 || road.topRight == 1)) {
+			if (*Type == 2 && ((*road).leftBottom == 1 || (*road).leftTop == 1 || (*road).bottomRight == 1 || (*road).topRight == 1)) {
 				MainRoad = TRUE;
 			}
 			else {
 				MainRoad = FALSE;
 			}
 
-			DrawStraightRails(hwnd, hdc, ps, BlockX, BlockY, FALSE, MainRoad);
-
-		}
-		if (road.leftBottom == *Type) {
-
-			if (*Type == 2 && (road.horizontal == 1 || road.vertical == 1 || road.leftTop == 1 || road.bottomRight == 1)) {
-				MainRoad = TRUE;
-			}
-			else {
-				MainRoad = FALSE;
-			}
-			DrawingRotedRails(hwnd, hdc, ps, BlockX, BlockY, 1, MainRoad);
+			DrawStraightRails(hdc, ps, BlockX, BlockY, FALSE, MainRoad);
 
 		}
-		if (road.bottomRight == *Type) {
+		if ((*road).leftBottom == *Type) {
 
-			if (*Type == 2 && (road.horizontal == 1 || road.vertical == 1 || road.leftBottom == 1 || road.topRight == 1)) {
+			if (*Type == 2 && ((*road).horizontal == 1 || (*road).vertical == 1 || (*road).leftTop == 1 || (*road).bottomRight == 1)) {
 				MainRoad = TRUE;
 			}
 			else {
 				MainRoad = FALSE;
 			}
+			DrawingRotedRails(hdc, ps, BlockX, BlockY, 1, MainRoad);
 
-			DrawingRotedRails(hwnd, hdc, ps, BlockX, BlockY, 2, MainRoad);
 		}
-		if (road.topRight == *Type) {
+		if ((*road).bottomRight == *Type) {
 
-			if (*Type == 2 && (road.horizontal == 1 || road.vertical == 1 || road.bottomRight == 1 || road.leftTop == 1)) {
+			if (*Type == 2 && ((*road).horizontal == 1 || (*road).vertical == 1 || (*road).leftBottom == 1 || (*road).topRight == 1)) {
 				MainRoad = TRUE;
 			}
 			else {
 				MainRoad = FALSE;
 			}
 
-			DrawingRotedRails(hwnd, hdc, ps, BlockX, BlockY, 3, MainRoad);
+			DrawingRotedRails(hdc, ps, BlockX, BlockY, 2, MainRoad);
 		}
-		if (road.leftTop == *Type) {
+		if ((*road).topRight == *Type) {
 
-			if (*Type == 2 && (road.horizontal == 1 || road.vertical == 1 || road.topRight == 1 || road.leftBottom == 1)) {
+			if (*Type == 2 && ((*road).horizontal == 1 || (*road).vertical == 1 || (*road).bottomRight == 1 || (*road).leftTop == 1)) {
 				MainRoad = TRUE;
 			}
 			else {
 				MainRoad = FALSE;
 			}
 
-			DrawingRotedRails(hwnd, hdc, ps, BlockX, BlockY, 4, MainRoad);
+			DrawingRotedRails(hdc, ps, BlockX, BlockY, 3, MainRoad);
+		}
+		if ((*road).leftTop == *Type) {
+
+			if (*Type == 2 && ((*road).horizontal == 1 || (*road).vertical == 1 || (*road).topRight == 1 || (*road).leftBottom == 1)) {
+				MainRoad = TRUE;
+			}
+			else {
+				MainRoad = FALSE;
+			}
+
+			DrawingRotedRails(hdc, ps, BlockX, BlockY, 4, MainRoad);
 		}
 	}
 }
@@ -255,37 +256,37 @@ void RotatePoint(POINT pt[], int iAngle)
 	}
 }
 
-NewRoad ResetNewRoad(NewRoad newRoadBlock) {
-	newRoadBlock.road.horizontal = 0;
-	newRoadBlock.road.vertical = 0;
-	newRoadBlock.road.bottomRight = 0;
-	newRoadBlock.road.leftBottom = 0;
-	newRoadBlock.road.topRight = 0;
-	newRoadBlock.road.leftTop = 0;
+NewRoad ResetNewRoad(NewRoad* newRoadBlock) {
+	(*newRoadBlock).road.horizontal = 0;
+	(*newRoadBlock).road.vertical = 0;
+	(*newRoadBlock).road.bottomRight = 0;
+	(*newRoadBlock).road.leftBottom = 0;
+	(*newRoadBlock).road.topRight = 0;
+	(*newRoadBlock).road.leftTop = 0;
 
-	return newRoadBlock;
+	return *newRoadBlock;
 }
 
-void DrawingRailWays(HWND hwnd, HDC hdc, PAINTSTRUCT ps, Road map[CLIENT_AREA_X][CLIENT_AREA_Y], NewRoad newRoadBlock) {
+void DrawingRailWays(HDC* hdc, PAINTSTRUCT* ps, Road map[CLIENT_AREA_X][CLIENT_AREA_Y], NewRoad* newRoadBlock) {
 
 	//drawing unactive rails
 	int type = 1;
 
 	for (int i = 0; i < CLIENT_AREA_X; i++) {
 		for (int j = 0; j < CLIENT_AREA_Y; j++) {
-			DrawingRoads(&hwnd, &hdc, &ps, map[i][j], &type, &i, &j);
+			DrawingRoads(hdc, ps, &map[i][j], &type, &i, &j);
 		}
 	}
 
 	//drawing building rails
-	DrawingRoads(&hwnd, &hdc, &ps, newRoadBlock.road, &type, &newRoadBlock.block.x, &newRoadBlock.block.y);
+	DrawingRoads(hdc, ps, &((*newRoadBlock).road), & type, &(*newRoadBlock).block.x, &(*newRoadBlock).block.y);
 
 	//drawing active rails
 	type = 2;
 
 	for (int i = 0; i < CLIENT_AREA_X; i++) {
 		for (int j = 0; j < CLIENT_AREA_Y; j++) {
-			DrawingRoads(&hwnd, &hdc, &ps, map[i][j], &type, &i, &j);
+			DrawingRoads(hdc, ps, &map[i][j], &type, &i, &j);
 		}
 	}
 

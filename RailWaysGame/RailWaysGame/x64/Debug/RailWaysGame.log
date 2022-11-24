@@ -1,2 +1,4 @@
-﻿  RailWaysGame.c
+﻿  CreatNewTrainAndMove.c
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\CreatNewTrainAndMove.c(205,43): warning C4090: 'function': different 'const' qualifiers
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\CreatNewTrainAndMove.c(260,34): warning C4047: '!=': 'const int *' differs in levels of indirection from 'int'
   RailWaysGame.vcxproj -> C:\Projects\C\RailWaysGame\RailWaysGame\x64\Debug\RailWaysGame.exe

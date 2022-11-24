@@ -12,7 +12,7 @@ void TurningTrainTopLeft(int*, Train[]);
 void TurningTrainRightBottom(int*, Train[]);
 void TurningTrainBottomRight(int*, Train[]);
 
-void DrawTrains(HWND* hwnd, HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, RECT* trainRedraw, const int* amountTrainsOnTheMap,
+void DrawTrains(HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, RECT* trainRedraw, const int* amountTrainsOnTheMap,
 	Train* trains, Road map[CLIENT_AREA_X][CLIENT_AREA_Y], City* cities, int* finishedTrains) {
 
 	BYTE movingLeft, movingRight, movingUp, movingDown;
@@ -30,17 +30,17 @@ void DrawTrains(HWND* hwnd, HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, 
 						TurningTrainLeftBottom(&i, trains);
 
 						trainRedraw[i].left = drawPreBlock.x * 100;
-						trainRedraw[i].top = drawTrainBlock.y * 100;
+						trainRedraw[i].top = drawTrainBlock.y * 100 + 30;
 						trainRedraw[i].right = drawTrainBlock.x * 100 + 100;
-						trainRedraw[i].bottom = drawTrainBlock.y * 100 + 100 + 50;
+						trainRedraw[i].bottom = drawTrainBlock.y * 100 + 100 + 50 + 30;
 					}
 					else {
 						TurningTrainBottomLeft(&i, trains);
 
 						trainRedraw[i].left = drawTrainBlock.x * 100 - 20;
-						trainRedraw[i].top = drawTrainBlock.y * 100;
+						trainRedraw[i].top = drawTrainBlock.y * 100 + 30;
 						trainRedraw[i].right = drawTrainBlock.x * 100 + 100;
-						trainRedraw[i].bottom = drawPreBlock.y * 100 + 100;
+						trainRedraw[i].bottom = drawPreBlock.y * 100 + 100 + 30;
 					}
 				}
 
@@ -49,17 +49,17 @@ void DrawTrains(HWND* hwnd, HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, 
 						TurningTrainRightBottom(&i, trains);
 
 						trainRedraw[i].left = drawTrainBlock.x * 100;
-						trainRedraw[i].top = drawTrainBlock.y * 100;
+						trainRedraw[i].top = drawTrainBlock.y * 100 + 30;
 						trainRedraw[i].right = drawPreBlock.x * 100 + 100;
-						trainRedraw[i].bottom = drawPreBlock.y * 100 + 100;
+						trainRedraw[i].bottom = drawPreBlock.y * 100 + 100 + 15 + 30;
 					}
 					else {
 						TurningTrainBottomRight(&i, trains);
 
 						trainRedraw[i].left = drawTrainBlock.x * 100;
-						trainRedraw[i].top = drawTrainBlock.y * 100;
+						trainRedraw[i].top = drawTrainBlock.y * 100 + 30;
 						trainRedraw[i].right = drawTrainBlock.x * 100 + 100 + 20;
-						trainRedraw[i].bottom = drawPreBlock.y * 100 + 100;
+						trainRedraw[i].bottom = drawPreBlock.y * 100 + 100 + 30;
 					}
 				}
 
@@ -68,17 +68,17 @@ void DrawTrains(HWND* hwnd, HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, 
 						TurningTrainTopRight(&i, trains);
 
 						trainRedraw[i].left = drawPreBlock.x * 100;
-						trainRedraw[i].top = drawPreBlock.y * 100;
+						trainRedraw[i].top = drawPreBlock.y * 100 + 30;
 						trainRedraw[i].right = drawTrainBlock.x * 100 + 100 + 20;
-						trainRedraw[i].bottom = drawTrainBlock.y * 100 + 100;
+						trainRedraw[i].bottom = drawTrainBlock.y * 100 + 100 + 30;
 					}
 					else {
 						TurningTrainRightTop(&i, trains);
 
 						trainRedraw[i].left = drawTrainBlock.x * 100;
-						trainRedraw[i].top = drawTrainBlock.y * 100 - 20;
+						trainRedraw[i].top = drawTrainBlock.y * 100 - 20 + 30;
 						trainRedraw[i].right = drawPreBlock.x * 100 + 100;
-						trainRedraw[i].bottom = drawPreBlock.y * 100 + 100;
+						trainRedraw[i].bottom = drawPreBlock.y * 100 + 100 + 30;
 					}
 				}
 
@@ -87,18 +87,18 @@ void DrawTrains(HWND* hwnd, HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, 
 						TurningTrainLeftTop(&i, trains);
 
 						trainRedraw[i].left = drawPreBlock.x * 100;
-						trainRedraw[i].top = drawPreBlock.y * 100 - 20;
+						trainRedraw[i].top = drawPreBlock.y * 100 - 20 + 30;
 						trainRedraw[i].right = drawTrainBlock.x * 100 + 100;
-						trainRedraw[i].bottom = drawTrainBlock.y * 100 + 100;
+						trainRedraw[i].bottom = drawTrainBlock.y * 100 + 100 + 30;
 					}
 					else
 					{
 						TurningTrainTopLeft(&i, trains);
 
 						trainRedraw[i].left = drawPreBlock.x * 100 - 20;
-						trainRedraw[i].top = drawPreBlock.y * 100;
+						trainRedraw[i].top = drawPreBlock.y * 100 + 30;
 						trainRedraw[i].right = drawTrainBlock.x * 100 + 100;
-						trainRedraw[i].bottom = drawTrainBlock.y * 100 + 100;
+						trainRedraw[i].bottom = drawTrainBlock.y * 100 + 100 + 30;
 					}
 				}
 
@@ -109,15 +109,15 @@ void DrawTrains(HWND* hwnd, HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, 
 
 					if (DirectMoving(&i, FALSE, trains)) {
 						trainRedraw[i].left = trains[i].head.x - 30;
-						trainRedraw[i].top = drawTrainBlock.y * 100;
+						trainRedraw[i].top = drawTrainBlock.y * 100 + 30;
 						trainRedraw[i].right = trains[i].tail.x + 30;
-						trainRedraw[i].bottom = drawTrainBlock.y * 100 + 100;
+						trainRedraw[i].bottom = drawTrainBlock.y * 100 + 100 + 30;
 					}
 					else {
 						trainRedraw[i].left = trains[i].tail.x - 30;
-						trainRedraw[i].top = drawTrainBlock.y * 100;
+						trainRedraw[i].top = drawTrainBlock.y * 100 + 30;
 						trainRedraw[i].right = trains[i].head.x + 30;
-						trainRedraw[i].bottom = drawTrainBlock.y * 100 + 100;
+						trainRedraw[i].bottom = drawTrainBlock.y * 100 + 100 + 30;
 					}
 
 
@@ -130,16 +130,16 @@ void DrawTrains(HWND* hwnd, HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, 
 
 					if (DirectMoving(&i, TRUE, trains)) {
 						trainRedraw[i].left = drawTrainBlock.x * 100;
-						trainRedraw[i].top = trains[i].head.y - 30;
+						trainRedraw[i].top = trains[i].head.y - 30 + 30;
 						trainRedraw[i].right = drawTrainBlock.x * 100 + 100;
-						trainRedraw[i].bottom = trains[i].tail.y + 30;
+						trainRedraw[i].bottom = trains[i].tail.y + 30 + 30;
 					}
 					else
 					{
 						trainRedraw[i].left = drawTrainBlock.x * 100;
-						trainRedraw[i].top = trains[i].tail.y - 30;
+						trainRedraw[i].top = trains[i].tail.y - 30 + 30;
 						trainRedraw[i].right = drawTrainBlock.x * 100 + 100;
-						trainRedraw[i].bottom = trains[i].head.y + 30;
+						trainRedraw[i].bottom = trains[i].head.y + 30 + 30;
 					}
 				}
 
@@ -270,8 +270,8 @@ void DrawTrains(HWND* hwnd, HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, 
 
 				HPEN hOldPen = SelectObject(*hdc, hPen);
 
-				MoveToEx(*hdc, trains[i].head.x, trains[i].head.y, NULL);
-				LineTo(*hdc, trains[i].tail.x, trains[i].tail.y);
+				MoveToEx(*hdc, trains[i].head.x, trains[i].head.y + 30, NULL);
+				LineTo(*hdc, trains[i].tail.x, trains[i].tail.y + 30);
 
 				SelectObject(*hdc, hOldPen);
 

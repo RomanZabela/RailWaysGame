@@ -34,43 +34,43 @@ void CityDrawing(HDC* hdc, int* numberOfCities, City* cities) {
 		coordinates.y = cities[i].block.y * 100;
 
 		triangle[0].x = 36 + coordinates.x;
-		triangle[0].y = 70 + coordinates.y;
+		triangle[0].y = 100 + coordinates.y;
 
 		triangle[1].x = 50 + coordinates.x;
-		triangle[1].y = 60 + coordinates.y;
+		triangle[1].y = 90 + coordinates.y;
 
 		triangle[2].x = 62 + coordinates.x;
-		triangle[2].y = 70 + coordinates.y;
+		triangle[2].y = 100 + coordinates.y;
 
-		Rectangle(*hdc, 15 + coordinates.x, 10 + coordinates.y, 45 + coordinates.x, 50 + coordinates.y);
+		Rectangle(*hdc, 15 + coordinates.x, 40 + coordinates.y, 45 + coordinates.x, 80 + coordinates.y);
 
 		SelectObject(*hdc, hBrushWindows);
 		SelectObject(*hdc, hPenWindows);
 
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < 2; j++) {
-				Rectangle(*hdc, 20 + (15 * i) + coordinates.x, 15 + (20 * j) + coordinates.y,
-					25 + (15 * i) + coordinates.x, 25 + (20 * j) + coordinates.y);
+				Rectangle(*hdc, 20 + (15 * i) + coordinates.x, 45 + (20 * j) + coordinates.y,
+					25 + (15 * i) + coordinates.x, 55 + (20 * j) + coordinates.y);
 			}
 		}
 
 		SelectObject(*hdc, hBrushBuild);
 		SelectObject(*hdc, hPenBuild);
 
-		Rectangle(*hdc, 5 + coordinates.x, 40 + coordinates.y, 35 + coordinates.x, 80 + coordinates.y);
-		Rectangle(*hdc, 40 + coordinates.x, 70 + coordinates.y, 60 + coordinates.x, 90 + coordinates.y);
-		Rectangle(*hdc, 55 + coordinates.x, 15 + coordinates.y, 75 + coordinates.x, 35 + coordinates.y);
+		Rectangle(*hdc, 5 + coordinates.x, 70 + coordinates.y, 35 + coordinates.x, 110 + coordinates.y);
+		Rectangle(*hdc, 40 + coordinates.x, 100 + coordinates.y, 60 + coordinates.x, 120 + coordinates.y);
+		Rectangle(*hdc, 55 + coordinates.x, 45 + coordinates.y, 75 + coordinates.x, 65 + coordinates.y);
 
 		Polygon(*hdc, triangle, 3);
 
 		triangle[0].x = 51 + coordinates.x;
-		triangle[0].y = 15 + coordinates.y;
+		triangle[0].y = 45 + coordinates.y;
 
 		triangle[1].x = 65 + coordinates.x;
-		triangle[1].y = 5 + coordinates.y;
+		triangle[1].y = 35 + coordinates.y;
 
 		triangle[2].x = 77 + coordinates.x;
-		triangle[2].y = 15 + coordinates.y;
+		triangle[2].y = 45 + coordinates.y;
 
 		Polygon(*hdc, triangle, 3);
 
@@ -80,13 +80,13 @@ void CityDrawing(HDC* hdc, int* numberOfCities, City* cities) {
 
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < 2; j++) {
-				Rectangle(*hdc, 10 + (15 * i) + coordinates.x, 45 + (20 * j) + coordinates.y,
-					15 + (15 * i) + coordinates.x, 55 + (20 * j) + coordinates.y);
+				Rectangle(*hdc, 10 + (15 * i) + coordinates.x, 75 + (20 * j) + coordinates.y,
+					15 + (15 * i) + coordinates.x, 85 + (20 * j) + coordinates.y);
 			}
 		}
 
-		Rectangle(*hdc, 45 + coordinates.x, 75 + coordinates.y, 50 + coordinates.x, 80 + coordinates.y);
-		Rectangle(*hdc, 60 + coordinates.x, 20 + coordinates.y, 65 + coordinates.x, 25 + coordinates.y);
+		Rectangle(*hdc, 45 + coordinates.x, 105 + coordinates.y, 50 + coordinates.x, 110 + coordinates.y);
+		Rectangle(*hdc, 60 + coordinates.x, 50 + coordinates.y, 65 + coordinates.x, 55 + coordinates.y);
 
 		SelectObject(*hdc, hOldBrush);
 		DeleteObject(hBrushBuild);
