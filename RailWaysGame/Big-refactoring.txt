@@ -1,9 +1,0 @@
-1. Separated function from the file HelpForMain.c and removed the file
-2. Rebuilt Main RailWaysGame.c file:
-	a. Moved all procedures to specific files:
-		Create, Move and draw trains -> CreatNewTrainAndMove.c
-		Create and draw City -> CreateCityAndDrawing.c
-		Drawing Railways -> DrawingRails.c
-	b. Fixed all warnings
-	c. Kept in place the procedures responsible for main logics and connected with system
-3. Isolated all Moving procedures into CreatNewTrainAndMove.c: Turning left and right, Moving up and down
