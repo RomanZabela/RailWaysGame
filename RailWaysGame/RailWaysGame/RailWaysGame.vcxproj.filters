@@ -27,21 +27,39 @@
     <ClInclude Include="DrawingRails.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TrainMove.h">
+    <ClInclude Include="CreatNewTrainAndMove.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Structures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HelpNewCity.h">
+    <ClInclude Include="CreateCityAndDrawing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HelpForMain.h">
+    <ClInclude Include="MousePosition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawingInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RailWaysGame.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawingRails.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CreateCityAndDrawing.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CreatNewTrainAndMove.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MousePosition.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawingInterface.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
