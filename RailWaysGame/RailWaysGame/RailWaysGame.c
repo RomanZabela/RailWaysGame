@@ -120,9 +120,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		//creating new City
 		if (timer % CREATE_NEW_CITY_TIMER == 0) {
 
-			if (amountCitiesOnTheMap <= 13) {
+			if (amountCitiesOnTheMap < 13) {
 				amountCitiesOnTheMap++;
-
 				NewCity(amountCitiesOnTheMap, cities, map, BankOfColors);
 			}
 

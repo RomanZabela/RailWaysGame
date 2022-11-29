@@ -11,6 +11,8 @@ void TurningTrainLeftTop(int*, Train[]);
 void TurningTrainTopLeft(int*, Train[]);
 void TurningTrainRightBottom(int*, Train[]);
 void TurningTrainBottomRight(int*, Train[]);
+void InizializeVariablesForTrainMovingCalculation(POINT*, POINT*, POINT*, Train*);
+void AssignedVaiablesBackAfterCalculation(POINT*, POINT*, Train*);
 
 void DrawTrains(HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, RECT* trainRedraw, const int* amountTrainsOnTheMap,
 	Train* trains, Road map[CLIENT_AREA_X][CLIENT_AREA_Y], City* cities, int* finishedTrains) {
@@ -418,317 +420,271 @@ int CorrectTail(int* Tail, const int* Block) {
 
 BYTE DirectMoving(int* numberTrain, byte Vertical, Train trains[]) {
 
-	int headX = trains[*numberTrain].head.x;
-	int headY = trains[*numberTrain].head.y;
-	int tailX = trains[*numberTrain].tail.x;
-	int tailY = trains[*numberTrain].tail.y;
-	int blockX = (trains[*numberTrain].block.x * 100);
-	int blockY = (trains[*numberTrain].block.y * 100);
+	POINT head, tail, block;
+
+	InizializeVariablesForTrainMovingCalculation(&head, &tail, &block, &trains[*numberTrain]);
 
 	byte forwardVertical = trains[*numberTrain].block.y - trains[*numberTrain].preBlock.y < 0;
 	byte forwardHorizontal = trains[*numberTrain].block.x - trains[*numberTrain].preBlock.x < 0;
 
 	if (Vertical) {
 		if (forwardVertical) {
-			headY--;
-			tailY--;
+			head.y--;
+			tail.y--;
 
-			tailX = CorrectTail(&tailX, &blockX);
+			tail.x = CorrectTail(&tail.x, &block.x);
 		}
 		else {
-			headY++;
-			tailY++;
+			head.y++;
+			tail.y++;
 
-			tailX = CorrectTail(&tailX, &blockX);
+			tail.x = CorrectTail(&tail.x, &block.x);
 		}
 
 	}
 	else {
 		if (forwardHorizontal) {
-			headX--;
-			tailX--;
+			head.x--;
+			tail.x--;
 
-			tailY = CorrectTail(&tailY, &blockY);
+			tail.y = CorrectTail(&tail.y, &block.y);
 		}
 		else
 		{
-			headX++;
-			tailX++;
+			head.x++;
+			tail.x++;
 
-			tailY = CorrectTail(&tailY, &blockY);
+			tail.y = CorrectTail(&tail.y, &block.y);
 		}
 	}
 
-	trains[*numberTrain].head.x = headX;
-	trains[*numberTrain].head.y = headY;
-	trains[*numberTrain].tail.x = tailX;
-	trains[*numberTrain].tail.y = tailY;
+	AssignedVaiablesBackAfterCalculation(&head, &tail, &trains[*numberTrain]);
 
 	return forwardHorizontal || forwardVertical;
 }
 
 void TurningTrainLeftBottom(int* numberTrain, Train trains[]) {
 
-	int headX = trains[*numberTrain].head.x;
-	int headY = trains[*numberTrain].head.y;
-	int tailX = trains[*numberTrain].tail.x;
-	int tailY = trains[*numberTrain].tail.y;
-	int blockX = (trains[*numberTrain].block.x * 100);
-	int blockY = (trains[*numberTrain].block.y * 100);
+	POINT head, tail, block;
 
-	tailY = CorrectTail(&tailY, &blockY);
+	InizializeVariablesForTrainMovingCalculation(&head, &tail, &block, &trains[*numberTrain]);
 
-	if (headX < (blockX + 20)) {
-		headX++;
-		tailX++;
+	tail.y = CorrectTail(&tail.y, &block.y);
+
+	if (head.x < (block.x + 20)) {
+		head.x++;
+		tail.x++;
 	}
 
-	if (headX >= (blockX + 20) && headX < (blockX + 50)) {
-		headX++;
-		tailX += 2;
-		headY++;
+	if (head.x >= (block.x + 20) && head.x < (block.x + 50)) {
+		head.x++;
+		tail.x += 2;
+		head.y++;
 	}
 
-	if (headY >= (blockY + 79) && headY <= (blockY + 100)) {
-		tailX++;
-		headY += 2;
+	if (head.y >= (block.y + 79) && head.y <= (block.y + 100)) {
+		tail.x++;
+		head.y += 2;
 	}
 
-	trains[*numberTrain].head.x = headX;
-	trains[*numberTrain].head.y = headY;
-	trains[*numberTrain].tail.x = tailX;
-	trains[*numberTrain].tail.y = tailY;
+	AssignedVaiablesBackAfterCalculation(&head, &tail, &trains[*numberTrain]);
 }
 
 void TurningTrainBottomLeft(int* numberTrain, Train trains[]) {
 
-	int headX = trains[*numberTrain].head.x;
-	int headY = trains[*numberTrain].head.y;
-	int tailX = trains[*numberTrain].tail.x;
-	int tailY = trains[*numberTrain].tail.y;
-	int blockX = (trains[*numberTrain].block.x * 100);
-	int blockY = (trains[*numberTrain].block.y * 100 + 100);
+	POINT head, tail, block;
 
-	tailX = CorrectTail(&tailX, &blockX);
+	InizializeVariablesForTrainMovingCalculation(&head, &tail, &block, &trains[*numberTrain]);
+	
+	block.y = block.y + 100;
 
-	if (headY > (blockY - 20)) {
-		headY--;
-		tailY--;
+	tail.x = CorrectTail(&tail.x, &block.x);
+
+	if (head.y > (block.y - 20)) {
+		head.y--;
+		tail.y--;
 	}
 
-	if (headY <= (blockY - 20) && headY > (blockY - 50)) {
-		headY--;
-		tailY -= 2;
-		headX--;
+	if (head.y <= (block.y - 20) && head.y > (block.y - 50)) {
+		head.y--;
+		tail.y -= 2;
+		head.x--;
 	}
 
-	if (headX <= (blockX + 29) && headX >= (blockX)) {
-		tailY--;
-		headX -= 2;
+	if (head.x <= (block.x + 29) && head.x >= (block.x)) {
+		tail.y--;
+		head.x -= 2;
 	}
 
-	trains[*numberTrain].head.x = headX;
-	trains[*numberTrain].head.y = headY;
-	trains[*numberTrain].tail.x = tailX;
-	trains[*numberTrain].tail.y = tailY;
+	AssignedVaiablesBackAfterCalculation(&head, &tail, &trains[*numberTrain]);
 }
 
 void TurningTrainTopRight(int* numberTrain, Train trains[]) {
 
-	int headX = trains[*numberTrain].head.x;
-	int headY = trains[*numberTrain].head.y;
-	int tailX = trains[*numberTrain].tail.x;
-	int tailY = trains[*numberTrain].tail.y;
-	int blockX = (trains[*numberTrain].block.x * 100);
-	int blockY = (trains[*numberTrain].block.y * 100);
+	POINT head, tail, block;
 
-	tailX = CorrectTail(&tailX, &blockX);
+	InizializeVariablesForTrainMovingCalculation(&head, &tail, &block, &trains[*numberTrain]);
 
-	if (headY < (blockY + 20)) {
-		headY++;
-		tailY++;
+	tail.x = CorrectTail(&tail.x, &block.x);
+
+	if (head.y < (block.y + 20)) {
+		head.y++;
+		tail.y++;
 	}
 
-	if (headY >= (blockY + 20) && headY < (blockY + 50)) {
-		headY++;
-		tailY += 2;
-		headX++;
+	if (head.y >= (block.y + 20) && head.y < (block.y + 50)) {
+		head.y++;
+		tail.y += 2;
+		head.x++;
 	}
 
-	if (headX >= (blockX + 79) && headX <= (blockX + 100)) {
-		tailY++;
-		headX += 2;
+	if (head.x >= (block.x + 79) && head.x <= (block.x + 100)) {
+		tail.y++;
+		head.x += 2;
 	}
 
-	trains[*numberTrain].head.x = headX;
-	trains[*numberTrain].head.y = headY;
-	trains[*numberTrain].tail.x = tailX;
-	trains[*numberTrain].tail.y = tailY;
+	AssignedVaiablesBackAfterCalculation(&head, &tail, &trains[*numberTrain]);
 }
 
 void TurningTrainRightTop(int* numberTrain, Train trains[]) {
 
-	int headX = trains[*numberTrain].head.x;
-	int headY = trains[*numberTrain].head.y;
-	int tailX = trains[*numberTrain].tail.x;
-	int tailY = trains[*numberTrain].tail.y;
-	int blockX = (trains[*numberTrain].block.x * 100 + 100);
-	int blockY = (trains[*numberTrain].block.y * 100);
+	POINT head, tail, block;
 
-	tailY = CorrectTail(&tailY, &blockY);
+	InizializeVariablesForTrainMovingCalculation(&head, &tail, &block, &trains[*numberTrain]);
 
-	if (headX > (blockX - 20)) {
-		headX--;
-		tailX--;
+	block.x = block.x + 100;
+
+	tail.y = CorrectTail(&tail.y, &block.y);
+
+	if (head.x > (block.x - 20)) {
+		head.x--;
+		tail.x--;
 	}
 
-	if (headX <= (blockX - 20) && headX > (blockX - 50)) {
-		headX--;
-		tailX -= 2;
-		headY--;
+	if (head.x <= (block.x - 20) && head.x > (block.x - 50)) {
+		head.x--;
+		tail.x -= 2;
+		head.y--;
 	}
 
-	if (headY <= (blockY + 29) && headY >= (blockY)) {
-		tailX--;
-		headY -= 2;
+	if (head.y <= (block.y + 29) && head.y >= (block.y)) {
+		tail.x--;
+		head.y -= 2;
 	}
 
-	trains[*numberTrain].head.x = headX;
-	trains[*numberTrain].head.y = headY;
-	trains[*numberTrain].tail.x = tailX;
-	trains[*numberTrain].tail.y = tailY;
+	AssignedVaiablesBackAfterCalculation(&head, &tail, &trains[*numberTrain]);
 }
 
 void TurningTrainLeftTop(int* numberTrain, Train trains[]) {
 
-	int headX = trains[*numberTrain].head.x;
-	int headY = trains[*numberTrain].head.y;
-	int tailX = trains[*numberTrain].tail.x;
-	int tailY = trains[*numberTrain].tail.y;
-	int blockX = (trains[*numberTrain].block.x * 100);
-	int blockY = (trains[*numberTrain].block.y * 100);
+	POINT head, tail, block;
 
-	tailY = CorrectTail(&tailY, &blockY);
+	InizializeVariablesForTrainMovingCalculation(&head, &tail, &block, &trains[*numberTrain]);
 
-	if (headX < (blockX + 20)) {
-		headX++;
-		tailX++;
+	tail.y = CorrectTail(&tail.y, &block.y);
+
+	if (head.x < (block.x + 20)) {
+		head.x++;
+		tail.x++;
 	}
 
-	if (headX >= (blockX + 20) && headX < (blockX + 50)) {
-		headX++;
-		tailX += 2;
-		headY--;
+	if (head.x >= (block.x + 20) && head.x < (block.x + 50)) {
+		head.x++;
+		tail.x += 2;
+		head.y--;
 	}
 
-	if (headY <= (blockY + 29) && headY >= (blockY)) {
-		tailX++;
-		headY -= 2;
+	if (head.y <= (block.y + 29) && head.y >= (block.y)) {
+		tail.x++;
+		head.y -= 2;
 	}
 
-	trains[*numberTrain].head.x = headX;
-	trains[*numberTrain].head.y = headY;
-	trains[*numberTrain].tail.x = tailX;
-	trains[*numberTrain].tail.y = tailY;
+	AssignedVaiablesBackAfterCalculation(&head, &tail, &trains[*numberTrain]);
 }
 
 void TurningTrainTopLeft(int* numberTrain, Train trains[]) {
 
-	int headX = trains[*numberTrain].head.x;
-	int headY = trains[*numberTrain].head.y;
-	int tailX = trains[*numberTrain].tail.x;
-	int tailY = trains[*numberTrain].tail.y;
-	int blockX = (trains[*numberTrain].block.x * 100);
-	int blockY = (trains[*numberTrain].block.y * 100);
+	POINT head, tail, block;
 
-	tailX = CorrectTail(&tailX, &blockX);
+	InizializeVariablesForTrainMovingCalculation(&head, &tail, &block, &trains[*numberTrain]);
 
-	if (headY < (blockY + 20)) {
-		headY++;
-		tailY++;
+	tail.x = CorrectTail(&tail.x, &block.x);
+
+	if (head.y < (block.y + 20)) {
+		head.y++;
+		tail.y++;
 	}
 
-	if (headY >= (blockY + 20) && headY < (blockY + 50)) {
-		headY++;
-		tailY += 2;
-		headX--;
+	if (head.y >= (block.y + 20) && head.y < (block.y + 50)) {
+		head.y++;
+		tail.y += 2;
+		head.x--;
 	}
 
-	if (headX <= (blockX + 29) && headX >= (blockX)) {
-		tailY++;
-		headX -= 2;
+	if (head.x <= (block.x + 29) && head.x >= (block.x)) {
+		tail.y++;
+		head.x -= 2;
 	}
 
-	trains[*numberTrain].head.x = headX;
-	trains[*numberTrain].head.y = headY;
-	trains[*numberTrain].tail.x = tailX;
-	trains[*numberTrain].tail.y = tailY;
+	AssignedVaiablesBackAfterCalculation(&head, &tail, &trains[*numberTrain]);
 }
 
 void TurningTrainRightBottom(int* numberTrain, Train trains[]) {
 
-	int headX = trains[*numberTrain].head.x;
-	int headY = trains[*numberTrain].head.y;
-	int tailX = trains[*numberTrain].tail.x;
-	int tailY = trains[*numberTrain].tail.y;
-	int blockX = (trains[*numberTrain].block.x * 100 + 100);
-	int blockY = (trains[*numberTrain].block.y * 100);
+	POINT head, tail, block;
 
-	tailY = CorrectTail(&tailY, &blockY);
+	InizializeVariablesForTrainMovingCalculation(&head, &tail, &block, &trains[*numberTrain]);
 
-	if (headX > (blockX - 20)) {
-		headX--;
-		tailX--;
+	block.x = block.x + 100;
+
+	tail.y = CorrectTail(&tail.y, &block.y);
+
+	if (head.x > (block.x - 20)) {
+		head.x--;
+		tail.x--;
 	}
 
-	if (headX <= (blockX - 20) && headX > (blockX - 50)) {
-		headX--;
-		tailX -= 2;
-		headY++;
+	if (head.x <= (block.x - 20) && head.x > (block.x - 50)) {
+		head.x--;
+		tail.x -= 2;
+		head.y++;
 	}
 
-	if (headY >= (blockY + 79) && headY <= (blockY + 100)) {
-		tailX--;
-		headY += 2;
+	if (head.y >= (block.y + 79) && head.y <= (block.y + 100)) {
+		tail.x--;
+		head.y += 2;
 	}
 
-	trains[*numberTrain].head.x = headX;
-	trains[*numberTrain].head.y = headY;
-	trains[*numberTrain].tail.x = tailX;
-	trains[*numberTrain].tail.y = tailY;
+	AssignedVaiablesBackAfterCalculation(&head, &tail, &trains[*numberTrain]);
 }
 
 void TurningTrainBottomRight(int* numberTrain, Train trains[]) {
 
-	int headX = trains[*numberTrain].head.x;
-	int headY = trains[*numberTrain].head.y;
-	int tailX = trains[*numberTrain].tail.x;
-	int tailY = trains[*numberTrain].tail.y;
-	int blockX = (trains[*numberTrain].block.x * 100);
-	int blockY = (trains[*numberTrain].block.y * 100 + 100);
+	POINT head, tail, block;
 
-	tailX = CorrectTail(&tailX, &blockX);
+	InizializeVariablesForTrainMovingCalculation(&head, &tail, &block, &trains[*numberTrain]);
 
-	if (headY > (blockY - 20)) {
-		headY--;
-		tailY--;
+	block.y = block.y + 100;
+
+	tail.x = CorrectTail(&tail.x, &block.x);
+
+	if (head.y > (block.y - 20)) {
+		head.y--;
+		tail.y--;
 	}
 
-	if (headY <= (blockY - 20) && headY > (blockY - 50)) {
-		headY--;
-		tailY -= 2;
-		headX++;
+	if (head.y <= (block.y - 20) && head.y > (block.y - 50)) {
+		head.y--;
+		tail.y -= 2;
+		head.x++;
 	}
 
-	if (headX >= (blockX + 79) && headX <= (blockX + 100)) {
-		tailY--;
-		headX += 2;
+	if (head.x >= (block.x + 79) && head.x <= (block.x + 100)) {
+		tail.y--;
+		head.x += 2;
 	}
 
-	trains[*numberTrain].head.x = headX;
-	trains[*numberTrain].head.y = headY;
-	trains[*numberTrain].tail.x = tailX;
-	trains[*numberTrain].tail.y = tailY;
+	AssignedVaiablesBackAfterCalculation(&head, &tail, &trains[*numberTrain]);
 }
 
 void FinishTrain(int* finishedTrain, int* trainsOnTheMap, Train trains[]) {
@@ -811,4 +767,17 @@ void AddNewTrain(int* numberOfTrains, int* numberOfCities, City* cities, Train* 
 		trains[*numberOfTrains].Stop = FALSE;
 		trains[*numberOfTrains].MouseStop = FALSE;
 	}
+}
+
+void InizializeVariablesForTrainMovingCalculation(POINT* Head, POINT* Tail, POINT* Block, Train* Train) {
+
+	*Head = (*Train).head;
+	*Tail = (*Train).tail;
+	(*Block).x = ((*Train).block.x * 100);
+	(*Block).y = ((*Train).block.y * 100);
+}
+
+void AssignedVaiablesBackAfterCalculation(POINT* Head, POINT* Tail, Train* Train) {
+	(*Train).head = *Head;
+	(*Train).tail = *Tail;
 }

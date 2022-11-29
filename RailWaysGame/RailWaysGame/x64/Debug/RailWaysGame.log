@@ -1,10 +1,2 @@
-﻿  CreatNewTrainAndMove.c
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\CreatNewTrainAndMove.c(205,43): warning C4090: 'function': different 'const' qualifiers
-C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\CreatNewTrainAndMove.c(260,34): warning C4047: '!=': 'const int *' differs in levels of indirection from 'int'
-  CreateCityAndDrawing.c
-  DrawingInterface.c
-  DrawingRails.c
-  MousePosition.c
-  Generating Code...
-  LINK : C:\Projects\C\RailWaysGame\RailWaysGame\x64\Debug\RailWaysGame.exe not found or not built by the last incremental link; performing full link
+﻿  RailWaysGame.c
   RailWaysGame.vcxproj -> C:\Projects\C\RailWaysGame\RailWaysGame\x64\Debug\RailWaysGame.exe
