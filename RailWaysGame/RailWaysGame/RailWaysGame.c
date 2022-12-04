@@ -4,6 +4,7 @@
 #include "DrawingRails.h"
 #include "CreateCityAndDrawing.h"
 #include "MousePosition.h"
+#include "DrawingInterface.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 void RestartTimer(HWND*, const int*);
@@ -22,6 +23,7 @@ int amountTrainsOnTheMap = -1;
 int amountCitiesOnTheMap = -1;
 int finishedTrains = 0;
 int rightButton, leftButton;
+int Money = 1000;
 
 Road map[CLIENT_AREA_X][CLIENT_AREA_Y]; // client zone
 NewRoad newRoadBlock;
@@ -31,7 +33,7 @@ Train trains[20];
 RECT trainsRedraw[20];
 POINT mouse, mousePosition, mapBlock;
 
-HWND hLaFinishedTrains;
+HWND hLaFinishedTrains, hLaMoney;
 
 int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ PWSTR lpCmdLine, _In_ int nCmdShow) {
 	
@@ -61,6 +63,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	
 	PAINTSTRUCT ps;
 	HDC hdc;
+
 	RECT redrawingRect = {0};
 	POINT nextMouse = {0};
 	BYTE foundTrainInTheBlock;
@@ -75,12 +78,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		leftButton = -1;
 		amountCitiesOnTheMap = 1;
 
-		hLaFinishedTrains = CreateWindowW(L"Static", L"No Finished Trains Yet", WS_CHILD | WS_VISIBLE, 650, 5, 750, 30, hwnd, (HMENU)1, NULL, NULL);
+		hLaFinishedTrains = CreateWindowW(L"Static", L"No Finished Trains Yet", WS_CHILD | WS_VISIBLE | WS_EX_TRANSPARENT, 650, 5, 150, 30, hwnd, (HMENU)1, NULL, NULL);
+		hLaMoney = CreateWindowW(L"Static", L"", WS_CHILD | WS_VISIBLE | WS_EX_TRANSPARENT, 1400 - 120, 5, 100, 30, hwnd, (HMENU)2, NULL, NULL);
+		DrawingLabelMoney(&hLaMoney, &hdc, &Money);
 
 		NewCity(0, cities, map, BankOfColors);
 		NewCity(1, cities, map, BankOfColors);
 
-		break;
+		return 0;
 
 	case WM_TIMER:
 
@@ -91,19 +96,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 			if (amountTrainsOnTheMap != -1) {
 				for (int i = 0; i <= amountTrainsOnTheMap; i++) {
+
 					InvalidateRect(hwnd, &trainsRedraw[i], TRUE);
 				}
 			}
 			
 		}
-
-		//if (timer % 2) {
-		//	if (trainsOnTheMap != -1) {
-		//		for (int i = 0; i <= trainsOnTheMap; i++) {
-		//			InvalidateRect(hwnd, &trainsRedraw[i], TRUE);
-		//		}
-		//	}
-		//}
 		
 		//adding new Train
 
@@ -113,7 +111,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 				amountTrainsOnTheMap++;
 
-				AddNewTrain(&amountTrainsOnTheMap, &amountCitiesOnTheMap, cities, trains);
+				AddNewTrain(&amountTrainsOnTheMap, &amountCitiesOnTheMap, cities, trains, &trainsRedraw[amountTrainsOnTheMap]);
 			}
 			
 		}
@@ -138,14 +136,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				InvalidateRect(hwnd, &redrawingRect, TRUE);
 			}
 		}
-
+		break;
 	case WM_PAINT:
 		hdc = BeginPaint(hwnd, &ps);
+
 		DrawingRailWays(&hdc, &ps, map, &newRoadBlock);
 		DrawTrains(&hLaFinishedTrains, &hdc, &ps, trainsRedraw, &amountTrainsOnTheMap, trains, map, cities, &finishedTrains);
 		CityDrawing(&hdc, &amountCitiesOnTheMap, cities);
+
 		EndPaint(hwnd, &ps);
-		break;
+		DeleteObject(hdc);
+		DeleteDC(hdc);
+		return 0;
 	case WM_RBUTTONDOWN:
 
 		mouse.x = LOWORD(lParam) / 100;
@@ -157,6 +159,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		else {
 			rightButton++;
 		}
+
 		break;
 	case WM_RBUTTONUP:	
 
@@ -229,8 +232,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				break;
 			}
 
-			newRoadBlock.block.x = mouse.x;
-			newRoadBlock.block.y = mouse.y;
+			newRoadBlock.block = mouse;
 
 			redrawingRect.left = mouse.x * 100;
 			redrawingRect.top = mouse.y * 100 + 30;
@@ -239,6 +241,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 			InvalidateRect(hwnd, &redrawingRect, TRUE);
 		}
+
 		break;
 	case WM_LBUTTONDOWN:
 		mousePosition.x = LOWORD(lParam);
@@ -306,6 +309,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			}
 
 			newRoadBlock = ResetNewRoad(&newRoadBlock);
+			
 			mouse.x = -1;
 			mouse.y = -1;
 		}
@@ -317,7 +321,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				leftButton++;
 			}
 		}
-		
+
 		break;
 	case WM_LBUTTONUP:
 
@@ -484,6 +488,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				mousePosition.y >= trains[foundTrain].head.y && mousePosition.y <= trains[foundTrain].tail.y) ||
 				(mousePosition.x >= trains[foundTrain].head.x - 10 && mousePosition.x <= trains[foundTrain].head.x + 10 &&	//moving down
 				mousePosition.y >= trains[foundTrain].tail.y && mousePosition.y <= trains[foundTrain].head.y)) {
+
 				if (trains[foundTrain].MouseStop) {
 					trains[foundTrain].MouseStop = FALSE;
 				}
@@ -492,6 +497,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				}
 			}
 		}
+
 		break;
 
 	case WM_MOUSEMOVE:
@@ -513,14 +519,20 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			mouse.x = -1;
 			mouse.y = -1;
 		}
+
 		break;
 
 	case WM_DESTROY:
 		PostQuitMessage(0);
+
 		return 0;
+
+	default: 
+		return DefWindowProcW(hwnd, msg, wParam, lParam);
+		break;
 	};
 
-	return DefWindowProcW(hwnd, msg, wParam, lParam);
+	
 }
 
 void RestartTimer(HWND* hwnd, const int* TimerID) {

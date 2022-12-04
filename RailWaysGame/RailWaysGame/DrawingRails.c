@@ -170,10 +170,10 @@ void DrawingRoads(HDC* hdc, PAINTSTRUCT* ps, Road* road, int* Type, int* BlockX,
 
 	BYTE MainRoad = FALSE; // turn main way on
 
-	if ((*road).isRoad) {
-		if ((*road).horizontal == *Type) {
+	if (road->isRoad) {
+		if (road->horizontal == *Type) {
 
-			if (*Type == 2 && ((*road).leftBottom == 1 || (*road).leftTop == 1 || (*road).bottomRight == 1 || (*road).topRight == 1)) {
+			if (*Type == 2 && (road->leftBottom == 1 || road->leftTop == 1 || road->bottomRight == 1 || road->topRight == 1)) {
 				MainRoad = TRUE;
 			}
 			else {
@@ -181,9 +181,9 @@ void DrawingRoads(HDC* hdc, PAINTSTRUCT* ps, Road* road, int* Type, int* BlockX,
 			}
 			DrawStraightRails(hdc, ps, BlockX, BlockY, TRUE, MainRoad);
 		}
-		if ((*road).vertical == *Type) {
+		if (road->vertical == *Type) {
 
-			if (*Type == 2 && ((*road).leftBottom == 1 || (*road).leftTop == 1 || (*road).bottomRight == 1 || (*road).topRight == 1)) {
+			if (*Type == 2 && (road->leftBottom == 1 || road->leftTop == 1 || road->bottomRight == 1 || road->topRight == 1)) {
 				MainRoad = TRUE;
 			}
 			else {
@@ -193,9 +193,9 @@ void DrawingRoads(HDC* hdc, PAINTSTRUCT* ps, Road* road, int* Type, int* BlockX,
 			DrawStraightRails(hdc, ps, BlockX, BlockY, FALSE, MainRoad);
 
 		}
-		if ((*road).leftBottom == *Type) {
+		if (road->leftBottom == *Type) {
 
-			if (*Type == 2 && ((*road).horizontal == 1 || (*road).vertical == 1 || (*road).leftTop == 1 || (*road).bottomRight == 1)) {
+			if (*Type == 2 && (road->horizontal == 1 || road->vertical == 1 || road->leftTop == 1 || road->bottomRight == 1)) {
 				MainRoad = TRUE;
 			}
 			else {
@@ -204,9 +204,9 @@ void DrawingRoads(HDC* hdc, PAINTSTRUCT* ps, Road* road, int* Type, int* BlockX,
 			DrawingRotedRails(hdc, ps, BlockX, BlockY, 1, MainRoad);
 
 		}
-		if ((*road).bottomRight == *Type) {
+		if (road->bottomRight == *Type) {
 
-			if (*Type == 2 && ((*road).horizontal == 1 || (*road).vertical == 1 || (*road).leftBottom == 1 || (*road).topRight == 1)) {
+			if (*Type == 2 && (road->horizontal == 1 || road->vertical == 1 || road->leftBottom == 1 || road->topRight == 1)) {
 				MainRoad = TRUE;
 			}
 			else {
@@ -215,9 +215,9 @@ void DrawingRoads(HDC* hdc, PAINTSTRUCT* ps, Road* road, int* Type, int* BlockX,
 
 			DrawingRotedRails(hdc, ps, BlockX, BlockY, 2, MainRoad);
 		}
-		if ((*road).topRight == *Type) {
+		if (road->topRight == *Type) {
 
-			if (*Type == 2 && ((*road).horizontal == 1 || (*road).vertical == 1 || (*road).bottomRight == 1 || (*road).leftTop == 1)) {
+			if (*Type == 2 && (road->horizontal == 1 || road->vertical == 1 || road->bottomRight == 1 || road->leftTop == 1)) {
 				MainRoad = TRUE;
 			}
 			else {
@@ -226,9 +226,9 @@ void DrawingRoads(HDC* hdc, PAINTSTRUCT* ps, Road* road, int* Type, int* BlockX,
 
 			DrawingRotedRails(hdc, ps, BlockX, BlockY, 3, MainRoad);
 		}
-		if ((*road).leftTop == *Type) {
+		if (road->leftTop == *Type) {
 
-			if (*Type == 2 && ((*road).horizontal == 1 || (*road).vertical == 1 || (*road).topRight == 1 || (*road).leftBottom == 1)) {
+			if (*Type == 2 && (road->horizontal == 1 || road->vertical == 1 || road->topRight == 1 || road->leftBottom == 1)) {
 				MainRoad = TRUE;
 			}
 			else {
@@ -257,12 +257,12 @@ void RotatePoint(POINT pt[], int iAngle)
 }
 
 NewRoad ResetNewRoad(NewRoad* newRoadBlock) {
-	(*newRoadBlock).road.horizontal = 0;
-	(*newRoadBlock).road.vertical = 0;
-	(*newRoadBlock).road.bottomRight = 0;
-	(*newRoadBlock).road.leftBottom = 0;
-	(*newRoadBlock).road.topRight = 0;
-	(*newRoadBlock).road.leftTop = 0;
+	newRoadBlock->road.horizontal = 0;
+	newRoadBlock->road.vertical = 0;
+	newRoadBlock->road.bottomRight = 0;
+	newRoadBlock->road.leftBottom = 0;
+	newRoadBlock->road.topRight = 0;
+	newRoadBlock->road.leftTop = 0;
 
 	return *newRoadBlock;
 }
@@ -279,7 +279,7 @@ void DrawingRailWays(HDC* hdc, PAINTSTRUCT* ps, Road map[CLIENT_AREA_X][CLIENT_A
 	}
 
 	//drawing building rails
-	DrawingRoads(hdc, ps, &((*newRoadBlock).road), & type, &(*newRoadBlock).block.x, &(*newRoadBlock).block.y);
+	DrawingRoads(hdc, ps, &newRoadBlock->road, & type, &newRoadBlock->block.x, &newRoadBlock->block.y);
 
 	//drawing active rails
 	type = 2;

@@ -2,6 +2,7 @@
 #include "CreatNewTrainAndMove.h"
 #include "DrawingInterface.h"
 
+//moving funcitions
 BYTE DirectMoving(int*, byte, Train[]);
 void TurningTrainLeftBottom(int*, Train[]);
 void TurningTrainBottomLeft(int*, Train[]);
@@ -11,10 +12,23 @@ void TurningTrainLeftTop(int*, Train[]);
 void TurningTrainTopLeft(int*, Train[]);
 void TurningTrainRightBottom(int*, Train[]);
 void TurningTrainBottomRight(int*, Train[]);
+
+//delete the train from the map
+void FinishTrain(int*, int*, Train[]);
+
+//looking for the train on the current block
+BYTE IsAnyTrainInTheBlock(Train[], POINT, const int*, int*);
+
+//add new train
+void AddNewTrain(int*, int*, City*, Train*, RECT*);
+
+//help procedures for moving trains
 void InizializeVariablesForTrainMovingCalculation(POINT*, POINT*, POINT*, Train*);
 void AssignedVaiablesBackAfterCalculation(POINT*, POINT*, Train*);
+void MovingRightOrTopBeforeTurning(int*, int*, int*);
+void MovingLeftOrBottomBeforeTurning(int*, int*, int*);
 
-void DrawTrains(HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, RECT* trainRedraw, const int* amountTrainsOnTheMap,
+void DrawTrains(HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, RECT* trainRedraw, int* amountTrainsOnTheMap,
 	Train* trains, Road map[CLIENT_AREA_X][CLIENT_AREA_Y], City* cities, int* finishedTrains) {
 
 	BYTE movingLeft, movingRight, movingUp, movingDown;
@@ -259,7 +273,7 @@ void DrawTrains(HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, RECT* trainR
 				}
 			}
 
-			if (amountTrainsOnTheMap != -1) {
+			if (*amountTrainsOnTheMap != -1) {
 
 				LOGBRUSH brush = { 0 };
 				DWORD pen_style = PS_GEOMETRIC; //PS_SOLID | PS_GEOMETRIC | PS_JOIN_BEVEL;
@@ -471,10 +485,7 @@ void TurningTrainLeftBottom(int* numberTrain, Train trains[]) {
 
 	tail.y = CorrectTail(&tail.y, &block.y);
 
-	if (head.x < (block.x + 20)) {
-		head.x++;
-		tail.x++;
-	}
+	MovingRightOrTopBeforeTurning(&head.x, &tail.x, &block.x);
 
 	if (head.x >= (block.x + 20) && head.x < (block.x + 50)) {
 		head.x++;
@@ -500,10 +511,7 @@ void TurningTrainBottomLeft(int* numberTrain, Train trains[]) {
 
 	tail.x = CorrectTail(&tail.x, &block.x);
 
-	if (head.y > (block.y - 20)) {
-		head.y--;
-		tail.y--;
-	}
+	MovingLeftOrBottomBeforeTurning(&head.y, &tail.y, &block.y);
 
 	if (head.y <= (block.y - 20) && head.y > (block.y - 50)) {
 		head.y--;
@@ -527,10 +535,7 @@ void TurningTrainTopRight(int* numberTrain, Train trains[]) {
 
 	tail.x = CorrectTail(&tail.x, &block.x);
 
-	if (head.y < (block.y + 20)) {
-		head.y++;
-		tail.y++;
-	}
+	MovingRightOrTopBeforeTurning(&head.y, &tail.y, &block.y);
 
 	if (head.y >= (block.y + 20) && head.y < (block.y + 50)) {
 		head.y++;
@@ -556,10 +561,7 @@ void TurningTrainRightTop(int* numberTrain, Train trains[]) {
 
 	tail.y = CorrectTail(&tail.y, &block.y);
 
-	if (head.x > (block.x - 20)) {
-		head.x--;
-		tail.x--;
-	}
+	MovingLeftOrBottomBeforeTurning(&head.x, &tail.x, &block.x);
 
 	if (head.x <= (block.x - 20) && head.x > (block.x - 50)) {
 		head.x--;
@@ -583,10 +585,7 @@ void TurningTrainLeftTop(int* numberTrain, Train trains[]) {
 
 	tail.y = CorrectTail(&tail.y, &block.y);
 
-	if (head.x < (block.x + 20)) {
-		head.x++;
-		tail.x++;
-	}
+	MovingRightOrTopBeforeTurning(&head.x, &tail.x, &block.x);
 
 	if (head.x >= (block.x + 20) && head.x < (block.x + 50)) {
 		head.x++;
@@ -610,10 +609,7 @@ void TurningTrainTopLeft(int* numberTrain, Train trains[]) {
 
 	tail.x = CorrectTail(&tail.x, &block.x);
 
-	if (head.y < (block.y + 20)) {
-		head.y++;
-		tail.y++;
-	}
+	MovingRightOrTopBeforeTurning(&head.y, &tail.y, &block.y);
 
 	if (head.y >= (block.y + 20) && head.y < (block.y + 50)) {
 		head.y++;
@@ -639,10 +635,7 @@ void TurningTrainRightBottom(int* numberTrain, Train trains[]) {
 
 	tail.y = CorrectTail(&tail.y, &block.y);
 
-	if (head.x > (block.x - 20)) {
-		head.x--;
-		tail.x--;
-	}
+	MovingLeftOrBottomBeforeTurning(&head.x, &tail.x, &block.x);
 
 	if (head.x <= (block.x - 20) && head.x > (block.x - 50)) {
 		head.x--;
@@ -668,10 +661,12 @@ void TurningTrainBottomRight(int* numberTrain, Train trains[]) {
 
 	tail.x = CorrectTail(&tail.x, &block.x);
 
-	if (head.y > (block.y - 20)) {
+	MovingLeftOrBottomBeforeTurning(&head.y, &tail.y, &block.y);
+
+	/*if (head.y > (block.y - 20)) {
 		head.y--;
 		tail.y--;
-	}
+	}*/
 
 	if (head.y <= (block.y - 20) && head.y > (block.y - 50)) {
 		head.y--;
@@ -727,7 +722,7 @@ BYTE IsAnyTrainInTheBlock(Train train[], POINT Block, const int* trainOnTheMap, 
 	return result;
 }
 
-void AddNewTrain(int* numberOfTrains, int* numberOfCities, City* cities, Train* trains) {
+void AddNewTrain(int* numberOfTrains, int* numberOfCities, City* cities, Train* trains, RECT* trainsRedraw) {
 
 	srand((unsigned int)time(NULL));
 
@@ -752,6 +747,12 @@ void AddNewTrain(int* numberOfTrains, int* numberOfCities, City* cities, Train* 
 		trains[*numberOfTrains].Color = cities[cityDest].Color;
 		trains[*numberOfTrains].Stop = FALSE;
 		trains[*numberOfTrains].MouseStop = FALSE;
+
+		trainsRedraw->left = trains[*numberOfTrains].tail.x - 30;
+		trainsRedraw->bottom = trains[*numberOfTrains].head.y - 30;
+		trainsRedraw->right = trains[*numberOfTrains].head.x + 30;
+		trainsRedraw->top = trains[*numberOfTrains].head.x + 30;
+
 	}
 	//train sarts from right side
 	else if (cities[citySource].block.x == CLIENT_AREA_X - 1) {
@@ -766,18 +767,38 @@ void AddNewTrain(int* numberOfTrains, int* numberOfCities, City* cities, Train* 
 		trains[*numberOfTrains].Color = cities[cityDest].Color;
 		trains[*numberOfTrains].Stop = FALSE;
 		trains[*numberOfTrains].MouseStop = FALSE;
+
+		trainsRedraw->left = trains[*numberOfTrains].head.x - 30;
+		trainsRedraw->bottom = trains[*numberOfTrains].head.y - 30;
+		trainsRedraw->right = trains[*numberOfTrains].tail.x - 30;
+		trainsRedraw->top = trains[*numberOfTrains].head.x + 30;
 	}
 }
 
 void InizializeVariablesForTrainMovingCalculation(POINT* Head, POINT* Tail, POINT* Block, Train* Train) {
 
-	*Head = (*Train).head;
-	*Tail = (*Train).tail;
-	(*Block).x = ((*Train).block.x * 100);
-	(*Block).y = ((*Train).block.y * 100);
+	*Head = Train->head;
+	*Tail = Train->tail;
+	Block->x = (Train->block.x * 100);
+	Block->y = (Train->block.y * 100);
 }
 
 void AssignedVaiablesBackAfterCalculation(POINT* Head, POINT* Tail, Train* Train) {
-	(*Train).head = *Head;
-	(*Train).tail = *Tail;
+	Train->head = *Head;
+	Train->tail = *Tail;
+}
+
+void MovingRightOrTopBeforeTurning(int* head, int* tail, int* block) {
+	
+	if (*head < (*block + 20)) {
+		(*head)++;
+		(*tail)++;
+	}
+}
+
+void MovingLeftOrBottomBeforeTurning(int* head, int* tail, int* block) {
+	if (*head > (*block - 20)) {
+		(*head)--;
+		(*tail)--;
+	}
 }
