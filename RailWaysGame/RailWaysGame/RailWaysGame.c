@@ -23,7 +23,7 @@ int amountTrainsOnTheMap = -1;
 int amountCitiesOnTheMap = -1;
 int finishedTrains = 0;
 int rightButton, leftButton;
-int Money = 1000;
+int Money;
 
 Road map[CLIENT_AREA_X][CLIENT_AREA_Y]; // client zone
 NewRoad newRoadBlock;
@@ -33,7 +33,7 @@ Train trains[20];
 RECT trainsRedraw[20];
 POINT mouse, mousePosition, mapBlock;
 
-HWND hLaFinishedTrains, hLaMoney;
+HWND hLaFinishedTrains, hLaMoney, hBtnPause, hBtnReset;
 
 int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ PWSTR lpCmdLine, _In_ int nCmdShow) {
 	
@@ -80,10 +80,19 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 		hLaFinishedTrains = CreateWindowW(L"Static", L"No Finished Trains Yet", WS_CHILD | WS_VISIBLE | WS_EX_TRANSPARENT, 650, 5, 150, 30, hwnd, (HMENU)1, NULL, NULL);
 		hLaMoney = CreateWindowW(L"Static", L"", WS_CHILD | WS_VISIBLE | WS_EX_TRANSPARENT, 1400 - 120, 5, 100, 30, hwnd, (HMENU)2, NULL, NULL);
-		DrawingLabelMoney(&hLaMoney, &hdc, &Money);
+		hBtnPause = CreateWindowW(L"Button", L"", WS_CHILD | WS_VISIBLE, 0, 0, 50, 30, hwnd, (HMENU)3, NULL, NULL);
+		hBtnReset = CreateWindowW(L"Button", L"", WS_CHILD | WS_VISIBLE, 50, 0, 50, 30, hwnd, (HMENU)4, NULL, NULL);
+		//DrawingLabelMoney(&hLaMoney, &hdc, &Money);
 
 		NewCity(0, cities, map, BankOfColors);
 		NewCity(1, cities, map, BankOfColors);
+
+		if (cities[0].block.x == cities[1].block.x) {
+			Money = (abs(cities[0].block.y - cities[1].block.y)) * 100 + 700;
+		}
+		else {
+			Money = (abs(cities[0].block.y - cities[1].block.y)) * 100 + 700 + 1100;
+		}
 
 		return 0;
 
@@ -141,8 +150,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		hdc = BeginPaint(hwnd, &ps);
 
 		DrawingRailWays(&hdc, &ps, map, &newRoadBlock);
-		DrawTrains(&hLaFinishedTrains, &hdc, &ps, trainsRedraw, &amountTrainsOnTheMap, trains, map, cities, &finishedTrains);
+		DrawTrains(&hLaFinishedTrains, &hdc, &ps, trainsRedraw, &amountTrainsOnTheMap, trains, map, cities, &finishedTrains, &Money);
 		CityDrawing(&hdc, &amountCitiesOnTheMap, cities);
+
+		DrawingLabelMoney(&hLaMoney, &hdc, &Money);
 
 		EndPaint(hwnd, &ps);
 		DeleteObject(hdc);
@@ -186,60 +197,69 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				}
 			}
 
-			switch (rightButton)
-			{
-			case 0:
-				newRoadBlock = ResetNewRoad(&newRoadBlock);
-				newRoadBlock.road.horizontal = 1;
-				newRoadBlock.road.isRoad = TRUE;
-				break;
-			case 1:
-				newRoadBlock = ResetNewRoad(&newRoadBlock);
-				newRoadBlock.road.vertical = 1;
-				newRoadBlock.road.isRoad = TRUE;
+			if (Money - 100 > 0) {
+				switch (rightButton)
+				{
+				case 0:
+					newRoadBlock = ResetNewRoad(&newRoadBlock);
+					newRoadBlock.road.horizontal = 1;
+					newRoadBlock.road.isRoad = TRUE;
+					break;
+				case 1:
+					newRoadBlock = ResetNewRoad(&newRoadBlock);
+					newRoadBlock.road.vertical = 1;
+					newRoadBlock.road.isRoad = TRUE;
 
-				break;
-			case 2:
-				newRoadBlock = ResetNewRoad(&newRoadBlock);
-				newRoadBlock.road.leftBottom = 1;
-				newRoadBlock.road.isRoad = TRUE;
+					break;
+				case 2:
+					newRoadBlock = ResetNewRoad(&newRoadBlock);
+					newRoadBlock.road.leftBottom = 1;
+					newRoadBlock.road.isRoad = TRUE;
 
-				break;
-			case 3:
-				newRoadBlock = ResetNewRoad(&newRoadBlock);
-				newRoadBlock.road.bottomRight = 1;
-				newRoadBlock.road.isRoad = TRUE;
+					break;
+				case 3:
+					newRoadBlock = ResetNewRoad(&newRoadBlock);
+					newRoadBlock.road.bottomRight = 1;
+					newRoadBlock.road.isRoad = TRUE;
 
-				break;
-			case 4:
-				newRoadBlock = ResetNewRoad(&newRoadBlock);
-				newRoadBlock.road.topRight = 1;
-				newRoadBlock.road.isRoad = TRUE;
+					break;
+				case 4:
+					newRoadBlock = ResetNewRoad(&newRoadBlock);
+					newRoadBlock.road.topRight = 1;
+					newRoadBlock.road.isRoad = TRUE;
 
-				break;
-			case 5:
-				newRoadBlock = ResetNewRoad(&newRoadBlock);
-				newRoadBlock.road.leftTop = 1;
-				newRoadBlock.road.isRoad = TRUE;
+					break;
+				case 5:
+					newRoadBlock = ResetNewRoad(&newRoadBlock);
+					newRoadBlock.road.leftTop = 1;
+					newRoadBlock.road.isRoad = TRUE;
 
-				break;
-			case -1:
-				newRoadBlock = ResetNewRoad(&newRoadBlock);
-				newRoadBlock.road.isRoad = FALSE;
+					break;
+				case -1:
+					newRoadBlock = ResetNewRoad(&newRoadBlock);
+					newRoadBlock.road.isRoad = FALSE;
 
-				break;
-			default:
-				break;
+					break;
+				default:
+					break;
+
+					
+				}
+
+				newRoadBlock.block = mouse;
+
+				redrawingRect.left = mouse.x * 100;
+				redrawingRect.top = mouse.y * 100 + 30;
+				redrawingRect.right = (mouse.x * 100) + 100;
+				redrawingRect.bottom = (mouse.y * 100) + 100 + 30;
+
+				InvalidateRect(hwnd, &redrawingRect, TRUE);
+			}
+			else {
+
 			}
 
-			newRoadBlock.block = mouse;
-
-			redrawingRect.left = mouse.x * 100;
-			redrawingRect.top = mouse.y * 100 + 30;
-			redrawingRect.right = (mouse.x * 100) + 100;
-			redrawingRect.bottom = (mouse.y * 100) + 100 + 30;
-
-			InvalidateRect(hwnd, &redrawingRect, TRUE);
+			
 		}
 
 		break;
@@ -280,6 +300,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 				InvalidateRect(hwnd, &redrawingRect, TRUE);
 
+				Money = Money - 100;
+
 			}
 			else if (!map[mouse.x][mouse.y].isRoad) {
 				if (newRoadBlock.road.horizontal == 1) {
@@ -306,6 +328,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 					map[mouse.x][mouse.y].topRight = 2;
 					map[mouse.x][mouse.y].isRoad = TRUE;
 				};
+
+				Money = Money - 100;
 			}
 
 			newRoadBlock = ResetNewRoad(&newRoadBlock);

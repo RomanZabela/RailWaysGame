@@ -14,7 +14,7 @@ void TurningTrainRightBottom(int*, Train[]);
 void TurningTrainBottomRight(int*, Train[]);
 
 //delete the train from the map
-void FinishTrain(int*, int*, Train[]);
+void FinishTrain(int*, int*, Train[], RECT*);
 
 //looking for the train on the current block
 BYTE IsAnyTrainInTheBlock(Train[], POINT, const int*, int*);
@@ -29,7 +29,7 @@ void MovingRightOrTopBeforeTurning(int*, int*, int*);
 void MovingLeftOrBottomBeforeTurning(int*, int*, int*);
 
 void DrawTrains(HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, RECT* trainRedraw, int* amountTrainsOnTheMap,
-	Train* trains, Road map[CLIENT_AREA_X][CLIENT_AREA_Y], City* cities, int* finishedTrains) {
+	Train* trains, Road map[CLIENT_AREA_X][CLIENT_AREA_Y], City* cities, int* finishedTrains, int* Money) {
 
 	BYTE movingLeft, movingRight, movingUp, movingDown;
 
@@ -209,20 +209,26 @@ void DrawTrains(HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, RECT* trainR
 						trains[i].preBlock.y = drawTrainBlock.y;
 
 						trains[i].block.x = (trains[i].head.x / 100) - 1;
+
+						(*Money) = (*Money) - 5;
 					}
 					else if ((trains[i].head.x - trains[i].tail.x > 0) && movingRight) {
 						trains[i].preBlock.x = drawTrainBlock.x;
 						trains[i].preBlock.y = drawTrainBlock.y;
 
 						trains[i].block.x = trains[i].head.x / 100;
+
+						(*Money) = (*Money) - 5;
 					}
 					else if ((drawTrainBlock.x == 0 || drawTrainBlock.x == 13) && (cities[trains[i].Destination].block.x == drawTrainBlock.x) &&
 						(cities[trains[i].Destination].block.y == drawTrainBlock.y)) {
-						FinishTrain(&i, amountTrainsOnTheMap, trains);
+						FinishTrain(&i, amountTrainsOnTheMap, trains, trainRedraw);
 						if (trains[i].head.x == -1 || trains[i].head.x == 1401) {
 							(*finishedTrains)++;
+							(*Money) = (*Money) + 150;
 							DrawingLabelFinishedTrains(hLaFinishedTrains, hdc, finishedTrains);
 						}
+						
 					}
 					//if wrong city, need to turn arround the train
 					else if ((drawTrainBlock.x == 0 || drawTrainBlock.x == 13) && (trains[i].head.x == 0 || trains[i].head.x == 1400) &&
@@ -257,6 +263,8 @@ void DrawTrains(HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, RECT* trainR
 						trains[i].preBlock.y = drawTrainBlock.y;
 
 						trains[i].block.y = (trains[i].head.y / 100) - 1;
+
+						(*Money) = (*Money) - 5;
 					}
 					//down
 					else  if ((trains[i].head.y - trains[i].tail.y > 0) && movingDown) {
@@ -264,6 +272,8 @@ void DrawTrains(HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, RECT* trainR
 						trains[i].preBlock.y = drawTrainBlock.y;
 
 						trains[i].block.y = trains[i].head.y / 100;
+
+						(*Money) = (*Money) - 5;
 					}
 					//stop moving
 					else if (!trains[i].Stop) {
@@ -663,11 +673,6 @@ void TurningTrainBottomRight(int* numberTrain, Train trains[]) {
 
 	MovingLeftOrBottomBeforeTurning(&head.y, &tail.y, &block.y);
 
-	/*if (head.y > (block.y - 20)) {
-		head.y--;
-		tail.y--;
-	}*/
-
 	if (head.y <= (block.y - 20) && head.y > (block.y - 50)) {
 		head.y--;
 		tail.y -= 2;
@@ -682,7 +687,7 @@ void TurningTrainBottomRight(int* numberTrain, Train trains[]) {
 	AssignedVaiablesBackAfterCalculation(&head, &tail, &trains[*numberTrain]);
 }
 
-void FinishTrain(int* finishedTrain, int* trainsOnTheMap, Train trains[]) {
+void FinishTrain(int* finishedTrain, int* trainsOnTheMap, Train trains[], RECT* trainRedrawRect) {
 
 	if (trains[*finishedTrain].block.x == 0) {
 
@@ -692,6 +697,7 @@ void FinishTrain(int* finishedTrain, int* trainsOnTheMap, Train trains[]) {
 		}
 		else if (trains[*finishedTrain].tail.x == -50) {
 			trains[*finishedTrain] = trains[*trainsOnTheMap];
+			trainRedrawRect[*finishedTrain] = trainRedrawRect[*trainsOnTheMap];
 			(*trainsOnTheMap)--;
 		}
 	}
@@ -704,6 +710,7 @@ void FinishTrain(int* finishedTrain, int* trainsOnTheMap, Train trains[]) {
 		}
 		else if (trains[*finishedTrain].tail.x == 1450) {
 			trains[*finishedTrain] = trains[*trainsOnTheMap];
+			trainRedrawRect[*finishedTrain] = trainRedrawRect[*trainsOnTheMap];
 			(*trainsOnTheMap)--;
 		}
 	}
