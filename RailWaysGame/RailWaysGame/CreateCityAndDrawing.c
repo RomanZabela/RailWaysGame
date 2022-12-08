@@ -117,16 +117,16 @@ BYTE FindNotUsingPosition(const int* randNumber, const int* numberCities, City c
 
 	BYTE result = FALSE;
 
-	if (*randNumber < 7) {
+	if (*randNumber < MAX_CITIES_ON_THE_AREA / 2) {
 		for (int i = 0; i < *numberCities; i++) {
 			if (cities[i].block.y == *randNumber && cities[i].block.x == 0) {
 				result = TRUE;
 			}
 		}
 	}
-	else if (*randNumber >= 7) {
+	else if (*randNumber >= MAX_CITIES_ON_THE_AREA / 2) {
 		for (int i = 0; i <= *numberCities; i++) {
-			if (cities[i].block.y == (*randNumber) - 7 && cities[i].block.x == 13) {
+			if (cities[i].block.y == (*randNumber) - (MAX_CITIES_ON_THE_AREA / 2) && cities[i].block.x == 13) {
 				result = TRUE;
 			}
 		}
@@ -139,14 +139,14 @@ void NewCity(const int numberCities, City cities[MAX_CITIES_ON_THE_AREA], Road m
 
 	srand((unsigned int)time(NULL));
 	
-	int randomNumber = rand() % 14;
+	int randomNumber = rand() % MAX_CITIES_ON_THE_AREA;
 
 	while (FindNotUsingPosition(&randomNumber, &numberCities, cities)) {
-		randomNumber = rand() % 14;
+		randomNumber = rand() % MAX_CITIES_ON_THE_AREA;
 	};
 
 	//drawing in the left side
-	if (randomNumber < 7) {
+	if (randomNumber < (MAX_CITIES_ON_THE_AREA / 2)) {
 		cities[numberCities].block.y = randomNumber;
 		cities[numberCities].block.x = 0;
 
@@ -154,18 +154,18 @@ void NewCity(const int numberCities, City cities[MAX_CITIES_ON_THE_AREA], Road m
 		map[0][randomNumber].isRoad = TRUE;
 	}
 	//drawing in the right side
-	else if (randomNumber >= 7) {
-		cities[numberCities].block.y = randomNumber - 7;
+	else if (randomNumber >= (MAX_CITIES_ON_THE_AREA / 2)) {
+		cities[numberCities].block.y = randomNumber - (MAX_CITIES_ON_THE_AREA / 2);
 		cities[numberCities].block.x = 13;
 
-		map[13][randomNumber - 7].horizontal = 2;
-		map[13][randomNumber - 7].isRoad = TRUE;
+		map[13][randomNumber - (MAX_CITIES_ON_THE_AREA / 2)].horizontal = 2;
+		map[13][randomNumber - (MAX_CITIES_ON_THE_AREA / 2)].isRoad = TRUE;
 	};
 
-	randomNumber = rand() % 14;
+	randomNumber = rand() % MAX_CITIES_ON_THE_AREA;
 
 	while (FindColor(&randomNumber, &numberCities, BankOfColors, cities)) {
-		randomNumber = rand() % 14;
+		randomNumber = rand() % MAX_CITIES_ON_THE_AREA;
 	}
 
 	cities[numberCities].Color = BankOfColors[randomNumber];

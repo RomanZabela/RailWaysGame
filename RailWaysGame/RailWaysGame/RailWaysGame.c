@@ -7,12 +7,14 @@
 #include "DrawingInterface.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+
 void RestartTimer(HWND*, const int*);
 
 const COLORREF BankOfColors[] = { 0x300055, 0x9999FF, 0x8000FF, 0x00554c,
 								0x00AA99, 0x004c99, 0xCC0000, 0x99A000,
 								0x660066, 0xFF3399, 0xFF9933, 0x995500,
-								0x4cBB00, 0x70F0A2 };
+								0x4cBB00, 0x70F0A2, 0x0000CC, 0x15D7F7,
+								0xA0A0A0, 0xFFFF00 };
 
 const int MIN_TIMER_FOR_REDRAW_OBJECTS = 61;
 const int CREATE_NEW_TRAIN_TIMER = 500;
@@ -34,6 +36,8 @@ RECT trainsRedraw[20];
 POINT mouse, mousePosition, mapBlock;
 
 HWND hLaFinishedTrains, hLaMoney, hBtnPause, hBtnReset;
+
+HINSTANCE ghInstance;
 
 int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ PWSTR lpCmdLine, _In_ int nCmdShow) {
 	
@@ -82,7 +86,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		hLaMoney = CreateWindowW(L"Static", L"", WS_CHILD | WS_VISIBLE | WS_EX_TRANSPARENT, 1400 - 120, 5, 100, 30, hwnd, (HMENU)2, NULL, NULL);
 		hBtnPause = CreateWindowW(L"Button", L"", WS_CHILD | WS_VISIBLE, 0, 0, 50, 30, hwnd, (HMENU)3, NULL, NULL);
 		hBtnReset = CreateWindowW(L"Button", L"", WS_CHILD | WS_VISIBLE, 50, 0, 50, 30, hwnd, (HMENU)4, NULL, NULL);
-		//DrawingLabelMoney(&hLaMoney, &hdc, &Money);
 
 		NewCity(0, cities, map, BankOfColors);
 		NewCity(1, cities, map, BankOfColors);
@@ -127,7 +130,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		//creating new City
 		if (timer % CREATE_NEW_CITY_TIMER == 0) {
 
-			if (amountCitiesOnTheMap < 13) {
+			if (amountCitiesOnTheMap < MAX_CITIES_ON_THE_AREA - 1) {
 				amountCitiesOnTheMap++;
 				NewCity(amountCitiesOnTheMap, cities, map, BankOfColors);
 			}
@@ -135,7 +138,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		}
 		if (timer % (CREATE_NEW_CITY_TIMER + 1) == 0) {
 
-			if (amountCitiesOnTheMap <= 13) {
+			if (amountCitiesOnTheMap <= MAX_CITIES_ON_THE_AREA - 1) {
 
 				redrawingRect.left = cities[amountCitiesOnTheMap].block.x * 100;
 				redrawingRect.top = cities[amountCitiesOnTheMap].block.y * 100 + 30;
@@ -145,7 +148,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				InvalidateRect(hwnd, &redrawingRect, TRUE);
 			}
 		}
-		break;
+		return 0;
 	case WM_PAINT:
 		hdc = BeginPaint(hwnd, &ps);
 
@@ -158,6 +161,19 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		EndPaint(hwnd, &ps);
 		DeleteObject(hdc);
 		DeleteDC(hdc);
+
+		
+
+		return 0;
+	case WM_DRAWITEM:
+		hdc = BeginPaint(hBtnPause, &ps);
+		MoveToEx(hdc, 5, 5, NULL);
+		LineTo(hdc, 10, 10);
+
+		EndPaint(hBtnPause, &ps);
+		DeleteObject(hdc);
+		DeleteDC(hdc);
+
 		return 0;
 	case WM_RBUTTONDOWN:
 
@@ -171,7 +187,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			rightButton++;
 		}
 
-		break;
+		return 0;
 	case WM_RBUTTONUP:	
 
 		if (mouse.x != 0 && mouse.x != 13) {
@@ -262,7 +278,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			
 		}
 
-		break;
+		return 0;
 	case WM_LBUTTONDOWN:
 		mousePosition.x = LOWORD(lParam);
 		mousePosition.y = HIWORD(lParam) - 30;
@@ -346,7 +362,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			}
 		}
 
-		break;
+		return 0;
 	case WM_LBUTTONUP:
 
 		foundTrainInTheBlock = IsAnyTrainInTheBlock(trains, mapBlock, &amountTrainsOnTheMap, &foundTrain);
@@ -522,7 +538,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			}
 		}
 
-		break;
+		return 0;
 
 	case WM_MOUSEMOVE:
 
@@ -544,7 +560,27 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			mouse.y = -1;
 		}
 
-		break;
+		return 0;
+	case WM_COMMAND:
+
+		switch (LOWORD(wParam))
+		{
+		case 3:
+			//int nMB = MB_OKCANCEL | MB_ICONEXCLAMATION;
+
+			if (IDOK == MessageBox(GetWindow(hwnd, NULL), L"Game paused", L"Pause", MB_OKCANCEL | MB_ICONQUESTION)) {
+				MessageBox(GetWindow(hwnd, NULL), L"stdad", L"strTitle", MB_OK);
+			};
+
+			break;
+		case 4:
+			if (IDOK == MessageBox(GetWindow(hwnd, NULL), L"Are you sure to restart the game?", L"Restart", MB_OKCANCEL | MB_ICONEXCLAMATION)) {
+				MessageBox(GetWindow(hwnd, NULL), L"Restarted", L"Info", MB_OK);
+			};
+			break;
+		}
+
+		return 0;
 
 	case WM_DESTROY:
 		PostQuitMessage(0);
@@ -553,7 +589,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 	default: 
 		return DefWindowProcW(hwnd, msg, wParam, lParam);
-		break;
+		return 0;
 	};
 
 	

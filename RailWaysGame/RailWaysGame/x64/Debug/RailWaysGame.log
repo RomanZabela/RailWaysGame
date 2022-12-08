@@ -1,1 +1,10 @@
-﻿  RailWaysGame.vcxproj -> C:\Projects\C\RailWaysGame\RailWaysGame\x64\Debug\RailWaysGame.exe
+﻿  RailWaysGame.c
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(571,47): warning C4047: 'function': 'UINT' differs in levels of indirection from 'void *'
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(571,43): warning C4024: 'GetWindow': different types for formal and actual parameter 2
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(572,36): warning C4047: 'function': 'UINT' differs in levels of indirection from 'void *'
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(572,32): warning C4024: 'GetWindow': different types for formal and actual parameter 2
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(577,47): warning C4047: 'function': 'UINT' differs in levels of indirection from 'void *'
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(577,43): warning C4024: 'GetWindow': different types for formal and actual parameter 2
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(578,36): warning C4047: 'function': 'UINT' differs in levels of indirection from 'void *'
+C:\Projects\C\RailWaysGame\RailWaysGame\RailWaysGame\RailWaysGame.c(578,32): warning C4024: 'GetWindow': different types for formal and actual parameter 2
+  RailWaysGame.vcxproj -> C:\Projects\C\RailWaysGame\RailWaysGame\x64\Debug\RailWaysGame.exe

@@ -210,7 +210,7 @@ void DrawTrains(HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, RECT* trainR
 
 						trains[i].block.x = (trains[i].head.x / 100) - 1;
 
-						(*Money) = (*Money) - 5;
+						//(*Money) = (*Money) - 5;
 					}
 					else if ((trains[i].head.x - trains[i].tail.x > 0) && movingRight) {
 						trains[i].preBlock.x = drawTrainBlock.x;
@@ -218,7 +218,7 @@ void DrawTrains(HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, RECT* trainR
 
 						trains[i].block.x = trains[i].head.x / 100;
 
-						(*Money) = (*Money) - 5;
+						//(*Money) = (*Money) - 5;
 					}
 					else if ((drawTrainBlock.x == 0 || drawTrainBlock.x == 13) && (cities[trains[i].Destination].block.x == drawTrainBlock.x) &&
 						(cities[trains[i].Destination].block.y == drawTrainBlock.y)) {
@@ -264,7 +264,7 @@ void DrawTrains(HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, RECT* trainR
 
 						trains[i].block.y = (trains[i].head.y / 100) - 1;
 
-						(*Money) = (*Money) - 5;
+						//(*Money) = (*Money) - 5;
 					}
 					//down
 					else  if ((trains[i].head.y - trains[i].tail.y > 0) && movingDown) {
@@ -273,7 +273,7 @@ void DrawTrains(HWND* hLaFinishedTrains, HDC* hdc, PAINTSTRUCT* ps, RECT* trainR
 
 						trains[i].block.y = trains[i].head.y / 100;
 
-						(*Money) = (*Money) - 5;
+						//(*Money) = (*Money) - 5;
 					}
 					//stop moving
 					else if (!trains[i].Stop) {
