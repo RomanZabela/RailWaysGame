@@ -1,13 +1,9 @@
 # RailWaysGame
-Simple game for MASA
-
 Author: Zabela Roman
 
 Email: cplCold@gmail.com
 
 video from the game: https://drive.google.com/file/d/1kZ5A9mrfUTQ6nb8evb4_cdFTPRS-rt-G/view?usp=share_link
-
-The Train game created for learning C while studying on the Full Stack program from MASA and Zionet
 
 Version 1.0.0:
 
